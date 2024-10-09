@@ -2,6 +2,7 @@ import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.dev" });
 import mongoose from "mongoose";
 import User, { UserRole } from "../models/userModel";
+import bcrypt from "bcrypt";
 
 const connectDB = async () => {
   try {
@@ -15,10 +16,11 @@ const connectDB = async () => {
     const adminExists = await User.findOne({ role: UserRole.ADMIN });
     if (!adminExists) {
       // Create the admin user
+      const hashedPassword = await bcrypt.hash("admin", 10);
       const adminDefault = new User({
         name: "admin",
         username: "admin",
-        password: "admin",
+        password: hashedPassword,
         role: UserRole.ADMIN,
       });
       await adminDefault.save();
