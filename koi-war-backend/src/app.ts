@@ -1,5 +1,5 @@
 import express from "express";
-import { connectDB } from "./configs/db";
+import { connectDB } from "./config/db";
 import { userRoutes } from "./routes/userRoutes";
 import { UserController } from "./controllers/userController";
 import { UserRepository } from "./repositories/impl/userRepository";

@@ -1,5 +1,5 @@
 import { IUserRepository } from "../IUserRepository";
-import User from "../../models/userModel";
+import User from "../../models/user.model";
 
 export class UserRepository implements IUserRepository {
   async createUser(data: any): Promise<any> {

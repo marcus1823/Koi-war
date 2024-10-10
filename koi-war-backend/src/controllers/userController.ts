@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { IUserService } from "../services/IUserService";
+import { CreateUserInput } from "../schema/user.schema";
 
 export class UserController {
   private userService: IUserService;
@@ -8,20 +9,21 @@ export class UserController {
     this.userService = userService;
   }
 
-  registerUser = async (req: Request, res: Response): Promise<void> => {
+  registerUser = async (req: Request<{}, {}, CreateUserInput["body"]>, res: Response) => {
     try {
+      console.log("Registering user", req.body);
       const user = await this.userService.registerUser(req.body);
       res.status(201).json(user);
     } catch (error) {
       if (error instanceof Error) {
-        res.status(400).json({ error: error.message });
+        res.status(409).send(error.message);
       } else {
-        res.status(400).json({ error: "An unknown error occurred" });
+        res.status(409).send("An unknown error occurred");
       }
     }
   };
 
-  getUserById = async (req: Request, res: Response): Promise<void> => {
+  getUserById = async (req: Request, res: Response) => {
     try {
       const user = await this.userService.getUserById(req.params.id);
       if (user) {

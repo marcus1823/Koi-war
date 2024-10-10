@@ -1,10 +1,25 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 export enum UserRole {
   ADMIN = "admin",
   USER = "user",
   REFEREE = "referee",
   STAFF = "staff",
+}
+
+export interface UserInput {
+  email: string;
+  name: string;
+  username: string;
+  password: string;
+  role: UserRole;
+}
+
+export interface UserDocument extends UserInput, mongoose.Document {
+  createdAt: Date;
+  updatedAt: Date;
+  comparePassword(candidatePassword: string): Promise<Boolean>;
 }
 
 const userSchema = new mongoose.Schema(
@@ -40,6 +55,30 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+userSchema.pre("save", async function (next) {
+  let user = this as UserDocument;
+
+  if (!user.isModified("password")) {
+    return next();
+  }
+
+  const salt = await bcrypt.genSalt(10);
+
+  const hash = await bcrypt.hashSync(user.password, salt);
+
+  user.password = hash;
+
+  return next();
+});
+
+userSchema.methods.comparePassword = async function (
+  candidatePassword: string
+): Promise<boolean> {
+  const user = this as UserDocument;
+
+  return bcrypt.compare(candidatePassword, user.password).catch((e) => false);
+};
 
 const User = mongoose.model("User", userSchema);
 

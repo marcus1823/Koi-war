@@ -1,7 +1,7 @@
 // import bcrypt from "bcrypt";
 
-import { IUserRepository } from "../interfaces/user/IUserRepository";
-import { IUserService } from "./IUserService";
+import { IUserRepository } from "../../repositories/IUserRepository";
+import { IUserService } from "../IUserService";
 
 export class UserService implements IUserService {
   private userRepository: IUserRepository;
