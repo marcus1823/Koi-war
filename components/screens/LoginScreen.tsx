@@ -45,7 +45,7 @@ function LoginScreen() {
   const handleSignUp = () => {};
   return (
     <LinearGradient
-      colors={["#f0a370", "#eb7452"]}
+      colors={["#eb7452", "#0c446e"]}
       style={[styles.background, { height }]}
     >
       <Image source={logo} style={styles.logo} />
