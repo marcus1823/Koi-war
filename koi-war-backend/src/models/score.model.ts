@@ -1,6 +1,20 @@
 import mongoose from "mongoose";
+import { IRegistration } from "./registration.model";
 
-const scoreSchema = new mongoose.Schema({
+export interface IScore {
+  registration: IRegistration & { _id: string };
+  bodyScore: number;
+  patternScore: number;
+  colorScore: number;
+  rank: number;
+}
+
+interface ScoreDocument extends IScore, mongoose.Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const scoreSchema = new mongoose.Schema<ScoreDocument>({
   registration: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Registration",
@@ -24,6 +38,6 @@ const scoreSchema = new mongoose.Schema({
   },
 });
 
-const Score = mongoose.model("Score", scoreSchema);
+const Score = mongoose.model<ScoreDocument>("Score", scoreSchema);
 
 export default Score;

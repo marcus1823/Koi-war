@@ -8,7 +8,7 @@ export enum UserRole {
   STAFF = "staff",
 }
 
-export interface UserInput {
+export interface IUser {
   email: string;
   name: string;
   username: string;
@@ -16,7 +16,7 @@ export interface UserInput {
   role: UserRole;
 }
 
-export interface UserDocument extends UserInput, mongoose.Document {
+export interface UserDocument extends IUser, mongoose.Document {
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<Boolean>;
@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: false,
+      required: true,
       unique: true,
       match: [/\S+@\S+\.\S+/, "Email is invalid"],
     },

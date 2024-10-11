@@ -1,6 +1,9 @@
 // import bcrypt from "bcrypt";
 
+import User, { IUser, UserDocument } from "../../models/user.model";
 import { IUserRepository } from "../../repositories/IUserRepository";
+import { IUserResponse, mapUserResponse } from "../../types/user";
+import { generateAccessToken } from "../../utils/jwt.utils";
 import { IUserService } from "../IUserService";
 
 export class UserService implements IUserService {
@@ -9,16 +12,57 @@ export class UserService implements IUserService {
   constructor(userRepository: IUserRepository) {
     this.userRepository = userRepository;
   }
-  registerUser(data: any): Promise<any> {
-    return this.userRepository.createUser(data);
+  async registerUser(data: IUser): Promise<IUserResponse> {
+    const user = await this.userRepository.createUser(data);
+    return mapUserResponse(
+      user as IUser & { _id: string; createdAt: Date; updatedAt: Date }
+    );
   }
-  getUserById(id: string): Promise<any> {
-    return this.userRepository.findUserById(id);
+  async login(data: { email: string; password: string }): Promise<any> {
+    const user = (await User.findOne({ email: data.email })) as UserDocument;
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Compare passwords
+    const isPasswordValid = await user.comparePassword(data.password);
+    if (!isPasswordValid) {
+      throw new Error("Invalid password");
+    }
+
+    // Extract necessary fields for the token payload
+    const payload = {
+      email: user.email,
+      username: user.username,
+      role: user.role,
+    };
+
+    // Generate token
+    const token = generateAccessToken(payload);
+
+    return {
+      user: mapUserResponse(
+        user as IUser & { _id: string; createdAt: Date; updatedAt: Date }
+      ),
+      token,
+    };
   }
-  getUserByEmail(email: string): Promise<any> {
-    return this.userRepository.findUserByEmail(email);
+  async getUserById(id: string) {
+    const user = await this.userRepository.findUserById(id);
+    return mapUserResponse(
+      user as IUser & { _id: string; createdAt: Date; updatedAt: Date }
+    );
   }
-  getUserByUsername(username: string): Promise<any> {
-    return this.userRepository.findUserByUsername(username);
+  async getUserByEmail(email: string) {
+    const user = await this.userRepository.findUserByEmail(email);
+    return mapUserResponse(
+      user as IUser & { _id: string; createdAt: Date; updatedAt: Date }
+    );
+  }
+  async getUserByUsername(username: string) {
+    const user = await this.userRepository.findUserByUsername(username);
+    return mapUserResponse(
+      user as IUser & { _id: string; createdAt: Date; updatedAt: Date }
+    );
   }
 }

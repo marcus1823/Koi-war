@@ -54,5 +54,7 @@ export function userRoutes(userController: UserController): Router {
    */
   router.get("/:id", userController.getUserById);
 
+  router.post("/login", userController.login);
+
   return router;
 }

@@ -1,6 +1,20 @@
 import mongoose from "mongoose";
+import { IUser } from "./user.model";
+import { IRegistration } from "./registration.model";
 
-const predictionSchema = new mongoose.Schema({
+export interface IPrediction {
+  user: IUser;
+  registration: IRegistration;
+  score: number;
+  rank: number;
+}
+
+interface PredictionDocument extends IPrediction, mongoose.Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const predictionSchema = new mongoose.Schema<PredictionDocument>({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -21,6 +35,6 @@ const predictionSchema = new mongoose.Schema({
   },
 });
 
-const Prediction = mongoose.model("Prediction", predictionSchema);
+const Prediction = mongoose.model<PredictionDocument>("Prediction", predictionSchema);
 
 export default Prediction;

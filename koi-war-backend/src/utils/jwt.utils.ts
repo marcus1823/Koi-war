@@ -1,43 +1,11 @@
 import jwt from "jsonwebtoken";
-import config from "config";
 
-export function signJwt(
-  object: Object,
-  keyName: "accessTokenPrivateKey" | "refreshTokenPrivateKey",
-  options?: jwt.SignOptions | undefined
-) {
-  const signingKey = Buffer.from(
-    config.get<string>(keyName),
-    "base64"
-  ).toString("ascii");
+const JWT_SECRET = process.env.ACCESS_SECRET_KEY as string;
 
-  return jwt.sign(object, signingKey, {
-    ...(options && options),
-    algorithm: "RS256",
-  });
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET is not defined");
 }
 
-export function verifyJwt(
-  token: string,
-  keyName: "accessTokenPublicKey" | "refreshTokenPublicKey"
-) {
-  const publicKey = Buffer.from(config.get<string>(keyName), "base64").toString(
-    "ascii"
-  );
-
-  try {
-    const decoded = jwt.verify(token, publicKey);
-    return {
-      valid: true,
-      expired: false,
-      decoded,
-    };
-  } catch (e: any) {
-    console.error(e);
-    return {
-      valid: false,
-      expired: e.message === "jwt expired",
-      decoded: null,
-    };
-  }
+export function generateAccessToken(payload: any) {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
 }
