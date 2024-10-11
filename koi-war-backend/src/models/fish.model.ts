@@ -1,6 +1,21 @@
 import mongoose from "mongoose";
+import { IVariety } from "./variety.model";
 
-const fishSchema = new mongoose.Schema(
+export interface IFish {
+  name: string;
+  weight: number;
+  length: number;
+  images?: string[];
+  description?: string;
+  variety: IVariety;
+}
+
+interface FishDocument extends IFish, mongoose.Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const fishSchema = new mongoose.Schema<FishDocument>(
   {
     name: {
       type: String,
@@ -35,6 +50,6 @@ const fishSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Fish = mongoose.model("Fish", fishSchema);
+const Fish = mongoose.model<FishDocument>("Fish", fishSchema);
 
 export default Fish;

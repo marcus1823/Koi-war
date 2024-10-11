@@ -24,7 +24,7 @@ import { object, string, TypeOf } from "zod";
  *        password:
  *          type: string
  *          default: stringPassword123
- *    CreateUserResponse:
+ *    UserResponse:
  *      type: object
  *      properties:
  *        email:
@@ -40,6 +40,31 @@ import { object, string, TypeOf } from "zod";
  *        updatedAt:
  *          type: string
  */
+
+const userPayload = {
+  body: object({
+    name: string({
+      required_error: "Name is required",
+    }),
+    email: string({
+      required_error: "Email is required",
+    }).email("Email is invalid"),
+  }),
+};
+
+const params = {
+  params: object({
+    id: string({
+      required_error: "User Id is required",
+    }),
+  }),
+};
+
+const passwordField = object({
+  password: string({
+    required_error: "Password is required",
+  }).min(6, "Password must be at least 6 characters"),
+});
 
 export const createUserSchema = object({
   body: object({
@@ -58,4 +83,32 @@ export const createUserSchema = object({
   }),
 });
 
+export const loginUserSchema = object({
+  body: object({
+    email: string({
+      required_error: "Email is required",
+    }).email("Email is invalid"),
+    password: string({
+      required_error: "Password is required",
+    }).min(6, "Password must be at least 6 characters"),
+  }),
+});
+
+export const updateUserSchema = object({
+  ...userPayload,
+  ...params,
+});
+
+export const getUserSchema = object({
+  ...params,
+});
+
+export const deleteUserSchema = object({
+  ...params,
+});
+
 export type CreateUserInput = TypeOf<typeof createUserSchema>;
+export type LoginUserInput = TypeOf<typeof loginUserSchema>;
+export type UpdateUserInput = TypeOf<typeof updateUserSchema>;
+export type GetUserInput = TypeOf<typeof getUserSchema>;
+export type DeleteUserInput = TypeOf<typeof deleteUserSchema>;

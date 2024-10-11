@@ -1,6 +1,16 @@
 import mongoose from "mongoose";
 
-const constestSchema = new mongoose.Schema(
+export interface IContest {
+  name: string;
+  description?: string;
+}
+
+interface ContestDocument extends IContest, mongoose.Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const contestSchema = new mongoose.Schema<ContestDocument>(
   {
     name: {
       type: String,
@@ -16,6 +26,6 @@ const constestSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Contest = mongoose.model("Contest", constestSchema);
+const Contest = mongoose.model<ContestDocument>("Contest", contestSchema);
 
 export default Contest;

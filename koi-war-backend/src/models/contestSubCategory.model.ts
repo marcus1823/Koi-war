@@ -1,4 +1,18 @@
 import mongoose from "mongoose";
+import { IContestInstance } from "./contestInstance.model";
+
+export interface IContestSubCategory {
+  name: string;
+  description?: string;
+  contestInstance: IContestInstance & { _id: string };
+}
+
+interface ContestSubCategoryDocument
+  extends IContestSubCategory,
+    mongoose.Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const contestSubCategorySchema = new mongoose.Schema(
   {
@@ -21,7 +35,7 @@ const contestSubCategorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const ContestSubCategory = mongoose.model(
+const ContestSubCategory = mongoose.model<ContestSubCategoryDocument>(
   "ContestSubCategory",
   contestSubCategorySchema
 );

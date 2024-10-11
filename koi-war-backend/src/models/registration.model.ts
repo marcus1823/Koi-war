@@ -1,4 +1,7 @@
 import mongoose from "mongoose";
+import { IFish } from "./fish.model";
+import { IContestInstance } from "./contestInstance.model";
+import { IContestSubCategory } from "./contestSubCategory.model";
 
 export enum RegistrationStatus {
   PENDING = "pending",
@@ -6,7 +9,20 @@ export enum RegistrationStatus {
   REJECTED = "rejected",
 }
 
-const registrationSchema = new mongoose.Schema({
+export interface IRegistration {
+  status: RegistrationStatus;
+  rank?: number;
+  fish: IFish;
+  contestInstance: IContestInstance & { _id: string };
+  contestSubCategory: IContestSubCategory & { _id: string };
+}
+
+interface RegistrationDocument extends IRegistration, mongoose.Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const registrationSchema = new mongoose.Schema<RegistrationDocument>({
   status: {
     type: String,
     enum: Object.values(RegistrationStatus),
@@ -33,6 +49,6 @@ const registrationSchema = new mongoose.Schema({
   },
 });
 
-const Registration = mongoose.model("Registration", registrationSchema);
+const Registration = mongoose.model<RegistrationDocument>("Registration", registrationSchema);
 
 export default Registration;

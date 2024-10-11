@@ -1,6 +1,22 @@
 import mongoose from "mongoose";
+import { IContest } from "./contest.model";
 
-const constestInstanceSchema = new mongoose.Schema(
+export interface IContestInstance {
+  contest: IContest;
+  startDate: Date;
+  endDate: Date;
+  isActive: boolean;
+  description?: string;
+  rules?: string;
+  images?: string[];
+}
+
+interface ContestInstanceDocument extends IContestInstance, mongoose.Document {
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const contestInstanceSchema = new mongoose.Schema<ContestInstanceDocument>(
   {
     contest: {
       type: mongoose.Schema.Types.ObjectId,
@@ -35,9 +51,9 @@ const constestInstanceSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const ContestInstance = mongoose.model(
+const ContestInstance = mongoose.model<ContestInstanceDocument>(
   "ContestInstance",
-  constestInstanceSchema
+  contestInstanceSchema
 );
 
 export default ContestInstance;

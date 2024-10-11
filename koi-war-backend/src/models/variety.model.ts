@@ -1,6 +1,16 @@
 import mongoose from "mongoose";
 
-const varietySchema = new mongoose.Schema(
+export interface IVariety {
+  name: string;
+  description?: string;
+  images?: string[];
+}
+
+interface VarietyDocument extends IVariety, mongoose.Document {
+  classificationContestRules: mongoose.Types.Array<string>;
+}
+
+const varietySchema = new mongoose.Schema<VarietyDocument>(
   {
     name: {
       type: String,
@@ -26,6 +36,6 @@ const varietySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Variety = mongoose.model("Variety", varietySchema);
+const Variety = mongoose.model<VarietyDocument>("Variety", varietySchema);
 
 export default Variety;

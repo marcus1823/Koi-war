@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { IUserService } from "../services/IUserService";
-import { CreateUserInput } from "../schema/user.schema";
+import {
+  CreateUserInput,
+  GetUserInput,
+  LoginUserInput,
+} from "../schema/user.schema";
 
 export class UserController {
   private userService: IUserService;
@@ -9,9 +13,11 @@ export class UserController {
     this.userService = userService;
   }
 
-  registerUser = async (req: Request<{}, {}, CreateUserInput["body"]>, res: Response) => {
+  registerUser = async (
+    req: Request<{}, {}, CreateUserInput>,
+    res: Response
+  ) => {
     try {
-      console.log("Registering user", req.body);
       const user = await this.userService.registerUser(req.body);
       res.status(201).json(user);
     } catch (error) {
@@ -23,7 +29,7 @@ export class UserController {
     }
   };
 
-  getUserById = async (req: Request, res: Response) => {
+  getUserById = async (req: Request<GetUserInput["params"]>, res: Response) => {
     try {
       const user = await this.userService.getUserById(req.params.id);
       if (user) {
@@ -31,6 +37,19 @@ export class UserController {
       } else {
         res.status(404).json({ message: "User not found" });
       }
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(500).json({ error: error.message });
+      } else {
+        res.status(500).json({ error: "An unknown error occurred" });
+      }
+    }
+  };
+
+  login = async (req: Request<{}, {}, LoginUserInput>, res: Response) => {
+    try {
+      const { user, token } = await this.userService.login(req.body);
+      res.status(200).json({ user, token });
     } catch (error) {
       if (error instanceof Error) {
         res.status(500).json({ error: error.message });

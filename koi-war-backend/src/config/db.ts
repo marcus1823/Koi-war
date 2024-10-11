@@ -1,8 +1,8 @@
 import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.dev" });
 import mongoose from "mongoose";
-import User, { UserRole } from "../models/user.model";
 import bcrypt from "bcrypt";
+import User, { UserRole } from "../models/user.model";
 
 const connectDB = async () => {
   try {
