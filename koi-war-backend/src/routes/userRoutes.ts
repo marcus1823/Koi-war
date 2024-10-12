@@ -2,6 +2,7 @@ import { Router } from "express";
 import { UserController } from "../controllers/userController";
 import { createUserSchema } from "../schema/user.schema";
 import { validate } from "../middleware/validateResource";
+import { verifyToken } from "../middleware/authMiddleware";
 
 export function userRoutes(userController: UserController): Router {
   const router = Router();
@@ -52,9 +53,11 @@ export function userRoutes(userController: UserController): Router {
    *      '404':
    *        description: User not found
    */
-  router.get("/:id", userController.getUserById);
+  // router.get("/:id", userController.getUserById);
 
   router.post("/login", userController.login);
+
+  router.get("/me", verifyToken, userController.getUserProfile);
 
   return router;
 }
