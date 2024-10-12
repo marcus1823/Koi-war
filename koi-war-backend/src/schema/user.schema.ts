@@ -85,9 +85,9 @@ export const createUserSchema = object({
 
 export const loginUserSchema = object({
   body: object({
-    email: string({
-      required_error: "Email is required",
-    }).email("Email is invalid"),
+    username: string({
+      required_error: "Username is required",
+    }),
     password: string({
       required_error: "Password is required",
     }).min(6, "Password must be at least 6 characters"),

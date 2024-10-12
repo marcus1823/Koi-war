@@ -12,6 +12,6 @@ export function generateAccessToken(payload: any) {
 
 export function verifyAccessToken(token: string) {
   const decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
-  console.log("decoded", decoded);
-  return decoded.email;
+  console.log("Decoded token:", decoded);
+  return decoded;
 }

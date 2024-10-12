@@ -19,6 +19,7 @@ const connectDB = async () => {
       const hashedPassword = await bcrypt.hash("admin", 10);
       const adminDefault = new User({
         name: "admin",
+        email: "admin@admin.com",
         username: "admin",
         password: hashedPassword,
         role: UserRole.ADMIN,

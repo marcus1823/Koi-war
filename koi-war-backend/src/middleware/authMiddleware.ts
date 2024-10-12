@@ -21,8 +21,8 @@ export function verifyToken(
   }
 
   try {
-    const email = verifyAccessToken(token);
-    req.body.email = email;
+    const user = verifyAccessToken(token);
+    req.body = user;
     next();
   } catch (error) {
     res.status(401).json({ error: "Invalid token" });
