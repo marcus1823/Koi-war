@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import { Alert, Dimensions, Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import logo from "../../assets/images/logo.png";
 
+
 const { height } = Dimensions.get("window");
 
 function SignUpScreen() {
@@ -44,17 +45,18 @@ function SignUpScreen() {
 
     // Simulated success response
     if (username && password && password.length >= 6 && password === confirmPassword) {
-      setModalVisible(true); // Hiển thị modal
-      // Reset form fields
-      setSuccessMessage("Sign up successful! Welcome!");
-      setUsername("");
-      setPassword("");
-      setConfirmPassword(""); // Reset confirmPassword
-      setRole("User");
+        // Save user data to localStorage
+        localStorage.setItem("userData", JSON.stringify({ username, role }));
+        setModalVisible(true);
+        setSuccessMessage("Sign up successful! Welcome!");
+        setUsername("");
+        setPassword("");
+        setConfirmPassword("");
+        setRole("User");
     } else {
-      Alert.alert("Error", "Please fill out all fields correctly!");
+        Alert.alert("Error", "Please fill out all fields correctly!");
     }
-  };
+    };
 
     const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
