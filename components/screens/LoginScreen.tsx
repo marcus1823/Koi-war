@@ -1,25 +1,27 @@
+import { Ionicons } from '@expo/vector-icons';
+import Feather from "@expo/vector-icons/Feather";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Dimensions,
+  Image,
   StyleSheet,
   Text,
-  View,
   TextInput,
   TouchableOpacity,
-  Image,
+  View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import Feather from "@expo/vector-icons/Feather";
-import { useRouter } from "expo-router";
 import logo from "../../assets/images/logo.png";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 const { height } = Dimensions.get("window");
 
 function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showUsernameError, setShowUsernameError] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [showPasswordError, setShowPasswordError] = useState(false);
 
   const router = useRouter();
@@ -42,10 +44,18 @@ function LoginScreen() {
       }
     }
   };
-  const handleSignUp = () => {};
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+    };
+
+  const handleSignUp = () => {
+    router.push("/signup");
+  };
+
   return (
     <LinearGradient
-      colors={["#eb7452", "#0c446e"]}
+      colors={["#eb7452", "#5C98BB"]}
       style={[styles.background, { height }]}
     >
       <Image source={logo} style={styles.logo} />
@@ -86,10 +96,13 @@ function LoginScreen() {
             style={styles.input}
             placeholder="Password"
             placeholderTextColor="#fff"
-            secureTextEntry
+            secureTextEntry={!isPasswordVisible}
             value={password}
             onChangeText={setPassword}
           />
+            <TouchableOpacity onPress={togglePasswordVisibility}>
+              <Ionicons name={isPasswordVisible ? 'eye-off' : 'eye'} size={17} color={"white"} />
+            </TouchableOpacity>
         </View>
 
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
@@ -116,13 +129,14 @@ const styles = StyleSheet.create({
     fontSize: 30,
     textAlign: "center",
     fontWeight: "600",
+    fontFamily: 'outfit-regular'
   },
   slogan: {
     color: "rgba(255, 255, 255, 0.8)",
     fontSize: 18,
     textAlign: "center",
     fontWeight: "400",
-    marginBottom: 25,
+    marginBottom: 75,
   },
   background: {
     flex: 1,
@@ -137,6 +151,7 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     paddingVertical: 15,
     alignItems: "center",
+    marginTop: 25
   },
   button2: {
     width: "100%",
