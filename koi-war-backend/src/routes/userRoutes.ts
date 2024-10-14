@@ -2,6 +2,9 @@ import { Router } from "express";
 import { UserController } from "../controllers/userController";
 import { createUserSchema } from "../schema/user.schema";
 import { validate } from "../middleware/validateResource";
+import { verifyToken } from "../middleware/authMiddleware";
+import { authorizeRole } from "../middleware/authorizeMiddleware";
+import { UserRole } from "../models/user.model";
 
 export function userRoutes(userController: UserController): Router {
   const router = Router();
@@ -35,7 +38,7 @@ export function userRoutes(userController: UserController): Router {
 
   /**
    * @openapi
-   * /api/users/{id}:
+   * /api/users/user/{id}:
    *  get:
    *    tags:
    *      - Users
@@ -52,9 +55,55 @@ export function userRoutes(userController: UserController): Router {
    *      '404':
    *        description: User not found
    */
-  router.get("/:id", userController.getUserById);
+  router.get(
+    "/user/:id",
+    (req, res, next) =>
+      authorizeRole([UserRole.ADMIN, UserRole.STAFF], req, res, next),
+    userController.getUserById
+  );
 
+  /**
+   * @openapi
+   * /api/users/login:
+   *   post:
+   *     tags:
+   *       - Users
+   *     description: Login a user
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               email:
+   *                 type: string
+   *               password:
+   *                 type: string
+   *     responses:
+   *       '200':
+   *         description: Successfully logged in
+   *       '401':
+   *         description: Invalid credentials
+   */
   router.post("/login", userController.login);
+
+  /**
+   * @openapi
+   * /api/users/me:
+   *   get:
+   *     tags:
+   *       - Users
+   *     security:
+   *       - bearerAuth: []
+   *     description: Get the authenticated user's details
+   *     responses:
+   *       '200':
+   *         description: Successfully retrieved user
+   *       '404':
+   *         description: User not found
+   */
+  router.get("/me", verifyToken, userController.getUserProfile);
 
   return router;
 }

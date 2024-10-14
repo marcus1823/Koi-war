@@ -1,6 +1,6 @@
 // import bcrypt from "bcrypt";
 
-import User, { IUser, UserDocument } from "../../models/user.model";
+import { IUser, UserDocument } from "../../models/user.model";
 import { IUserRepository } from "../../repositories/IUserRepository";
 import { IUserResponse, mapUserResponse } from "../../types/user";
 import { generateAccessToken } from "../../utils/jwt.utils";
@@ -18,8 +18,11 @@ export class UserService implements IUserService {
       user as IUser & { _id: string; createdAt: Date; updatedAt: Date }
     );
   }
-  async login(data: { email: string; password: string }): Promise<any> {
-    const user = (await User.findOne({ email: data.email })) as UserDocument;
+  async login(data: { username: string; password: string }): Promise<any> {
+    const user = (await this.userRepository.findUserByUsername(
+      data.username
+    )) as UserDocument;
+    console.log("user", user);
     if (!user) {
       throw new Error("User not found");
     }
