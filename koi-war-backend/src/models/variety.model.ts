@@ -36,6 +36,7 @@ const varietySchema = new mongoose.Schema<VarietyDocument>(
   { timestamps: true }
 );
 
+
 const Variety = mongoose.model<VarietyDocument>("Variety", varietySchema);
 
 export default Variety;

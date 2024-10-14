@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { IContestSubCategory } from "./contestSubCategory.model";
 
-interface IClassificationContestRule {
+export interface IClassificationContestRule {
   name: string;
   description?: string;
   contestSubCategory: IContestSubCategory & { _id: string };
@@ -43,9 +43,9 @@ const classificationContestRuleSchema =
     { timestamps: true }
   );
 
-const Classification = mongoose.model<ClassificationContestRuleDocument>(
+const ClassificationContestRule = mongoose.model<ClassificationContestRuleDocument>(
   "ClassificationContestRule",
   classificationContestRuleSchema
 );
 
-export default Classification;
+export default ClassificationContestRule;
