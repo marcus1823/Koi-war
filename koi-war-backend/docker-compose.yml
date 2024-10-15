@@ -1,0 +1,27 @@
+services:
+  webapp:
+    image: giangnnt260703/koiwar:v1.0
+    ports:
+      - "3000:5000"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+    restart: on-failure
+    networks:
+      - webnet1
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    restart: always
+    networks:
+      - webnet1
+    volumes:
+      - mongodata:/data/db mongo
+volumes:
+  mongodata:
+
+networks:
+  webnet1:
+    driver: bridge
