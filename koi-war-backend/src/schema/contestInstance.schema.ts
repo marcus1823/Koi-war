@@ -1,4 +1,69 @@
 import {boolean, date, object, string, TypeOf} from "zod";
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    CreateContestInstanceInput:
+ *      type: object
+ *      required:
+ *        - contest
+ *        - startDate
+ *        - endDate
+ *        - isActive
+ *        - description
+ *        - rules
+ *        - images
+ *      properties:
+ *        contest:
+ *          type: string
+ *          default: Contest ID
+ *        startDate:
+ *          type: string
+ *          format: date-time
+ *          default: 2024-10-13T12:00:00Z
+ *        endDate:
+ *          type: string
+ *          format: date-time
+ *          default: 2024-10-15T12:00:00Z
+ *        isActive:
+ *          type: boolean
+ *          default: true
+ *        description:
+ *          type: string
+ *          default: Contest instance description
+ *        rules:
+ *          type: string
+ *          default: Contest rules
+ *        images:
+ *          type: string
+ *          default: contest-image-url
+ *    ContestInstanceResponse:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *        contest:
+ *          type: string
+ *        startDate:
+ *          type: string
+ *          format: date-time
+ *        endDate:
+ *          type: string
+ *          format: date-time
+ *        isActive:
+ *          type: boolean
+ *        description:
+ *          type: string
+ *        rules:
+ *          type: string
+ *        images:
+ *          type: string
+ *        createdAt:
+ *          type: string
+ *        updatedAt:
+ *          type: string
+ */
+
 
 export const createContestInstanceSchema = object({
     body: object({

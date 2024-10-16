@@ -3,7 +3,7 @@ import {IVariety} from "../models/variety.model";
 export interface IVarietyResponse {
     _id: string;
     name: string;
-    images: string;
+    images?: string[];
     description: string;
 
 }
@@ -14,7 +14,7 @@ export function mapVarietyResponse(
     return {
         _id: variety._id,
         name: variety.name,
-        images: variety.images ? variety.images[0] : "",
+        images: variety.images,
         description: variety.description ?? "",
     }
 }

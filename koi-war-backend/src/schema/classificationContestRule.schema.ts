@@ -1,4 +1,51 @@
 import {array, object, string, TypeOf} from "zod";
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    CreateClassificationContestRuleInput:
+ *      type: object
+ *      required:
+ *        - name
+ *        - description
+ *        - contestSubCategory
+ *        - varieties
+ *      properties:
+ *        name:
+ *          type: string
+ *          default: Classification Name
+ *        description:
+ *          type: string
+ *          default: Classification Description
+ *        contestSubCategory:
+ *          type: string
+ *          default: Contest SubCategory ID
+ *        varieties:
+ *          type: array
+ *          items:
+ *            type: string
+ *          default: ["Variety1", "Variety2"]
+ *    ClassificationContestRuleResponse:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *        name:
+ *          type: string
+ *        description:
+ *          type: string
+ *        contestSubCategory:
+ *          type: string
+ *        varieties:
+ *          type: array
+ *          items:
+ *            type: string
+ *        createdAt:
+ *          type: string
+ *        updatedAt:
+ *          type: string
+ */
+
 
 export const createClassificationContestRuleSchema = object({
     body: object({
