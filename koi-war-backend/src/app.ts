@@ -33,7 +33,7 @@ import cors from "cors";
 const app = express();
 connectDB();
 
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 
 app.use(
