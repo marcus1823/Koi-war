@@ -28,10 +28,12 @@ import {ClassificationContestRuleController} from "./controllers/classificationC
 import {ClassificationContestRuleService} from "./services/impl/classificationContestRuleServices";
 import {ClassificationContestRuleRepository} from "./repositories/impl/classificationContestRuleRepository";
 import {classificationContestRuleRoutes} from "./routes/classificationContestRuleRoutes";
-
+import {corsOptions} from "./config/cors.config";
+import cors from "cors";
 const app = express();
 connectDB();
 
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use(
