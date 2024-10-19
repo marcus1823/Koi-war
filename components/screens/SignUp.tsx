@@ -1,70 +1,104 @@
-import { Ionicons } from '@expo/vector-icons';
+import { registerUser } from "@/api/registerApi";
+import { Ionicons } from "@expo/vector-icons";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import Fontisto from "@expo/vector-icons/Fontisto";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { router } from "expo-router";
 import React, { useState } from "react";
-import { Alert, Dimensions, Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Dimensions,
+  Image,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import logo from "../../assets/images/logo.png";
-
 
 const { height } = Dimensions.get("window");
 
 function SignUpScreen() {
+  const [name, setName] = useState("");
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("User");
   const [showUsernameError, setShowUsernameError] = useState(false);
   const [showPasswordError, setShowPasswordError] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showConfirmPasswordError, setShowConfirmPasswordError] = useState(false);
+  const [showConfirmPasswordError, setShowConfirmPasswordError] =
+    useState(false);
   const [modalVisible, setModalVisible] = useState(false); // Trạng thái modal
   const [successMessage, setSuccessMessage] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
+    useState(false);
 
-  const router = useRouter();
-
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     setShowUsernameError(false);
     setShowPasswordError(false);
-    setShowConfirmPasswordError(false); // Reset trạng thái lỗi
+    setShowConfirmPasswordError(false);
     setSuccessMessage("");
 
     // Validation
     if (!username) {
       setShowUsernameError(true);
+      return;
     }
     if (!password || password.length < 6) {
       setShowPasswordError(true);
+      return;
     }
     if (password !== confirmPassword) {
       setShowConfirmPasswordError(true);
+      return;
     }
 
-    // Simulated success response
-    if (username && password && password.length >= 6 && password === confirmPassword) {
-        // Save user data to localStorage
-        localStorage.setItem("userData", JSON.stringify({ username, role }));
+    try {
+      const response = await registerUser({
+        name,
+        username,
+        email,
+        password,
+        confirmPassword,
+      });
+
+      console.log("registerUser", response)
+
+      if (response.success) {
+        // Handle success
         setModalVisible(true);
         setSuccessMessage("Sign up successful! Welcome!");
+        setEmail("");
+        setName("");
         setUsername("");
         setPassword("");
         setConfirmPassword("");
         setRole("User");
-    } else {
-        Alert.alert("Error", "Please fill out all fields correctly!");
+      } else {
+        Alert.alert(
+          "Error",
+          response.message || "Registration failed. Please try again."
+        );
+      }
+    } catch (error) {
+      Alert.alert("Error", "Something went wrong. Please try again.");
     }
-    };
+  };
 
-    const togglePasswordVisibility = () => {
+  const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
-    };
+  };
 
-    const toggleConfirmPasswordVisibility = () => {
-        setIsConfirmPasswordVisible(!isConfirmPasswordVisible);
-    };
+  const toggleConfirmPasswordVisibility = () => {
+    setIsConfirmPasswordVisible(!isConfirmPasswordVisible);
+  };
 
   const handleModalClose = () => {
     setModalVisible(false);
@@ -72,7 +106,10 @@ function SignUpScreen() {
   };
 
   return (
-    <LinearGradient colors={["#eb7452", "#5C98BB"]} style={[styles.background, { height }]}>
+    <LinearGradient
+      colors={["#eb7452", "#5C98BB"]}
+      style={[styles.background, { height }]}
+    >
       <Image source={logo} style={styles.logo} />
       <Text style={styles.header}>KOI-WAR</Text>
       <Text style={styles.slogan}>Join the battle with Koi!</Text>
@@ -84,7 +121,32 @@ function SignUpScreen() {
           </View>
         )}
         <View style={styles.inputContainer}>
-          <FontAwesome6 name="user" size={20} color="#fff" style={styles.icon} />
+          <Fontisto name="email" size={20} color="white" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="#fff"
+            value={email}
+            onChangeText={setEmail}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <AntDesign name="user" size={20} color="white" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Your Name"
+            placeholderTextColor="#fff"
+            value={name}
+            onChangeText={setName}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <FontAwesome6
+            name="user"
+            size={20}
+            color="#fff"
+            style={styles.icon}
+          />
           <TextInput
             style={styles.input}
             placeholder="User Name"
@@ -96,7 +158,9 @@ function SignUpScreen() {
         {showPasswordError && (
           <View style={{ flexDirection: "row", marginTop: 15, marginLeft: 20 }}>
             <MaterialIcons name="error-outline" size={20} color="white" />
-            <Text style={styles.errorText}>Please enter a strong Password (at least 6 characters)</Text>
+            <Text style={styles.errorText}>
+              Please enter a strong Password (at least 6 characters)
+            </Text>
           </View>
         )}
         <View style={styles.inputContainer}>
@@ -109,9 +173,13 @@ function SignUpScreen() {
             value={password}
             onChangeText={setPassword}
           />
-            <TouchableOpacity onPress={togglePasswordVisibility}>
-                <Ionicons name={isPasswordVisible ? 'eye-off' : 'eye'} size={17} color={"white"} />
-            </TouchableOpacity>
+          <TouchableOpacity onPress={togglePasswordVisibility}>
+            <Ionicons
+              name={isPasswordVisible ? "eye-off" : "eye"}
+              size={17}
+              color={"white"}
+            />
+          </TouchableOpacity>
         </View>
         {showConfirmPasswordError && (
           <View style={{ flexDirection: "row", marginTop: 15, marginLeft: 20 }}>
@@ -129,30 +197,12 @@ function SignUpScreen() {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
           />
-            <TouchableOpacity onPress={toggleConfirmPasswordVisibility}>
-                <Ionicons name={isConfirmPasswordVisible ? 'eye-off' : 'eye'} size={17} color={"white"} />
-            </TouchableOpacity>
-        </View>
-
-        <View style={styles.roleContainer}>
-          <Text style={styles.roleText}>Role:</Text>
-          <TouchableOpacity
-            style={[styles.roleButton, role === "User" && styles.selectedRole]}
-            onPress={() => setRole("User")}
-          >
-            <Text style={styles.roleButtonText}>User</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.roleButton, role === "Staff" && styles.selectedRole]}
-            onPress={() => setRole("Staff")}
-          >
-            <Text style={styles.roleButtonText}>Staff</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.roleButton, role === "Referee" && styles.selectedRole]}
-            onPress={() => setRole("Referee")}
-          >
-            <Text style={styles.roleButtonText}>Referee</Text>
+          <TouchableOpacity onPress={toggleConfirmPasswordVisibility}>
+            <Ionicons
+              name={isConfirmPasswordVisible ? "eye-off" : "eye"}
+              size={17}
+              color={"white"}
+            />
           </TouchableOpacity>
         </View>
 
@@ -160,27 +210,29 @@ function SignUpScreen() {
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
         <Text style={styles.or}>_____ Already have an account? _____</Text>
-        <TouchableOpacity style={styles.button2} onPress={() => router.push("/login")}>
+        <TouchableOpacity
+          style={styles.button2}
+          onPress={() => router.push("/login")}
+        >
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </View>
 
-    {/* Modal for success message */}
-        <Modal
-                transparent={true}
-                visible={modalVisible}
-                animationType="slide"
+      {/* Modal for success message */}
+      <Modal transparent={true} visible={modalVisible} animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>{successMessage}</Text>
+            {/* <Text style={styles.modalText}>Login Now</Text> */}
+            <TouchableOpacity
+              onPress={handleModalClose}
+              style={styles.modalButton}
             >
-                <View style={styles.modalOverlay}>
-                <View style={styles.modalContent}>
-                    <Text style={styles.modalText}>{successMessage}</Text>
-                    {/* <Text style={styles.modalText}>Login Now</Text> */}
-                    <TouchableOpacity onPress={handleModalClose} style={styles.modalButton}>
-                    <Text style={styles.buttonText}>Login</Text>
-                    </TouchableOpacity>
-                </View>
-                </View>
-            </Modal>
+              <Text style={styles.buttonText}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </LinearGradient>
   );
 }
@@ -197,7 +249,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     textAlign: "center",
     fontWeight: "600",
-    fontFamily: 'outfit-regular'
+    fontFamily: "outfit-regular",
   },
   slogan: {
     color: "rgba(255, 255, 255, 0.8)",
@@ -218,7 +270,7 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     paddingVertical: 15,
     alignItems: "center",
-    marginTop: 20
+    marginTop: 20,
   },
   button2: {
     width: "100%",
@@ -279,7 +331,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: 20,
-    alignItems: "center"
+    alignItems: "center",
   },
   roleText: {
     color: "white",
@@ -297,7 +349,7 @@ const styles = StyleSheet.create({
   },
   roleButtonText: {
     color: "white",
-    fontSize: 11
+    fontSize: 11,
   },
   modalOverlay: {
     flex: 1,

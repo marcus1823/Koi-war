@@ -1,3 +1,4 @@
+import { loginUser } from '@/api/loginApi';
 import { Ionicons } from '@expo/vector-icons';
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
@@ -25,7 +26,8 @@ function LoginScreen() {
   const [showPasswordError, setShowPasswordError] = useState(false);
 
   const router = useRouter();
-  const handleLogin = () => {
+
+  const handleLogin = async () => {
     setShowUsernameError(false);
     setShowPasswordError(false);
 
@@ -37,10 +39,15 @@ function LoginScreen() {
     }
 
     if (username && password) {
-      if (username === "user" && password === "123") {
-        router.push("/(tabs)/home");
-      } else {
-        alert("wrong username and password!");
+      try {
+        const response = await loginUser(username, password);
+        if (response && response.success) {
+          router.push("/(tabs)/home");
+        } else {
+          alert("Wrong username and password!");
+        }
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'An unexpected error occurred');
       }
     }
   };
@@ -59,7 +66,7 @@ function LoginScreen() {
       style={[styles.background, { height }]}
     >
       <Image source={logo} style={styles.logo} />
-      <Text style={styles.header}>KOI-WAR</Text>
+      <Text style={styles.header}>KOI WAR</Text>
       <Text style={styles.slogan}>Discover - Compete - Celebrate Koi</Text>
       <View style={styles.form}>
         {showUsernameError && (
