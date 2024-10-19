@@ -1,0 +1,1 @@
+<!-- Mỗi màn hình (HomeScreen, DetailScreen...) -->
