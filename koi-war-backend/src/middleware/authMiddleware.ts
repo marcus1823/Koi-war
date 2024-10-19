@@ -22,7 +22,7 @@ export function verifyToken(
 
   try {
     const user = verifyAccessToken(token);
-    req.body = user;
+    req.body = {...req.body, user};
     next();
   } catch (error) {
     res.status(401).json({ error: "Invalid token" });

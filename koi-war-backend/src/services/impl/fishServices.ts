@@ -15,7 +15,7 @@ export class FishServices implements IFishService {
     }
 
     async createFish(data: IFish): Promise<IFishProfileResponse> {
-        const user = await this.userService.getUserByUsername("admin");
+        const user = await this.userService.getUserByUsername(data.user.username);
         if (!user) {
             throw new Error("User not found");
         }

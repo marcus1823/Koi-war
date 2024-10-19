@@ -16,6 +16,7 @@ export class FishController {
         res: Response
     ) =>{
         try {
+            console.log("Create Fish Request", req.body);
             const fish = await this.fishService.createFish(req.body);
             res.status(201).json(fish);
         } catch (error) {

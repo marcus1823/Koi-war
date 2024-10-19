@@ -2,6 +2,7 @@ import  {Router} from "express";
 import {FishController} from "../controllers/fishController";
 import {validate} from "../middleware/validateResource";
 import {createFishSchema} from "../schema/fish.schema";
+import {verifyToken} from "../middleware/authMiddleware";
 
 export function fishRoutes(fishController: FishController): Router {
     const router = Router();
@@ -30,7 +31,7 @@ export function fishRoutes(fishController: FishController): Router {
      *       '400':
      *         description: Validation error
      */
-    router.post("/createFish", validate(createFishSchema), fishController.createFish);
+    router.post("/createFish", validate(createFishSchema), verifyToken, fishController.createFish);
 
     /**
      * @openapi

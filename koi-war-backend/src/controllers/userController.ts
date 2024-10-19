@@ -61,7 +61,7 @@ export class UserController {
 
   getUserProfile = async (req: Request, res: Response) => {
     try {
-      const user = await this.userService.getUserByEmail(req.body.email);
+      const user = await this.userService.getUserByUsername(req.body.user.username);
       res.status(200).json(user);
     } catch (error) {
       if (error instanceof Error) {
