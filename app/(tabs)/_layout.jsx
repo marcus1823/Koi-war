@@ -11,12 +11,16 @@ export default function TabLayout() {
     }}>
       <Tabs.Screen name='home'
         options={{
-          tabBarLabel: 'Home',
-          tabBarIcon: ({ color }) =>
-            <Feather name="home" size={24} color="black" />
+          tabBarLabel: 'Home', 
+          tabBarIcon: ({color}) => <Feather name="home" size={24} color="black" />
         }}
-      />
-
+        />
+        <Tabs.Screen name='profile' 
+            options={{
+                tabBarLabel: 'Profile',
+                tabBarIcon: ({ color }) => <AntDesign name="user" size={24} color={color} />
+            }}/>
+        
     </Tabs>
   )
 }

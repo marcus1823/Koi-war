@@ -11,6 +11,11 @@ export default function RootLayout() {
       <Stack.Screen name="login" />
       <Stack.Screen name="signup" />
       <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="editprofile" />
+      <Stack.Screen name="fishprofile" />
+      <Stack.Screen name="predictresults" />
+      <Stack.Screen name="progress" />
+
     </Stack>
   );
 }
