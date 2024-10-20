@@ -20,7 +20,6 @@ export const registerUser = async (
       confirmPassword: userData.confirmPassword,
     });
 
-    // Kiểm tra response và trả về kết quả rõ ràng
     if (response.data) {
       return {
         success: true,
