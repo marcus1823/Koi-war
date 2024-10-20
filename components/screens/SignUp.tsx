@@ -28,17 +28,15 @@ function SignUpScreen() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("User");
+  const [role, setRole] = useState("user");
   const [showUsernameError, setShowUsernameError] = useState(false);
   const [showPasswordError, setShowPasswordError] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showConfirmPasswordError, setShowConfirmPasswordError] =
-    useState(false);
-  const [modalVisible, setModalVisible] = useState(false); // Trạng thái modal
+  const [showConfirmPasswordError, setShowConfirmPasswordError] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
-    useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
 
   const handleSignUp = async () => {
     setShowUsernameError(false);
@@ -46,7 +44,6 @@ function SignUpScreen() {
     setShowConfirmPasswordError(false);
     setSuccessMessage("");
 
-    // Validation
     if (!username) {
       setShowUsernameError(true);
       return;
@@ -69,26 +66,26 @@ function SignUpScreen() {
         confirmPassword,
       });
 
-      console.log("registerUser", response)
-
       if (response.success) {
-        // Handle success
+        setSuccessMessage(response.message || "Sign up successful! Welcome!");
         setModalVisible(true);
-        setSuccessMessage("Sign up successful! Welcome!");
         setEmail("");
         setName("");
         setUsername("");
         setPassword("");
         setConfirmPassword("");
-        setRole("User");
+        setRole("user");
       } else {
         Alert.alert(
-          "Error",
-          response.message || "Registration failed. Please try again."
+          "Registration Failed",
+          response.message || "Something went wrong. Please try again."
         );
       }
     } catch (error) {
-      Alert.alert("Error", "Something went wrong. Please try again.");
+      Alert.alert(
+        "Error",
+        "An unexpected error occurred. Please try again later."
+      );
     }
   };
 
@@ -102,7 +99,7 @@ function SignUpScreen() {
 
   const handleModalClose = () => {
     setModalVisible(false);
-    router.push("/login"); // Chuyển hướng đến trang đăng nhập
+    router.push("/login");
   };
 
   return (
@@ -219,11 +216,22 @@ function SignUpScreen() {
       </View>
 
       {/* Modal for success message */}
-      <Modal transparent={true} visible={modalVisible} animationType="slide">
+      <Modal
+        transparent={true}
+        visible={modalVisible}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
+            <AntDesign
+              name="checkcircle"
+              size={50}
+              color="#eb7452"
+              style={styles.modalIcon}
+            />
+            <Text style={styles.modalTitle}>Registration Successful!</Text>
             <Text style={styles.modalText}>{successMessage}</Text>
-            {/* <Text style={styles.modalText}>Login Now</Text> */}
             <TouchableOpacity
               onPress={handleModalClose}
               style={styles.modalButton}
@@ -356,6 +364,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+  },
+  modalIcon: {
+    marginBottom: 15,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#333",
   },
   modalContent: {
     backgroundColor: "white",
