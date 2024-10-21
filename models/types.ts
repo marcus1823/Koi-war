@@ -16,3 +16,8 @@ export interface Login {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface Profile {
+  username: string;
+  role: string;
+}
