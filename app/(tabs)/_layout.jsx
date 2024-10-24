@@ -22,7 +22,6 @@ export default function TabLayout() {
                 tabBarLabel: 'Profile',
                 tabBarIcon: ({ color }) => <AntDesign name="user" size={24} color={color} />
             }}/>
-        
     </Tabs>
   )
 }
