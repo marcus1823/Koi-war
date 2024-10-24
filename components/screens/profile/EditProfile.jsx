@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { AntDesign } from '@expo/vector-icons'; // Icon library
 import { useRouter } from 'expo-router';
+import React from 'react';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function EditProfile() {
 
@@ -47,7 +47,7 @@ export default function EditProfile() {
         <TextInput style={styles.input} placeholder="+84 912345678" />
 
         <Text style={styles.label}>Date of birth</Text>
-        <TextInput style={styles.input} placeholder="Enter date ò birth" />
+        <TextInput style={styles.input} placeholder="Enter date of birth" />
       </View>
 
       {/* Delete and Update buttons */}

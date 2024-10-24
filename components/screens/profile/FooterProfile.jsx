@@ -1,14 +1,19 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function FooterProfile() {
   const router = useRouter();
 
-  const handleLogout = () => {
-    console.log("Logged out");
-    router.replace("/login"); // Navigate to login screen after logout
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('token');
+        router.replace('/login');
+    } catch (error) {
+      console.error('Lỗi khi xoá token:', error);
+    }
   };
+  
 
   return (
     <View style={styles.container}>

@@ -1,15 +1,32 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { getUserById } from '@/api/profileApi';
+import Feather from '@expo/vector-icons/Feather';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import Feather from '@expo/vector-icons/Feather';
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function HeaderProfile() {
   const router = useRouter();
+  const [ userProfile, setUserProfile ] = useState({username: "loading..", role: "loading.."});
+
+  useEffect(() => {
+    const getUserProfile = async () => {
+      try {
+        const userProfile = await getUserById();
+        setUserProfile(userProfile);
+      } catch (error) {
+        console.error("Error getting user information: ", error);
+      }
+    }
+    
+    getUserProfile();
+  },[]);
+
 
   const navigateToEditProfile = () => {
-    router.push("/editprofile"); 
+    router.push("/editprofile");
   };
+
 
   return (
     <View>
@@ -26,8 +43,8 @@ export default function HeaderProfile() {
             source={require('../../../assets/images/koi-fish.png')}
             style={styles.avatar}
           />
-          <Text style={styles.username}>Lucasta</Text>
-          <Text style={styles.Role}>User</Text>
+          <Text style={styles.username}>{userProfile.username}</Text>
+          <Text style={styles.Role}>{userProfile.role}</Text>
         </View>
       </LinearGradient>
     </View>

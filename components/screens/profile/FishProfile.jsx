@@ -1,9 +1,8 @@
-import React from 'react';
-import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { AntDesign } from '@expo/vector-icons'; // Icon library
+import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React from 'react';
+import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
 
-// Sample data for fish profiles
 const fishProfiles = [
   { id: '1', code: '223', type: 'Koi', size: 'Large', age: '3 years', awardWinning: 'Yes', image: require('../../../assets/images/caKoi.png') },
   { id: '2', code: '224', type: 'Karashigoi', size: 'Medium', age: '2 years', awardWinning: 'No', image: require('../../../assets/images/caKoi.png') },
@@ -15,7 +14,6 @@ const fishProfiles = [
   { id: '8', code: '234', type: 'Karashigoi', size: 'Medium', age: '2 years', awardWinning: 'No', image: require('../../../assets/images/caKoi.png') },
   { id: '9', code: '245', type: 'Koi', size: 'Medium', age: '2 years', awardWinning: 'No', image: require('../../../assets/images/caKoi.png') },
 
-  // Add more fish profiles as needed
 ];
 
 export default function FishProfile() {
