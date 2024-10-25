@@ -8,7 +8,7 @@ export function varietyRoutes(varietyController: VarietyController): Router {
 
     /**
      * @openapi
-     * /api/varieties/createVariety:
+     * /api/variety/createVariety:
      *   post:
      *     tags:
      *       - Varieties

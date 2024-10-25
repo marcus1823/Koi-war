@@ -3,6 +3,8 @@ import {FishController} from "../controllers/fishController";
 import {validate} from "../middleware/validateResource";
 import {createFishSchema} from "../schema/fish.schema";
 import {verifyToken} from "../middleware/authMiddleware";
+import {authorizeRole} from "../middleware/authorizeMiddleware";
+import {UserRole} from "../models/user.model";
 
 export function fishRoutes(fishController: FishController): Router {
     const router = Router();
@@ -210,6 +212,9 @@ export function fishRoutes(fishController: FishController): Router {
      *         description: Fish not found
      */
     router.delete("/deleteFishById/:id", fishController.deleteFishById);
+
+    router.get("/myFishes", verifyToken, (req, res, next) =>
+        authorizeRole([UserRole.USER], req, res, next), fishController.getAllMyFishes);
 
     return router;
 }

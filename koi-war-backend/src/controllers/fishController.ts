@@ -157,4 +157,18 @@ export class FishController {
         }
     }
 
+    getAllMyFishes = async (req: Request, res: Response) => {
+        const requestUser = req.body.user;
+        try {
+            const fishes = await this.fishService.getFishByUserId(requestUser.id);
+            res.status(200).json(fishes);
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(500).json({ error: error.message });
+            } else {
+                res.status(500).json({ error: "An unknown error occurred" });
+            }
+        }
+    }
+
 }

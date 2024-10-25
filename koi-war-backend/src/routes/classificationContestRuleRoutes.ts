@@ -7,7 +7,7 @@ export function classificationContestRuleRoutes(classificationContestRuleControl
     const router = Router();
     /**
      * @openapi
-     * /api/classification-contests/createClassification:
+     * /api/classificationRule/createClassification:
      *   post:
      *     tags:
      *       - Classification Contest Rules
@@ -29,8 +29,6 @@ export function classificationContestRuleRoutes(classificationContestRuleControl
      *       '400':
      *         description: Validation error
      */
-
-
     router.post(
         "/createClassification",
         validate(createClassificationContestRuleSchema),

@@ -6,4 +6,8 @@ export class ContestInstanceRepository implements IContestInstanceRepository {
         const contestInstance = new ContestInstance(data);
         return contestInstance.save();
     }
+
+    async getAllContestInstances(): Promise<IContestInstance[]> {
+        return ContestInstance.find();
+    }
 }

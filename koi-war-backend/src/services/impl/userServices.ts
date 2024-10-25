@@ -38,6 +38,7 @@ export class UserService implements IUserService {
       email: user.email,
       username: user.username,
       role: user.role,
+      id: user.id,
     };
 
     // Generate token

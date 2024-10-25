@@ -7,7 +7,7 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
     const router = Router();
     /**
      * @openapi
-     * /api/contest-instances/createContestInstance:
+     * /api/contestInstance/createContestInstance:
      *   post:
      *     tags:
      *       - Contest Instances
@@ -29,8 +29,6 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
      *       '400':
      *         description: Validation error
      */
-
-
     router.post(
         "/createContestInstance",
         validate(createContestInstanceSchema),
