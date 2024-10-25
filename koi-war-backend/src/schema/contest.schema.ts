@@ -30,8 +30,6 @@ import {object, string, TypeOf} from "zod";
  *        updatedAt:
  *          type: string
  */
-
-
 export const createContestSchema = object({
     body: object({
         name: string({

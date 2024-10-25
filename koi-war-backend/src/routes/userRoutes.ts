@@ -42,7 +42,7 @@ export function userRoutes(userController: UserController): Router {
    *  get:
    *    tags:
    *      - Users
-   *    description: Get a user by ID
+   *    description: Get a user by ID - function for admin management
    *    parameters:
    *      - name: id
    *        in: path

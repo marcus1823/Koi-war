@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from 'express';
 import { UserRole } from "../models/user.model";
 import { verifyToken } from "./authMiddleware";
 

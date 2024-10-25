@@ -6,4 +6,10 @@ export class ContestSubCategoryRepository implements IContestSubCategoryReposito
         const contestSubCategory = new ContestSubCategory(data);
         return contestSubCategory.save();
     }
+
+    async getContestSubCategoriesOfContestInstanceId(contestInstanceId: string): Promise<IContestSubCategory[]> {
+        return ContestSubCategory.find({
+            contestInstance: contestInstanceId
+        });
+    }
 }

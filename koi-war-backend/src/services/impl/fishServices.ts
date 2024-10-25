@@ -1,9 +1,9 @@
-import {FishRepository} from "../../repositories/impl/fishRepository";
 import {IFish} from "../../models/fish.model";
 import {IFishProfileResponse, mapFishProfileResponse} from "../../types/fish";
 import {IFishService} from "../IFishService";
 import {IFishRepository} from "../../repositories/IFishRepository";
 import {IUserService} from "../IUserService";
+import * as console from "node:console";
 
 export class FishServices implements IFishService {
     private fishRepository: IFishRepository;
@@ -23,7 +23,7 @@ export class FishServices implements IFishService {
         console.log("fishCreateRequest", fishCreateRequest);
         const fish = await this.fishRepository.createFish(fishCreateRequest);
         return mapFishProfileResponse(
-            fish as IFish & { _id: string; createdAt: Date; updatedAt: Date}
+            fish as IFish & { _id: string; createdAt: Date; updatedAt: Date }
         )
     }
 
@@ -31,57 +31,57 @@ export class FishServices implements IFishService {
         const fish = await this.fishRepository.findFishById(id);
 
         return mapFishProfileResponse(
-            fish as IFish & { _id: string; createdAt: Date; updatedAt: Date}
+            fish as IFish & { _id: string; createdAt: Date; updatedAt: Date }
         );
     }
 
     async getAllFishes(): Promise<IFishProfileResponse[]> {
-        const fishes = await  this.fishRepository.getAllFishes();
+        const fishes = await this.fishRepository.getAllFishes();
         return fishes.map(fish =>
-        mapFishProfileResponse(
-            fish as IFish & { _id: string; createdAt: Date; updatedAt: Date}
-        ))
+            mapFishProfileResponse(
+                fish as IFish & { _id: string; createdAt: Date; updatedAt: Date }
+            ))
     }
 
-    async getFishByUserId(userId:string): Promise<IFishProfileResponse[]> {
-        const fishes = await  this.fishRepository.getFishByUserId(userId);
+    async getFishByUserId(userId: string): Promise<IFishProfileResponse[]> {
+        const fishes = await this.fishRepository.getFishByUserId(userId);
         return fishes.map(fish =>
-        mapFishProfileResponse(
-            fish as IFish & { _id: string; createdAt: Date; updatedAt: Date}
-        ))
+            mapFishProfileResponse(
+                fish as IFish & { _id: string; createdAt: Date; updatedAt: Date }
+            ))
     }
 
-    async getFishByVarietyId(varietyId:string): Promise<IFishProfileResponse[]> {
-        const fishes = await  this.fishRepository.getFishByVarietyId(varietyId);
+    async getFishByVarietyId(varietyId: string): Promise<IFishProfileResponse[]> {
+        const fishes = await this.fishRepository.getFishByVarietyId(varietyId);
         return fishes.map(fish =>
-        mapFishProfileResponse(
-            fish as IFish & { _id: string; createdAt: Date; updatedAt: Date}
+            mapFishProfileResponse(
+                fish as IFish & { _id: string; createdAt: Date; updatedAt: Date }
+            )
         )
-        )
     }
 
-    async getFishByVarietyName(varietyName:string): Promise<IFishProfileResponse[]> {
+    async getFishByVarietyName(varietyName: string): Promise<IFishProfileResponse[]> {
         const fishes = await this.fishRepository.getFishByVarietyName(varietyName);
 
         return fishes.map(fish =>
-        mapFishProfileResponse(
-            fish as IFish & { _id: string; createdAt: Date; updatedAt: Date}
-        )
+            mapFishProfileResponse(
+                fish as IFish & { _id: string; createdAt: Date; updatedAt: Date }
+            )
         )
     }
 
     async deleteFishById(id: string): Promise<IFishProfileResponse> {
-           const fish = await this.fishRepository.deleteFishById(id);
+        const fish = await this.fishRepository.deleteFishById(id);
 
-           return mapFishProfileResponse(
-               fish as IFish & { _id: string; createdAt: Date; updatedAt: Date}
-           )
+        return mapFishProfileResponse(
+            fish as IFish & { _id: string; createdAt: Date; updatedAt: Date }
+        )
     }
 
     async updateFishById(id: string, updateData: Partial<IFish>): Promise<IFishProfileResponse> {
         const fish = await this.fishRepository.updateFishById(id, updateData);
 
-       return fish as IFishProfileResponse;
+        return fish as IFishProfileResponse;
     }
 
 }

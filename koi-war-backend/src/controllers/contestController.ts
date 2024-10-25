@@ -24,5 +24,21 @@ export class ContestController {
             }
         }
     }
+
+    getAllContests = async (
+        req: Request,
+        res: Response,
+    ) => {
+        try {
+            const contests = await this.contestServices.getAllContests();
+            res.status(200).json(contests);
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(409).send(error.message);
+            }else {
+                res.status(409).send("An unknown error occurred");
+            }
+        }
+    }
 }
 

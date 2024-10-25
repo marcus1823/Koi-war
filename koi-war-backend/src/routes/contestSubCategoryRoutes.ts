@@ -5,9 +5,10 @@ import { createContestSubCategorySchema } from "../schema/contestSubCategory.sch
 
 export function contestSubCategoryRoutes(contestSubCategoryController: ContestSubCategoryController): Router {
     const router = Router();
+
     /**
      * @openapi
-     * /api/contest-subcategories/createContestSubCategory:
+     * /api/contestSubCategory/createContestSubCategory:
      *   post:
      *     tags:
      *       - Contest SubCategories
@@ -29,7 +30,6 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
      *       '400':
      *         description: Validation error
      */
-
     router.post(
         "/createContestSubCategory",
         validate(createContestSubCategorySchema),

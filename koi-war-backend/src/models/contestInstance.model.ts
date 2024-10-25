@@ -3,6 +3,7 @@ import { IContest } from "./contest.model";
 
 export interface IContestInstance {
   contest: IContest;
+  name: string;
   startDate: Date;
   endDate: Date;
   isActive: boolean;
@@ -21,6 +22,10 @@ const contestInstanceSchema = new mongoose.Schema<ContestInstanceDocument>(
     contest: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Contest",
+      required: true,
+    },
+    name: {
+      type: String,
       required: true,
     },
     startDate: {
