@@ -40,5 +40,26 @@ export class ContestController {
             }
         }
     }
+
+    getContestById = async (
+        req: Request<{id: string}>,
+        res: Response,
+    ) => {
+        try {
+            const contest = await this.contestServices.getContestById(req.params.id);
+            
+            if (!contest) {
+                res.status(404).json({message: "Contest not found"});
+            } else {
+                res.status(200).json(contest);
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(500).send(error.message);
+            } else {
+                res.status(500).send("An unknown error occurred");
+            }
+        }
+    }
 }
 

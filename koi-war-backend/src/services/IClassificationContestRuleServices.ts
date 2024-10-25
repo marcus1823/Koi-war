@@ -3,5 +3,7 @@ import {IClassificationContestRuleResponse} from "../types/classificationContest
 
 export interface IClassificationContestRuleServices {
     createClassificationContestRule(data: any): Promise<IClassificationContestRuleResponse>;
-
+    getAllClassificationContestRules(): Promise<IClassificationContestRuleResponse[]>;
+    getClassificationContestRuleById(id: string): Promise<IClassificationContestRuleResponse | null>;
 }
+

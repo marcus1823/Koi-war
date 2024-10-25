@@ -24,4 +24,40 @@ export class ContestInstanceController {
             }
         }
     }
+
+    getAllContestInstances = async (
+        req: Request,
+        res: Response
+    )=> {
+        try {
+            const contestInstances = await this.contestInstanceService.getAllContestInstances();
+            res.status(200).json(contestInstances);
+        }catch(error) {
+            if (error instanceof Error) {
+                res.status(500).send(error.message);
+            } else {
+                res.status(500).send("An unknown error occurred");
+            }
+        }
+    }
+
+    getContestInstanceById = async (
+        req: Request<{id: string}>,
+        res: Response,
+    ) => {
+        try {
+            const contestInstance = await this.contestInstanceService.getContestInstanceById(req.params.id);
+            if (!contestInstance) {
+                res.status(404).json({message: "Contest instance not found"});
+            } else {
+                res.status(200).json(contestInstance);
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(500).send(error.message);
+            } else {
+                res.status(500).send("An unknown error occurred");
+            }
+        }
+    }
 }

@@ -16,4 +16,23 @@ export class ContestInstanceServices implements IContestInstanceServices {
             contestInstance as IContestInstance & {_id: string; createdAt: Date; updatedAt: Date}
         )
     }
+
+    async getAllContestInstances(): Promise<IContestInstanceResponse[]> {
+        const contestInstance = await this.contestInstanceRepository.getAllContestInstances();
+        return contestInstance.map((contestInstance) =>
+            mapContestInstanceResponse(
+                contestInstance as IContestInstance & { _id: string; createdAt: Date; updatedAt: Date }
+            )
+        )
+    }
+
+    async getContestInstanceById(id: string): Promise<IContestInstanceResponse | null> {
+        const contestInstance = await this.contestInstanceRepository.getContestInstanceById(id)
+        if (!contestInstance) {
+            throw new Error("Contest instance not found");
+        }
+        return mapContestInstanceResponse(
+            contestInstance as IContestInstance & { _id: string; createdAt: Date; updatedAt: Date }
+        );
+    }
 }

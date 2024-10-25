@@ -25,4 +25,14 @@ export class ContestService implements IContestServices {
       contest as IContest & { _id: string; createdAt: Date; updatedAt: Date }
     );
   }
+
+  async getContestById(id: string): Promise<IContestResponse | null> {
+    const contest = await this.contestRepository.getContestById(id);
+    if (!contest){
+      throw new Error("Contest not found");
+    }
+    return mapContestResponse(
+      contest as IContest & { _id: string; createdAt: Date; updatedAt: Date }
+    );
+  }
 }

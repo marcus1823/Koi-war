@@ -2,6 +2,7 @@ import { IContestInstance } from "../models/contestInstance.model";
 import { IContest } from "../models/contest.model";
 
 export interface IContestInstanceResponse {
+  id: string;
   contest: IContest;
   name: string;
   startDate: Date;
@@ -19,6 +20,7 @@ export function mapContestInstanceResponse(
   }
 ): IContestInstanceResponse {
   return {
+    id: contestInstance._id,
     contest: contestInstance.contest,
     name: contestInstance.name,
     startDate: contestInstance.startDate,

@@ -6,6 +6,7 @@ import {
     mapClassificationContestRuleResponse
 } from "../../types/classificationContestRule";
 import {IClassificationContestRule} from "../../models/classificationContestRule.model";
+import {mapContestInstanceResponse} from "../../types/contestInstance";
 
 export class ClassificationContestRuleService implements IClassificationContestRuleServices {
     private classificationContestRuleRepository: IClassificationContestRuleRepository;
@@ -20,4 +21,24 @@ export class ClassificationContestRuleService implements IClassificationContestR
             classificationContestRule as IClassificationContestRule & { _id: string; createdAt: Date; updatedAt: Date }
         )
     }
+
+    async getAllClassificationContestRules(): Promise<IClassificationContestRuleResponse[]> {
+        const classificationContestRule = await this.classificationContestRuleRepository.getAllClassificationContestRules();
+        return classificationContestRule.map((classificationContestRule) =>
+            mapClassificationContestRuleResponse(
+                classificationContestRule as IClassificationContestRule & { _id: string; createdAt: Date; updatedAt: Date }
+            )
+        )
+    }
+
+    async getClassificationContestRuleById(id: string): Promise<IClassificationContestRuleResponse | null> {
+        const classificationContestRule = await this.classificationContestRuleRepository.getClassificationContestRuleById(id);
+        if (!classificationContestRule) {
+            throw new Error("Classification contest rule not found");
+        }
+        return mapClassificationContestRuleResponse(
+            classificationContestRule as IClassificationContestRule & { _id: string; createdAt: Date; updatedAt: Date }
+        )
+    }
+    
 }

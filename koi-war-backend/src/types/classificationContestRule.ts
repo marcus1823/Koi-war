@@ -1,6 +1,7 @@
 import {IContestSubCategory} from "../models/contestSubCategory.model";
 import {IClassificationContestRule} from "../models/classificationContestRule.model";
 export interface IClassificationContestRuleResponse {
+    id: string;
     name: string;
     description?: string;
     contestSubCategory: IContestSubCategory;
@@ -12,6 +13,7 @@ export function mapClassificationContestRuleResponse(
 
 ):  IClassificationContestRuleResponse {
     return {
+        id: classificationContestRule._id,
         name: classificationContestRule.name,
         description: classificationContestRule.description,
         contestSubCategory: classificationContestRule.contestSubCategory,
