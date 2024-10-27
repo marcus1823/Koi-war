@@ -5,6 +5,18 @@ export interface IClassificationContestRule {
   name: string;
   description?: string;
   contestSubCategory: IContestSubCategory & { _id: string };
+  weightRange: {
+    min: number;
+    max: number;
+  };
+  sizeRange: {
+    min: number;
+    max: number;
+  };
+  ageRange: {
+    min: number;
+    max: number;
+  };
   varieties: string[];
 }
 
@@ -33,6 +45,18 @@ const classificationContestRuleSchema =
         ref: "ContestSubCategory",
         required: true,
       },
+      weightRange: {
+        min: { type: Number, required: true },
+        max: { type: Number, required: true },
+      },
+      sizeRange: {
+        min: { type: Number, required: true },
+        max: { type: Number, required: true },
+      },
+      ageRange: {
+        min: { type: Number, required: true },
+        max: { type: Number, required: true },
+      },
       varieties: [
         {
           type: mongoose.Schema.Types.ObjectId,
@@ -43,9 +67,10 @@ const classificationContestRuleSchema =
     { timestamps: true }
   );
 
-const ClassificationContestRule = mongoose.model<ClassificationContestRuleDocument>(
-  "ClassificationContestRule",
-  classificationContestRuleSchema
-);
+const ClassificationContestRule =
+  mongoose.model<ClassificationContestRuleDocument>(
+    "ClassificationContestRule",
+    classificationContestRuleSchema
+  );
 
 export default ClassificationContestRule;

@@ -1,4 +1,4 @@
-import {array, object, string, TypeOf} from "zod";
+import { array, number, object, string, TypeOf } from "zod";
 /**
  * @openapi
  * components:
@@ -46,23 +46,49 @@ import {array, object, string, TypeOf} from "zod";
  *          type: string
  */
 
-
 export const createClassificationContestRuleSchema = object({
-    body: object({
-        name: string({
-            required_error: "Name is required",
-        }),
-        description: string({
-            required_error: "Description is required",
-        }),
-        contestSubCategory: string({
-            required_error: "Contest Sub Category is required",
-        }),
-        varieties: array(string({
-            required_error: "Varieties is required",
-        }))
-    })
-})
+  body: object({
+    name: string({
+      required_error: "Name is required",
+    }),
+    description: string({
+      required_error: "Description is required",
+    }),
+    contestSubCategory: string({
+      required_error: "Contest Sub Category is required",
+    }),
+    varieties: array(
+      string({
+        required_error: "Varieties is required",
+      })
+    ),
+    weightRange: object({
+      min: number({
+        required_error: "Minimum weight must be a number",
+      }),
+      max: number({
+        required_error: "Maximum weight must be a number",
+      }),
+    }),
+    sizeRange: object({
+      min: number({
+        required_error: "Minimum size must be a number",
+      }),
+      max: number({
+        required_error: "Maximum size must be a number",
+      }),
+    }),
+    ageRange: object({
+      min: number({
+        required_error: "Minimum age must be a number",
+      }),
+      max: number({
+        required_error: "Maximum age must be a number",
+      }),
+    }),
+  }),
+});
 
-
-export type ClassificationContestRuleInput = TypeOf<typeof createClassificationContestRuleSchema>;
+export type ClassificationContestRuleInput = TypeOf<
+  typeof createClassificationContestRuleSchema
+>;

@@ -1,44 +1,92 @@
-import {IClassificationContestRuleServices} from "../IClassificationContestRuleServices";
-import {IClassificationContestRuleRepository} from "../../repositories/IClassificationContestRuleRepository";
-import {IContestResponse} from "../../types/contest";
+import { IClassificationContestRuleServices } from "../IClassificationContestRuleServices";
+import { IClassificationContestRuleRepository } from "../../repositories/IClassificationContestRuleRepository";
+import { IContestResponse } from "../../types/contest";
 import {
-    IClassificationContestRuleResponse,
-    mapClassificationContestRuleResponse
+  IClassificationContestRuleResponse,
+  mapClassificationContestRuleResponse,
 } from "../../types/classificationContestRule";
-import {IClassificationContestRule} from "../../models/classificationContestRule.model";
-import {mapContestInstanceResponse} from "../../types/contestInstance";
+import { IClassificationContestRule } from "../../models/classificationContestRule.model";
+import { mapContestInstanceResponse } from "../../types/contestInstance";
 
-export class ClassificationContestRuleService implements IClassificationContestRuleServices {
-    private classificationContestRuleRepository: IClassificationContestRuleRepository;
+export class ClassificationContestRuleService
+  implements IClassificationContestRuleServices
+{
+  private classificationContestRuleRepository: IClassificationContestRuleRepository;
 
-    constructor(classificationContestRuleRepository: IClassificationContestRuleRepository) {
-        this.classificationContestRuleRepository = classificationContestRuleRepository;
-    }
+  constructor(
+    classificationContestRuleRepository: IClassificationContestRuleRepository
+  ) {
+    this.classificationContestRuleRepository =
+      classificationContestRuleRepository;
+  }
 
-    async createClassificationContestRule(data: any): Promise<IClassificationContestRuleResponse> {
-        const classificationContestRule = await this.classificationContestRuleRepository.createClassificationContestRule(data);
-        return mapClassificationContestRuleResponse(
-            classificationContestRule as IClassificationContestRule & { _id: string; createdAt: Date; updatedAt: Date }
-        )
-    }
+  async createClassificationContestRule(
+    data: any
+  ): Promise<IClassificationContestRuleResponse> {
+    const classificationContestRule =
+      await this.classificationContestRuleRepository.createClassificationContestRule(
+        data
+      );
+    return mapClassificationContestRuleResponse(
+      classificationContestRule as IClassificationContestRule & {
+        _id: string;
+        createdAt: Date;
+        updatedAt: Date;
+      }
+    );
+  }
 
-    async getAllClassificationContestRules(): Promise<IClassificationContestRuleResponse[]> {
-        const classificationContestRule = await this.classificationContestRuleRepository.getAllClassificationContestRules();
-        return classificationContestRule.map((classificationContestRule) =>
-            mapClassificationContestRuleResponse(
-                classificationContestRule as IClassificationContestRule & { _id: string; createdAt: Date; updatedAt: Date }
-            )
-        )
-    }
-
-    async getClassificationContestRuleById(id: string): Promise<IClassificationContestRuleResponse | null> {
-        const classificationContestRule = await this.classificationContestRuleRepository.getClassificationContestRuleById(id);
-        if (!classificationContestRule) {
-            throw new Error("Classification contest rule not found");
+  async getAllClassificationContestRules(): Promise<
+    IClassificationContestRuleResponse[]
+  > {
+    const classificationContestRule =
+      await this.classificationContestRuleRepository.getAllClassificationContestRules();
+    return classificationContestRule.map((classificationContestRule) =>
+      mapClassificationContestRuleResponse(
+        classificationContestRule as IClassificationContestRule & {
+          _id: string;
+          createdAt: Date;
+          updatedAt: Date;
         }
-        return mapClassificationContestRuleResponse(
-            classificationContestRule as IClassificationContestRule & { _id: string; createdAt: Date; updatedAt: Date }
-        )
+      )
+    );
+  }
+
+  async getClassificationContestRuleById(
+    id: string
+  ): Promise<IClassificationContestRuleResponse | null> {
+    const classificationContestRule =
+      await this.classificationContestRuleRepository.getClassificationContestRuleById(
+        id
+      );
+    if (!classificationContestRule) {
+      throw new Error("Classification contest rule not found");
     }
-    
+    return mapClassificationContestRuleResponse(
+      classificationContestRule as IClassificationContestRule & {
+        _id: string;
+        createdAt: Date;
+        updatedAt: Date;
+      }
+    );
+  }
+
+  async getClassificationContestRuleByContestSubCategoryId(
+    contestSubCategoryId: string
+  ): Promise<IClassificationContestRuleResponse | null> {
+    const classificationContestRule =
+      await this.classificationContestRuleRepository.getClassificationContestRuleByContestSubCategoryId(
+        contestSubCategoryId
+      );
+    if (!classificationContestRule) {
+      return null;
+    }
+    return mapClassificationContestRuleResponse(
+      classificationContestRule as IClassificationContestRule & {
+        _id: string;
+        createdAt: Date;
+        updatedAt: Date;
+      }
+    );
+  }
 }
