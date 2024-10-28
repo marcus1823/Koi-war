@@ -32,6 +32,10 @@ const contestSubCategorySchema = new mongoose.Schema(
       ref: "ContestInstance",
       required: true,
     },
+    classificationContestRule: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ClassificationContestRule",
+    },
   },
   { timestamps: true }
 );
