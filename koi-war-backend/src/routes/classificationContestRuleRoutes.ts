@@ -95,5 +95,45 @@ export function classificationContestRuleRoutes(classificationContestRuleControl
         classificationContestRuleController.getClassificationContestRuleById
     );
 
+    /**
+     * @openapi
+     * /api/classificationRule/updateClassificationById/{id}:
+     *   put:
+     *     tags:
+     *       - Classification Contest Rules
+     *     summary: Update a classification contest rule by ID
+     *     description: Update a specific classification contest rule's details by its ID
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: The ID of the classification contest rule to update
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/UpdateClassificationContestRuleInput'
+     *     responses:
+     *       '200':
+     *         description: Classification contest rule updated successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/ClassificationContestRuleResponse'
+     *       '400':
+     *         description: Validation error
+     *       '404':
+     *         description: Classification contest rule not found
+     *       '500':
+     *         description: Internal server error
+     */
+    router.put(
+        "/updateClassificationById/:id",
+        classificationContestRuleController.updateClassificationContestRuleById
+    );
+
     return router;
 }

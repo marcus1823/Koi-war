@@ -95,5 +95,50 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
         contestInstanceController.getContestInstanceById
     );
 
+    /**
+     * @openapi
+     * /api/contestInstance/updateContestInstanceById/{id}:
+     *   put:
+     *     tags:
+     *       - Contest Instances
+     *     summary: Update a contest instance by ID
+     *     description: Update a specific contest instance's details by its ID
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: The ID of the contest instance to update
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/UpdateContestInstanceInput'
+     *     responses:
+     *       '200':
+     *         description: Contest instance updated successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/ContestInstanceResponse'
+     *       '400':
+     *         description: Validation error
+     *       '404':
+     *         description: Contest instance not found
+     *       '500':
+     *         description: Internal server error
+     */
+    router.put(
+        "/updateContestInstanceById/:id",
+        contestInstanceController.updateContestInstanceById
+    );
+
+    router.put(
+        "/disableContestInstanceById/:id",
+        contestInstanceController.disableContestInstance
+    );
+
     return router;
 }

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import {IContestServices} from "../services/IContestServices";
 import {CreateContestInput} from "../schema/contest.schema";
+import { IContest } from "../models/contest.model";
 
 export class ContestController {
     private contestServices: IContestServices;
@@ -61,5 +62,44 @@ export class ContestController {
             }
         }
     }
-}
 
+    updateContestById = async (
+        req: Request<{id: string, updateData: Partial<IContest>}>,
+        res: Response,
+    ) => {
+        try {
+            const updateContest = await this.contestServices.updateContestById(req.params.id, req.body);
+            if (!updateContest) {
+                res.status(404).json({message: "Contest not found"});
+            } else {
+                res.status(200).json({message: "Contest updated successfully", contest: updateContest});
+            }   
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(500).send(error.message);
+            } else {
+                res.status(500).send("An unknown error occurred");
+            }
+        }
+    }
+
+    deleteContestById = async (
+        req: Request<{id: string}>,
+        res: Response,
+    ) => {
+        try {
+            const deletedContest = await this.contestServices.deleteContestById(req.params.id);
+            if (!deletedContest) {
+                res.status(404).json({message: "Contest not found"});
+            } else {
+                res.status(200).json({message: "Contest deleted successfully", contest: deletedContest});
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(500).send(error.message);
+            } else {
+                res.status(500).send("An unknown error occurred");
+            }
+        }
+    }
+}

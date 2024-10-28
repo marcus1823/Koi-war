@@ -89,5 +89,44 @@ export function contestRoutes(contestController: ContestController): Router {
    */
   router.get("/getContestById/:id", contestController.getContestById);
 
+  /**
+   * @openapi
+   * /api/contest/updateContestById/{id}:
+   *   put:
+   *     tags:
+   *       - Contests
+   *     summary: Update a contest by ID
+   *     description: Update a specific contest's details by its ID
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: The ID of the contest to update
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/UpdateContestInput'
+   *     responses:
+   *       '200':
+   *         description: Contest updated successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ContestResponse'
+   *       '400':
+   *         description: Validation error
+   *       '404':
+   *         description: Contest not found
+   *       '500':
+   *         description: Internal server error
+   */
+  router.put("/updateContestById/:id", contestController.updateContestById);
+
+  router.delete("/deleteContestById/:id", contestController.deleteContestById);
+  
   return router;
 }

@@ -5,4 +5,5 @@ export interface IContestSubCategoryRepository {
     getAllContestSubCategory(): Promise<IContestSubCategory[]>;
     getContestSubCategoriesOfContestInstanceId(contestInstanceId: string): Promise<IContestSubCategory[]>;
     getContestSubCategoryById(id: string): Promise<IContestSubCategory | null>;
+    updateContestSubCategoryById(id: string, updateData: Partial<IContestSubCategory>): Promise<IContestSubCategory | null>;    
 }

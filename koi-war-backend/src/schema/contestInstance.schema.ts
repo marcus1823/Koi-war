@@ -70,6 +70,9 @@ import { parseDateFromString } from "../utils/format.utils";
 
 export const createContestInstanceSchema = object({
   body: object({
+    name: string({
+      required_error: "Name is required",
+    }),
     contest: string({
       required_error: "Contest is required",
     }),

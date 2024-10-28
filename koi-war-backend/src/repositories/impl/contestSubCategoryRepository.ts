@@ -25,4 +25,9 @@ export class ContestSubCategoryRepository implements IContestSubCategoryReposito
             .populate("contestInstance");
         return contestSubCategory;
     }
-}
+
+    async updateContestSubCategoryById(id: string, updateData: Partial<IContestSubCategory>): Promise<IContestSubCategory | null> {
+        return ContestSubCategory.findByIdAndUpdate(id, updateData, {new: true})
+            .populate("contestInstance");
+    }
+}   

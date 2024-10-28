@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
+import { IContestInstance } from "./contestInstance.model";
 
 export interface IContest {
   name: string;
   description?: string;
+  contestInstances: mongoose.Types.ObjectId[] | IContestInstance[];
 }
 
 interface ContestDocument extends IContest, mongoose.Document {
@@ -22,6 +24,10 @@ const contestSchema = new mongoose.Schema<ContestDocument>(
       type: String,
       required: false,
     },
+    contestInstances: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ContestInstance",
+    }],
   },
   { timestamps: true }
 );

@@ -40,5 +40,13 @@ export class ClassificationContestRuleService implements IClassificationContestR
             classificationContestRule as IClassificationContestRule & { _id: string; createdAt: Date; updatedAt: Date }
         )
     }
-    
+    async updateClassificationContestRuleById(id: string, updateData: Partial<IClassificationContestRule>): Promise<IClassificationContestRuleResponse | null> {
+        const classificationContestRule = await this.classificationContestRuleRepository.updateClassificationContestRuleById(id, updateData);
+        if (!classificationContestRule) {
+            throw new Error("Classification contest rule not found");
+        }
+        return mapClassificationContestRuleResponse(
+            classificationContestRule as IClassificationContestRule & { _id: string; createdAt: Date; updatedAt: Date }
+        )   
+    }
 }

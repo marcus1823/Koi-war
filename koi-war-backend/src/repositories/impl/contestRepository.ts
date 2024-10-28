@@ -9,12 +9,32 @@ export class ContestRepository implements IContestRepository {
   }
 
   async getAllContests(): Promise<IContest[]> {
-    const contests = await Contest.find();
+    const contests = await Contest.find().populate({
+      path: 'contestInstances',
+      model: 'ContestInstance'
+    });
     return contests;
   }
 
   async getContestById(id: string): Promise<IContest | null> {
-    const contest = await Contest.findById(id);
+    const contest = await Contest.findById(id).populate({
+      path: 'contestInstances',
+      model: 'ContestInstance'
+    });
     return contest;
   }
+
+  async updateContest(id: string, updateData: Partial<IContest>): Promise<IContest | null> {
+    return Contest.findByIdAndUpdate(id, updateData, {new: true}).populate("contestInstances");  
+  }
+
+  async deleteContest(id: string): Promise<IContest | null> {
+    return Contest.findByIdAndDelete(id);
 }
+
+  async hasContestInstance(id: string): Promise<boolean> {
+    const contest = await Contest.findById(id);
+    return contest ? contest.contestInstances.length > 0 : false;
+  }
+}
+ 

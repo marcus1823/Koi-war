@@ -35,4 +35,24 @@ export class ContestInstanceServices implements IContestInstanceServices {
             contestInstance as IContestInstance & { _id: string; createdAt: Date; updatedAt: Date }
         );
     }
+
+    async updateContestInstanceById(id: string, updateData: Partial<IContestInstance>): Promise<IContestInstanceResponse | null> {
+        const contestInstance = await this.contestInstanceRepository.updateContestInstanceById(id, updateData);
+        if (!contestInstance) {
+            throw new Error("Contest instance not found");
+        }
+        return mapContestInstanceResponse(
+            contestInstance as IContestInstance & { _id: string; createdAt: Date; updatedAt: Date }
+        );  
+    }
+
+    async disableContestInstanceById(id: string): Promise<IContestInstanceResponse | null> {
+        const contestInstance = await this.contestInstanceRepository.disableContestInstanceById(id);
+        if (!contestInstance) {
+            throw new Error("Contest instance not found");
+        }
+        return mapContestInstanceResponse(
+            contestInstance as IContestInstance & { _id: string; createdAt: Date; updatedAt: Date }
+        );  
+    }
 }

@@ -27,6 +27,7 @@ const contestSubCategorySchema = new mongoose.Schema(
       required: false,
     },
     contestInstance: {
+
       type: mongoose.Schema.Types.ObjectId,
       ref: "ContestInstance",
       required: true,

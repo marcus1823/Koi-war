@@ -11,6 +11,7 @@ export interface IContestInstanceResponse {
   description?: string;
   rules?: string;
   images?: string;
+  isDisabled: boolean;
 }
 export function mapContestInstanceResponse(
   contestInstance: IContestInstance & {
@@ -29,5 +30,6 @@ export function mapContestInstanceResponse(
     description: contestInstance.description ?? "",
     rules: contestInstance.rules ?? "",
     images: contestInstance.images ? contestInstance.images[0] : "",
+    isDisabled: contestInstance.isDisabled,
   };
 }
