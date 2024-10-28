@@ -6,5 +6,6 @@ export interface IClassificationContestRuleServices {
     getAllClassificationContestRules(): Promise<IClassificationContestRuleResponse[]>;
     getClassificationContestRuleById(id: string): Promise<IClassificationContestRuleResponse | null>;
     getClassificationContestRuleByContestSubCategoryId(contestSubCategoryId: string): Promise<IClassificationContestRuleResponse | null>;
+    updateClassificationContestRuleById(id: string, updateData: Partial<IClassificationContestRule>): Promise<IClassificationContestRuleResponse | null>;
 }
 

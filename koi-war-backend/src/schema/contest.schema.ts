@@ -34,12 +34,26 @@ export const createContestSchema = object({
     body: object({
         name: string({
             required_error: "Name is required",
-        }),
+        })
+            .min(2, "Name must be at least 2 characters long")
+            .max(150, "Name must be less than 150 characters long"),
         description: string({
             required_error: "Description is required",
-        }).min(8,"Description must be at least 8 characters"),
+        }).min(8, "Description must be at least 8 characters long"),
     })
-
 })
 
+export const updateContestSchema = object({
+    body: object({
+        name: string()
+            .min(2, "Name must be at least 2 characters long")
+            .max(150, "Name must be less than 150 characters long")
+            .optional(),
+        description: string()
+            .min(8, "Description must be at least 8 characters long")
+            .optional(),
+    }),
+});
+
 export type CreateContestInput = TypeOf<typeof createContestSchema>;
+export type UpdateContestInput = TypeOf<typeof updateContestSchema>;

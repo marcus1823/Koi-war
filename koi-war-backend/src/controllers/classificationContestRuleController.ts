@@ -1,6 +1,7 @@
 import { IClassificationContestRuleServices } from "../services/IClassificationContestRuleServices";
 import { Request, Response } from "express";
 import { ClassificationContestRuleInput } from "../schema/classificationContestRule.schema";
+import { IClassificationContestRule } from "../models/classificationContestRule.model";
 
 export class ClassificationContestRuleController {
   private classificationContestRuleService: IClassificationContestRuleServices;
@@ -81,4 +82,20 @@ export class ClassificationContestRuleController {
       }
     }
   };
+
+    updateClassificationContestRuleById = async (
+        req: Request<{id: string}, {}, Partial<IClassificationContestRule>>,
+        res: Response,
+    ) => {
+        try {
+            const updateClassificationContestRule = await this.classificationContestRuleService.updateClassificationContestRuleById(req.params.id, req.body);
+            res.status(200).json(updateClassificationContestRule);
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(500).send(error.message);
+            } else {
+                res.status(500).send("An unknown error occurred");
+            }
+        }   
+    }
 }

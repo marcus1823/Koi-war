@@ -59,4 +59,14 @@ export class ContestSubCategoryServices implements IContestSubCategoryService {
       } & IClassificationContestRule
     );
   }
+
+    async updateContestSubCategoryById(id: string, updateData: Partial<IContestSubCategory>): Promise<IContestSubCategoryResponse | null> { 
+        const contestSubCategory = await this.contestSubCategoryRepository.updateContestSubCategoryById(id, updateData);
+        if (!contestSubCategory) {
+            throw new Error("Contest sub category not found");
+        }
+        return mapContestSubCategoryResponse(
+            contestSubCategory as IContestSubCategory & { _id: string; createdAt: Date; updatedAt: Date }
+        )
+    }
 }

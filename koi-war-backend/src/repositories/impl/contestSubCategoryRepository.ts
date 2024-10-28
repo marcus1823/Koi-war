@@ -35,4 +35,15 @@ export class ContestSubCategoryRepository
       .populate("classificationContestRule");
     return contestSubCategory;
   }
-}
+
+    async getContestSubCategoryById(id: string): Promise<IContestSubCategory | null> {
+        const contestSubCategory = await ContestSubCategory.findById(id)
+            .populate("contestInstance");
+        return contestSubCategory;
+    }
+
+    async updateContestSubCategoryById(id: string, updateData: Partial<IContestSubCategory>): Promise<IContestSubCategory | null> {
+        return ContestSubCategory.findByIdAndUpdate(id, updateData, {new: true})
+            .populate("contestInstance");
+    }
+}   

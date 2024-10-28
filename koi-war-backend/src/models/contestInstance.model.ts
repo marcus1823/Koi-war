@@ -10,6 +10,7 @@ export interface IContestInstance {
   description?: string;
   rules?: string;
   images?: string[];
+  isDisabled: boolean;
 }
 
 interface ContestInstanceDocument extends IContestInstance, mongoose.Document {
@@ -51,6 +52,10 @@ const contestInstanceSchema = new mongoose.Schema<ContestInstanceDocument>(
     images: {
       type: [String],
       required: false,
+    },
+    isDisabled: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

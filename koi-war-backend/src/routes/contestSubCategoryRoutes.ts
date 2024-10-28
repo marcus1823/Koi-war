@@ -95,5 +95,45 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
         contestSubCategoryController.getContestSubCategoryById
     );
 
+    /**
+     * @openapi
+     * /api/contestSubCategory/updateContestSubCategoryById/{id}:
+     *   put:
+     *     tags:
+     *       - Contest SubCategories
+     *     summary: Update a contest subcategory by ID
+     *     description: Update a specific contest subcategory's details by its ID
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: The ID of the contest subcategory to update
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/UpdateContestSubCategoryInput'
+     *     responses:
+     *       '200':
+     *         description: Contest subcategory updated successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/ContestSubCategoryResponse'
+     *       '400':
+     *         description: Validation error
+     *       '404':
+     *         description: Contest subcategory not found
+     *       '500':
+     *         description: Internal server error
+     */
+    router.put(
+        "/updateContestSubCategoryById/:id",
+        contestSubCategoryController.updateContestSubCategoryById
+    );
+
     return router;
 }
