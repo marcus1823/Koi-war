@@ -1,7 +1,7 @@
 import {ICompetitionManagementServices} from "../ICompetitionManagementServices";
 import {IScoreServices} from "../IScoreServices";
 import {IContestRegistrationServices} from "../IContestRegistrationServices";
-import {IContestRegistrationResponse} from "../../types/contestRegistration";
+import {IContestRegistrationResponse, mapContestRegistrationResponse} from "../../types/contestRegistration";
 
 export class CompetitionManagementServices implements ICompetitionManagementServices {
     private scoreServices: IScoreServices;
@@ -23,12 +23,12 @@ export class CompetitionManagementServices implements ICompetitionManagementServ
 
         const contestRegistration = await this.registrationServices.getContestRegistrationByFishId(fishId);
 
-        contestRegistration.score = await this.scoreServices.getScoreByRegistrationId(
-            contestRegistration.id
+        contestRegistration.scores = await this.scoreServices.getScoreByRegistrationId(
+            contestRegistration._id
         );
 
-        return contestRegistration;
-
+        // return contestRegistration;
+        return mapContestRegistrationResponse(contestRegistration);
     }
 
     getContestRegistrationById(id: string): Promise<any> {

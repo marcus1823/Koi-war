@@ -1,11 +1,10 @@
 import {IContestRegistrationRepository} from "../../repositories/IContestRegistrationRepository";
-import {mapContestInstanceResponse} from "../../types/contestInstance";
-import {IContestRegistrationResponse} from "../../types/contestRegistration";
 import {IClassificationContestRuleServices} from "../IClassificationContestRuleServices";
 import {IContestInstanceServices} from "../IContestInstanceServices";
 import {IContestRegistrationServices} from "../IContestRegistrationServices";
 import {IContestSubCategoryService} from "../IContestSubCategoryService";
 import {IFishService} from "../IFishService";
+import {IRegistration} from "../../models/registration.model";
 
 export class ContestRegistrationServices
     implements IContestRegistrationServices {
@@ -91,7 +90,7 @@ export class ContestRegistrationServices
 
     async getContestRegistrationByFishId(
         fishId: string
-    ): Promise<IContestRegistrationResponse> {
+    ): Promise<IRegistration & {_id: string}> {
         const contestRegistration =
             await this.contestRegistrationRepository.getContestRegistrationByFishId(
                 fishId
@@ -100,11 +99,6 @@ export class ContestRegistrationServices
             throw new Error("Contest registration not found");
         }
 
-        return {
-            ...mapContestInstanceResponse(contestRegistration),
-            fish: contestRegistration.fish,
-            score: contestRegistration.score,
-            contestSubCategory: contestRegistration.contestSubCategory,
-        };
+        return contestRegistration;
     }
 }
