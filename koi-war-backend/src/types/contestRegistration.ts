@@ -12,7 +12,7 @@ import { IContestSubCategory } from "../models/contestSubCategory.model";
 export interface IContestRegistrationResponse {
   id: string;
   fish: IFishProfileResponse;
-  score: IScoreResponse[];
+  scores: IScoreResponse[];
   contestSubCategory: IContestSubCategoryResponse;
 }
 
@@ -24,7 +24,7 @@ export function mapContestRegistrationResponse(
     fish: mapFishProfileResponse(
       data.fish as IFish & { _id: string; createdAt: Date; updatedAt: Date }
     ),
-    score: data.scores
+    scores: data.scores
       ? (
           data.scores as (IScore & {
             _id: string;
