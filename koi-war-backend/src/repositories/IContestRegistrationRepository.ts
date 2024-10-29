@@ -8,4 +8,6 @@ export interface IContestRegistrationRepository {
   getContestRegistrationById(id: string): Promise<any>;
 
   getContestRegistrationByFishId(fishId: string): Promise<any>;
+
+    getContestRegistrationsBySubCategoryId(contestSubCategoryId: string): Promise<any[]>;
 }

@@ -24,4 +24,12 @@ export class ContestRegistrationRepository
             .populate("contestSubCategory")
             .populate("fish");
     }
+
+    getContestRegistrationsBySubCategoryId(contestSubCategoryId: string): Promise<any[]> {
+        return Registration.find({contestSubCategory: contestSubCategoryId})
+            .populate("scores")
+            .populate("contestInstance")
+            .populate("contestSubCategory")
+            .populate("fish");
+    }
 }

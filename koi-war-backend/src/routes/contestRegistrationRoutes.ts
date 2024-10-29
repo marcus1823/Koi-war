@@ -68,5 +68,35 @@ export function contestRegistrationRoutes(
      *         description: Internal server error
      */
     router.get("/getByFishId/:fishId", contestRegistrationController.getContestRegistrationByFishId);
+
+    /**
+     * @openapi
+     * /api/contestRegistration/ranking/{contestSubCategoryId}:
+     *   get:
+     *     tags:
+     *       - Contest Registration
+     *     summary: Get contest registration ranking
+     *     description: Get contest registration ranking by contest sub category id
+     *     parameters:
+     *       - in: path
+     *         name: contestSubCategoryId
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: Contest sub category id
+     *     responses:
+     *       '200':
+     *         description: Contest registration ranking retrieved successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/ContestRegistrationResponse'
+     *       '500':
+     *         description: Internal server error
+     */
+    router.get("/ranking/:contestSubCategoryId", contestRegistrationController.rankingContest);
+
     return router;
 }

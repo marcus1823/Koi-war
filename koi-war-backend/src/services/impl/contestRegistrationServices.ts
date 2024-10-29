@@ -101,4 +101,8 @@ export class ContestRegistrationServices
 
         return contestRegistration;
     }
+
+    getContestRegistrationsBySubCategoryId(contestSubCategoryId: string): Promise<(IRegistration & { _id: string })[]> {
+        return this.contestRegistrationRepository.getContestRegistrationsBySubCategoryId(contestSubCategoryId);
+    }
 }
