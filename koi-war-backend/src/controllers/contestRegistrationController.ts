@@ -1,17 +1,17 @@
 import {Request, Response} from "express";
-import {IContestRegistrationServices} from "../services/IContestRegistrationServices";
+import {ICompetitionManagementServices} from "../services/ICompetitionManagementServices";
 
 export class ContestRegistrationController {
-    private contestRegistrationService: IContestRegistrationServices;
+    private competitionManagementServices: ICompetitionManagementServices;
 
-    constructor(contestRegistrationService: IContestRegistrationServices) {
-        this.contestRegistrationService = contestRegistrationService;
+    constructor(competitionManagementServices: ICompetitionManagementServices) {
+        this.competitionManagementServices = competitionManagementServices;
     }
 
     createContestRegistration = async (req: Request, res: Response) => {
         try {
             const contestRegistration =
-                await this.contestRegistrationService.createContestRegistration(
+                await this.competitionManagementServices.createContestRegistration(
                     req.body
                 );
             res.status(201).json(contestRegistration);
@@ -26,7 +26,7 @@ export class ContestRegistrationController {
 
     getContestRegistrationByFishId = async (req: Request, res: Response) => {
         try {
-            const contestRegistration = await this.contestRegistrationService.getContestRegistrationByFishId(
+            const contestRegistration = await this.competitionManagementServices.getContestRegistrationByFishId(
                 req.params.fishId
             );
 

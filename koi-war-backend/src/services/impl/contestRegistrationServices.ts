@@ -6,7 +6,6 @@ import {IContestInstanceServices} from "../IContestInstanceServices";
 import {IContestRegistrationServices} from "../IContestRegistrationServices";
 import {IContestSubCategoryService} from "../IContestSubCategoryService";
 import {IFishService} from "../IFishService";
-import {IScoreServices} from "../IScoreServices";
 
 export class ContestRegistrationServices
     implements IContestRegistrationServices {
@@ -15,7 +14,6 @@ export class ContestRegistrationServices
     private fishServices: IFishService;
     private contestSubCategoryServices: IContestSubCategoryService;
     private classificationContestRuleService: IClassificationContestRuleServices;
-    private scoreServices: IScoreServices;
 
     constructor(
         contestRegistrationRepository: IContestRegistrationRepository,
@@ -23,14 +21,12 @@ export class ContestRegistrationServices
         fishServices: IFishService,
         contestSubCategoryServices: IContestSubCategoryService,
         classificationContestRuleService: IClassificationContestRuleServices,
-        scoreServices: IScoreServices
     ) {
         this.contestRegistrationRepository = contestRegistrationRepository;
         this.contestInstanceServices = contestInstanceServices;
         this.fishServices = fishServices;
         this.contestSubCategoryServices = contestSubCategoryServices;
         this.classificationContestRuleService = classificationContestRuleService;
-        this.scoreServices = scoreServices;
     }
 
     async createContestRegistration(data: {
@@ -103,13 +99,11 @@ export class ContestRegistrationServices
         if (!contestRegistration) {
             throw new Error("Contest registration not found");
         }
-        const scores = await this.scoreServices.getScoreByRegistrationId(
-            contestRegistration.id
-        );
+
         return {
             ...mapContestInstanceResponse(contestRegistration),
             fish: contestRegistration.fish,
-            score: scores,
+            score: contestRegistration.score,
             contestSubCategory: contestRegistration.contestSubCategory,
         };
     }

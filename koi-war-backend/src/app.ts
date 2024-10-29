@@ -30,13 +30,14 @@ import {ClassificationContestRuleRepository} from "./repositories/impl/classific
 import {classificationContestRuleRoutes} from "./routes/classificationContestRuleRoutes";
 import cors from "cors";
 import {contestRegistrationRoutes} from "./routes/contestRegistrationRoutes";
-import {ContestRegistrationController} from "./controllers/contestRegistration.controller";
+import {ContestRegistrationController} from "./controllers/contestRegistrationController";
 import {ContestRegistrationServices} from "./services/impl/contestRegistrationServices";
 import {ContestRegistrationRepository} from "./repositories/impl/contestRegistrationRepository";
 import {scoreRoutes} from "./routes/scoreRoutes";
 import {ScoreController} from "./controllers/scoreController";
 import {ScoreServices} from "./services/impl/scoreServices";
 import {ScoreRepository} from "./repositories/impl/scoreRepository";
+import {CompetitionManagementServices} from "./services/impl/competitionManagementServices";
 
 const app = express();
 connectDB().then(() => console.log("Connected to DB"));
@@ -105,30 +106,22 @@ app.use(
     "/api/contestRegistration",
     contestRegistrationRoutes(
         new ContestRegistrationController(
-            new ContestRegistrationServices(
-                new ContestRegistrationRepository(),
-                new ContestInstanceServices(new ContestInstanceRepository()),
-                new FishServices(
-                    new FishRepository(),
-                    new UserService(new UserRepository())
-                ),
-                new ContestSubCategoryServices(new ContestSubCategoryRepository()),
-                new ClassificationContestRuleService(
-                    new ClassificationContestRuleRepository()
-                ),
-                new ScoreServices(new ScoreRepository(), new ContestRegistrationRepository()
-                )
-            )
-        )
-    )
-);
-
-app.use(
-    "/api/score",
-    scoreRoutes(
-        new ScoreController(
-            new ScoreServices(
-                new ScoreRepository(),
+            // new ContestRegistrationServices(
+            //     new ContestRegistrationRepository(),
+            //     new ContestInstanceServices(new ContestInstanceRepository()),
+            //     new FishServices(
+            //         new FishRepository(),
+            //         new UserService(new UserRepository())
+            //     ),
+            //     new ContestSubCategoryServices(new ContestSubCategoryRepository()),
+            //     new ClassificationContestRuleService(
+            //         new ClassificationContestRuleRepository()
+            //     ),
+            //     new ScoreServices(new ScoreRepository(), new ContestRegistrationRepository()
+            //     )
+            // )
+            new CompetitionManagementServices(
+                new ScoreServices(new ScoreRepository()),
                 new ContestRegistrationServices(
                     new ContestRegistrationRepository(),
                     new ContestInstanceServices(new ContestInstanceRepository()),
@@ -139,8 +132,29 @@ app.use(
                     new ContestSubCategoryServices(new ContestSubCategoryRepository()),
                     new ClassificationContestRuleService(
                         new ClassificationContestRuleRepository()
+                    )
+                )
+            )
+        )
+    )
+);
+
+app.use(
+    "/api/score",
+    scoreRoutes(
+        new ScoreController(
+            new CompetitionManagementServices(
+                new ScoreServices(new ScoreRepository()),
+                new ContestRegistrationServices(
+                    new ContestRegistrationRepository(),
+                    new ContestInstanceServices(new ContestInstanceRepository()),
+                    new FishServices(
+                        new FishRepository(),
+                        new UserService(new UserRepository())
                     ),
-                    new ScoreServices(new ScoreRepository(), new ContestRegistrationRepository()
+                    new ContestSubCategoryServices(new ContestSubCategoryRepository()),
+                    new ClassificationContestRuleService(
+                        new ClassificationContestRuleRepository()
                     )
                 )
             )

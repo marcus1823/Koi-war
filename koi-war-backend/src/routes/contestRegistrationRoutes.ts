@@ -1,5 +1,5 @@
 import {Router} from "express";
-import {ContestRegistrationController} from "../controllers/contestRegistration.controller";
+import {ContestRegistrationController} from "../controllers/contestRegistrationController";
 import {validate} from "../middleware/validateResource";
 import {CreateContestRegistrationInput} from "../schema/contestRegistration.schema";
 
