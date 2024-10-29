@@ -44,4 +44,19 @@ export class ContestRegistrationController {
         }
     }
 
+    rankingContest = async (req: Request, res: Response) => {
+        try {
+            const ranking = await this.competitionManagementServices.rankingContestRegistration(
+                req.params.contestSubCategoryId
+            );
+            res.status(200).json(ranking);
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(500).send(error.message);
+            } else {
+                res.status(500).send("An unknown error occurred");
+            }
+        }
+    }
+
 }

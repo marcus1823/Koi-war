@@ -2,6 +2,7 @@ import {ICompetitionManagementServices} from "../ICompetitionManagementServices"
 import {IScoreServices} from "../IScoreServices";
 import {IContestRegistrationServices} from "../IContestRegistrationServices";
 import {IContestRegistrationResponse, mapContestRegistrationResponse} from "../../types/contestRegistration";
+import {totalScoreOfAReferee} from "../../utils/expression.utils";
 
 export class CompetitionManagementServices implements ICompetitionManagementServices {
     private scoreServices: IScoreServices;
@@ -54,4 +55,35 @@ export class CompetitionManagementServices implements ICompetitionManagementServ
 
         return this.scoreServices.createScore(data);
     }
+
+    async rankingContestRegistration(contestSubCategoryId: string): Promise<any> {
+        const registrations = await this.registrationServices.getContestRegistrationsBySubCategoryId(contestSubCategoryId);
+
+        const registrationsWithScores = await Promise.all(
+            registrations.map(async (registration) => {
+                registration.scores = await this.scoreServices.getScoreByRegistrationId(
+                    registration._id
+                );
+                const totalScore = registration.scores?.reduce(
+                    (acc, score) => acc + totalScoreOfAReferee(score),
+                    0
+                )
+                return {
+                    registration,
+                    totalScore
+                };
+            })
+        );
+
+        registrationsWithScores.sort((a, b) => {
+            return (b.totalScore ?? 0) - (a.totalScore ?? 0);
+        });
+
+        return registrationsWithScores.map((entry, index) => ({
+            rank: index + 1,
+            registration: entry.registration,
+            totalScore: entry.totalScore,
+        }));
+    }
+
 }
