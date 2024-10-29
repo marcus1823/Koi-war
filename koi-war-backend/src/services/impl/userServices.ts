@@ -14,9 +14,7 @@ export class UserService implements IUserService {
   }
   async registerUser(data: IUser): Promise<IUserResponse> {
     const user = await this.userRepository.createUser(data);
-    return mapUserResponse(
-      user as IUser & { _id: string; createdAt: Date; updatedAt: Date }
-    );
+    return mapUserResponse(user as IUser & { _id: string; createdAt: Date; updatedAt: Date });
   }
   async login(data: { username: string; password: string }): Promise<any> {
     const user = (await this.userRepository.findUserByUsername(
@@ -45,28 +43,20 @@ export class UserService implements IUserService {
     const token = generateAccessToken(payload);
 
     return {
-      user: mapUserResponse(
-        user as IUser & { _id: string; createdAt: Date; updatedAt: Date }
-      ),
+      user: mapUserResponse(user as IUser & { _id: string; createdAt: Date; updatedAt: Date }),
       token,
     };
   }
   async getUserById(id: string) {
     const user = await this.userRepository.findUserById(id);
-    return mapUserResponse(
-      user as IUser & { _id: string; createdAt: Date; updatedAt: Date }
-    );
+    return mapUserResponse(user as IUser & { _id: string; createdAt: Date; updatedAt: Date });
   }
   async getUserByEmail(email: string) {
     const user = await this.userRepository.findUserByEmail(email);
-    return mapUserResponse(
-      user as IUser & { _id: string; createdAt: Date; updatedAt: Date }
-    );
+    return mapUserResponse(user as IUser & { _id: string; createdAt: Date; updatedAt: Date });
   }
   async getUserByUsername(username: string) {
     const user = await this.userRepository.findUserByUsername(username);
-    return mapUserResponse(
-      user as IUser & { _id: string; createdAt: Date; updatedAt: Date }
-    );
+    return mapUserResponse(user as IUser & { _id: string; createdAt: Date; updatedAt: Date });
   }
 }

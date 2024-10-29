@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { IRegistration } from "./registration.model";
+import { IUser } from "./user.model";
 
 export interface IScore {
   registration: IRegistration & { _id: string };
@@ -7,6 +8,7 @@ export interface IScore {
   patternScore: number;
   colorScore: number;
   rank: number;
+  referee: IUser & { _id: string };
 }
 
 interface ScoreDocument extends IScore, mongoose.Document {
@@ -34,7 +36,10 @@ const scoreSchema = new mongoose.Schema<ScoreDocument>({
   },
   rank: {
     type: Number,
-    required: true,
+  },
+  referee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
   },
 });
 
