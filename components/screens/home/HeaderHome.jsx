@@ -36,7 +36,6 @@ export default function Header() {
                     }}>Welcome,</Text>
                     <Text style={{
                         fontSize: 19,
-                        fontFamily: 'outfit-medium',
                         color: 'black'
                     }}>Ngoc</Text>
                 </View>
@@ -56,7 +55,6 @@ export default function Header() {
                 <AntDesign name="search1" size={24} color={Colors.PRIMARY} />
                 <TextInput placeholder='Search...'
                     style={{
-                        fontFamily: 'outfit',
                         fontSize: 16
                     }}
                 />
