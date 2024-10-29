@@ -3,7 +3,8 @@ import { Stack } from "expo-router";
 
 export default function RootLayout() {
   useFonts({
-    'outfit-regular': require('../assets/fonts/Outfit-VariableFont_wght.ttf'),
+    "outfit-regular": require("../assets/fonts/Outfit-VariableFont_wght.ttf"),
+    "outfit-bold": require("../assets/fonts/Outfit-Bold.ttf"),
   });
 
   return (
