@@ -4,7 +4,7 @@ import { IContestInstance } from "./contestInstance.model";
 export interface IContestSubCategory {
   name: string;
   description?: string;
-  contestInstance: IContestInstance & { _id: string };
+  contestInstance: mongoose.Types.ObjectId | string | IContestInstance;
 }
 
 interface ContestSubCategoryDocument
@@ -27,7 +27,6 @@ const contestSubCategorySchema = new mongoose.Schema(
       required: false,
     },
     contestInstance: {
-
       type: mongoose.Schema.Types.ObjectId,
       ref: "ContestInstance",
       required: true,

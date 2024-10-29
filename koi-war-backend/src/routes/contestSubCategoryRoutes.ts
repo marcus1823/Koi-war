@@ -1,7 +1,7 @@
 import { ContestSubCategoryController } from "../controllers/contestSubCategoryController";
 import { Router } from "express";
 import { validate } from "../middleware/validateResource";
-import { createContestSubCategorySchema } from "../schema/contestSubCategory.schema";
+import { createContestSubCategorySchema, updateContestSubCategorySchema } from "../schema/contestSubCategory.schema";
 
 export function contestSubCategoryRoutes(contestSubCategoryController: ContestSubCategoryController): Router {
     const router = Router();
@@ -59,7 +59,7 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
      *         description: Internal server error
      */
     router.get(
-        "/getAllContestSubCategories",
+        "/getAllContestSubCategory",
         contestSubCategoryController.getAllContestSubCategory
     );
 
@@ -132,6 +132,7 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
      */
     router.put(
         "/updateContestSubCategoryById/:id",
+        validate(updateContestSubCategorySchema),
         contestSubCategoryController.updateContestSubCategoryById
     );
 

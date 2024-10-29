@@ -1,6 +1,6 @@
 import {IContestInstanceServices} from "../services/IContestInstanceServices";
 import { Request, Response } from "express";
-import {ContestInstanceInput} from "../schema/contestInstance.schema";
+import { CreateContestInstanceInput} from "../schema/contestInstance.schema";
 import { IContestInstance } from "../models/contestInstance.model";
 
 export class ContestInstanceController {
@@ -11,17 +11,27 @@ export class ContestInstanceController {
     }
 
     createContestInstance = async (
-        req: Request<{}, {}, ContestInstanceInput>,
-        res: Response,
-    )=> {
+        req: Request<{}, {}, CreateContestInstanceInput["body"]>,
+        res: Response
+    ): Promise<void> => {
         try {
             const contestInstance = await this.contestInstanceService.createContestInstance(req.body);
-            res.status(201).json(contestInstance);
+            res.status(201).json({
+                success: true,
+                message: "Contest instance created successfully",
+                data: contestInstance
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(409).send(error.message);
+                res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
             } else {
-                res.status(409).send("An unknown error occurred");
+                res.status(500).json({
+                    success: false,
+                    message: "Internal server error"
+                });
             }
         }
     }
@@ -29,76 +39,124 @@ export class ContestInstanceController {
     getAllContestInstances = async (
         req: Request,
         res: Response
-    )=> {
+    ): Promise<void> => {
         try {
             const contestInstances = await this.contestInstanceService.getAllContestInstances();
-            res.status(200).json(contestInstances);
-        }catch(error) {
+            res.status(200).json({
+                success: true,
+                data: contestInstances
+            });
+        } catch (error) {
             if (error instanceof Error) {
-                res.status(500).send(error.message);
+                res.status(500).json({
+                    success: false,
+                    message: error.message
+                });
             } else {
-                res.status(500).send("An unknown error occurred");
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to fetch contest instances"
+                });
             }
         }
     }
 
     getContestInstanceById = async (
         req: Request<{id: string}>,
-        res: Response,
-    ) => {
+        res: Response
+    ): Promise<void> => {
         try {
             const contestInstance = await this.contestInstanceService.getContestInstanceById(req.params.id);
-            if (!contestInstance) {
-                res.status(404).json({message: "Contest instance not found"});
-            } else {
-                res.status(200).json(contestInstance);
-            }
+            res.status(200).json({
+                success: true,
+                data: contestInstance
+            });
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(500).send(error.message);
+            if (error instanceof Error && error.message === "Contest instance not found") {
+                res.status(404).json({
+                    success: false,
+                    message: "Contest instance not found"
+                });
             } else {
-                res.status(500).send("An unknown error occurred");
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to fetch contest instance"
+                });
             }
         }
     }
 
     updateContestInstanceById = async (
         req: Request<{id: string}, {}, Partial<IContestInstance>>,
-        res: Response,
-    ) => {
+        res: Response
+    ): Promise<void> => {
         try {
-            const updateContestInstance = await this.contestInstanceService.updateContestInstanceById(req.params.id, req.body);
-            res.status(200).json(updateContestInstance);
+            const updatedInstance = await this.contestInstanceService.updateContestInstanceById(
+                req.params.id,
+                req.body
+            );
+            res.status(200).json({
+                success: true,
+                message: "Contest instance updated successfully",
+                data: updatedInstance
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(500).send(error.message);
+                if (error.message === "Contest instance not found") {
+                    res.status(404).json({
+                        success: false,
+                        message: "Contest instance not found"
+                    });
+                } else {
+                    res.status(400).json({
+                        success: false,
+                        message: error.message
+                    });
+                }
             } else {
-                res.status(500).send("An unknown error occurred");
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to update contest instance"
+                });
             }
-        }   
-    }   
+        }
+    }
 
     disableContestInstance = async (
         req: Request<{id: string}>,
-        res: Response,
-      ) => {
+        res: Response
+    ): Promise<void> => {
         try {
-          const disabledContestInstance = await this.contestInstanceService.disableContestInstanceById(req.params.id);
-          if (!disabledContestInstance) {
-            res.status(404).json({message: "Contest instance not found"});
-          } else {
-            res.status(200).json({message: "Contest instance disabled successfully", contestInstance: disabledContestInstance});
-          }
+            const disabledInstance = await this.contestInstanceService.disableContestInstanceById(req.params.id);
+            res.status(200).json({
+                success: true,
+                message: "Contest instance disabled successfully",
+                data: disabledInstance
+            });
         } catch (error) {
-          if (error instanceof Error) {
-            if (error.message === "Contest has already started or is ongoing, cannot disable") {
-              res.status(400).json({message: error.message});
+            if (error instanceof Error) {
+                if (error.message === "Contest instance not found") {
+                    res.status(404).json({
+                        success: false,
+                        message: "Contest instance not found"
+                    });
+                } else if (error.message === "Contest has already started or is ongoing, cannot disable") {
+                    res.status(400).json({
+                        success: false,
+                        message: error.message
+                    });
+                } else {
+                    res.status(500).json({
+                        success: false,
+                        message: "Failed to disable contest instance"
+                    });
+                }
             } else {
-              res.status(500).send(error.message);
+                res.status(500).json({
+                    success: false,
+                    message: "Internal server error"
+                });
             }
-          } else {
-            res.status(500).send("An unknown error occurred");
-          }
         }
-      }
+    }
 }

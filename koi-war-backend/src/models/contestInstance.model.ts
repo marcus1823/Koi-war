@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { IContest } from "./contest.model";
-
+import { IContestSubCategory } from "./contestSubCategory.model";
 export interface IContestInstance {
   contest: IContest;
   name: string;
@@ -11,6 +11,7 @@ export interface IContestInstance {
   rules?: string;
   images?: string[];
   isDisabled: boolean;
+  contestSubCategories: mongoose.Types.ObjectId[] | IContestSubCategory[];
 }
 
 interface ContestInstanceDocument extends IContestInstance, mongoose.Document {
@@ -57,6 +58,10 @@ const contestInstanceSchema = new mongoose.Schema<ContestInstanceDocument>(
       type: Boolean,
       default: false,
     },
+    contestSubCategories: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ContestSubCategory",
+    }],
   },
   { timestamps: true }
 );

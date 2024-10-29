@@ -11,94 +11,139 @@ export class ContestController {
     }
 
     createContest = async (
-        req: Request<{}, {}, CreateContestInput>,
-        res: Response,
-    ) => {
+        req: Request<{}, {}, CreateContestInput["body"]>,
+        res: Response
+    ): Promise<void> => {
         try {
             const contest = await this.contestServices.createContest(req.body);
-            res.status(201).json(contest);
+            res.status(201).json({
+                success: true,
+                message: "Contest created successfully",
+                data: contest
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(409).send(error.message);
-            }else {
-                res.status(409).send("An unknown error occurred");
+                res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
+            } else {
+                res.status(500).json({
+                    success: false,
+                    message: "Internal server error"
+                });
             }
         }
     }
 
     getAllContests = async (
         req: Request,
-        res: Response,
-    ) => {
+        res: Response
+    ): Promise<void> => {
         try {
             const contests = await this.contestServices.getAllContests();
-            res.status(200).json(contests);
+            res.status(200).json({
+                success: true,
+                data: contests
+            });
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(409).send(error.message);
-            }else {
-                res.status(409).send("An unknown error occurred");
-            }
+            res.status(500).json({
+                success: false,
+                message: "Failed to fetch contests"
+            });
         }
     }
 
     getContestById = async (
         req: Request<{id: string}>,
-        res: Response,
-    ) => {
+        res: Response
+    ): Promise<void> => {
         try {
             const contest = await this.contestServices.getContestById(req.params.id);
-            
-            if (!contest) {
-                res.status(404).json({message: "Contest not found"});
-            } else {
-                res.status(200).json(contest);
-            }
+            res.status(200).json({
+                success: true,
+                data: contest
+            });
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(500).send(error.message);
+            if (error instanceof Error && error.message === "Contest not found") {
+                res.status(404).json({
+                    success: false,
+                    message: "Contest not found"
+                });
             } else {
-                res.status(500).send("An unknown error occurred");
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to fetch contest"
+                });
             }
         }
     }
 
     updateContestById = async (
-        req: Request<{id: string, updateData: Partial<IContest>}>,
-        res: Response,
-    ) => {
+        req: Request<{id: string}, {}, Partial<IContest>>,
+        res: Response
+    ): Promise<void> => {
         try {
-            const updateContest = await this.contestServices.updateContestById(req.params.id, req.body);
-            if (!updateContest) {
-                res.status(404).json({message: "Contest not found"});
-            } else {
-                res.status(200).json({message: "Contest updated successfully", contest: updateContest});
-            }   
+            const updatedContest = await this.contestServices.updateContestById(
+                req.params.id,
+                req.body
+            );
+            res.status(200).json({
+                success: true,
+                message: "Contest updated successfully",
+                data: updatedContest
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(500).send(error.message);
+                if (error.message === "Contest not found") {
+                    res.status(404).json({
+                        success: false,
+                        message: "Contest not found"
+                    });
+                } else {
+                    res.status(400).json({
+                        success: false,
+                        message: error.message
+                    });
+                }
             } else {
-                res.status(500).send("An unknown error occurred");
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to update contest"
+                });
             }
         }
     }
 
     deleteContestById = async (
         req: Request<{id: string}>,
-        res: Response,
-    ) => {
+        res: Response
+    ): Promise<void> => {
         try {
             const deletedContest = await this.contestServices.deleteContestById(req.params.id);
-            if (!deletedContest) {
-                res.status(404).json({message: "Contest not found"});
-            } else {
-                res.status(200).json({message: "Contest deleted successfully", contest: deletedContest});
-            }
+            res.status(200).json({
+                success: true,
+                message: "Contest deleted successfully",
+                data: deletedContest
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(500).send(error.message);
+                if (error.message === "Contest not found") {
+                    res.status(404).json({
+                        success: false,
+                        message: "Contest not found"
+                    });
+                } else if (error.message === "Cannot delete contest with existing instances") {
+                    res.status(400).json({
+                        success: false,
+                        message: "Cannot delete contest with existing instances"
+                    });
+                }
             } else {
-                res.status(500).send("An unknown error occurred");
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to delete contest"
+                });
             }
         }
     }

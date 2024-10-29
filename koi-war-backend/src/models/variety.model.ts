@@ -6,11 +6,14 @@ export interface IVariety {
   images?: string[];
 }
 
-interface VarietyDocument extends IVariety, mongoose.Document {
+export interface IVarietyDocument extends IVariety, mongoose.Document {
+  _id: string;
+  createdAt: Date;
+  updatedAt: Date;
   classificationContestRules: mongoose.Types.Array<string>;
 }
 
-const varietySchema = new mongoose.Schema<VarietyDocument>(
+const varietySchema = new mongoose.Schema<IVarietyDocument>(
   {
     name: {
       type: String,
@@ -37,6 +40,6 @@ const varietySchema = new mongoose.Schema<VarietyDocument>(
 );
 
 
-const Variety = mongoose.model<VarietyDocument>("Variety", varietySchema);
+const Variety = mongoose.model<IVarietyDocument>("Variety", varietySchema);
 
 export default Variety;

@@ -16,6 +16,6 @@ export function mapContestSubCategoryResponse(
         id: contestSubCategory._id,
         name: contestSubCategory.name,
         description: contestSubCategory.description,
-        contestInstance: contestSubCategory.contestInstance,
+        contestInstance: contestSubCategory.contestInstance as IContestInstance,
     }
 }

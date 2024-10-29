@@ -4,7 +4,9 @@ import {
   IContestSubCategoryResponse,
   mapContestSubCategoryResponse,
 } from "../../types/contestSubCategory";
-import { IContestSubCategory } from "../../models/contestSubCategory.model";
+import ContestSubCategory, { IContestSubCategory } from "../../models/contestSubCategory.model";
+import ContestInstance from "../../models/contestInstance.model";
+import mongoose from "mongoose";
 import { IClassificationContestRule } from "../../models/classificationContestRule.model";
 
 export class ContestSubCategoryServices implements IContestSubCategoryService {
@@ -17,16 +19,43 @@ export class ContestSubCategoryServices implements IContestSubCategoryService {
   async createContestSubCategory(
     data: any
   ): Promise<IContestSubCategoryResponse> {
-    const contestSubCategory =
-      await this.contestSubCategoryRepository.createContestSubCategory(data);
-
-    return mapContestSubCategoryResponse(
-      contestSubCategory as IContestSubCategory & {
-        _id: string;
-        createdAt: Date;
-        updatedAt: Date;
+    try {
+      // Kiểm tra contestInstance có tồn tại không
+      const contestInstance = await ContestInstance.findById(data.contestInstance);
+      if (!contestInstance) {
+        throw new Error("Contest instance not found");
       }
-    );
+
+      // Kiểm tra contestInstance có bị disable không
+      if (contestInstance.isDisabled) {
+        throw new Error("Cannot create subcategory for disabled contest instance");
+      }
+
+      // Kiểm tra tên subcategory đã tồn tại trong contest instance này chưa
+      const existingSubCategory = await ContestSubCategory.findOne({
+        contestInstance: data.contestInstance,
+        name: data.name
+      } );
+      if (existingSubCategory) {
+        throw new Error("A subcategory with this name already exists in this contest instance");
+      }
+
+      const contestSubCategory =
+        await this.contestSubCategoryRepository.createContestSubCategory(data);
+
+      return mapContestSubCategoryResponse(
+        contestSubCategory as IContestSubCategory & {
+          _id: string;
+          createdAt: Date;
+          updatedAt: Date;
+        }
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error("Failed to create contest subcategory");
+    }
   }
 
   async getAllContestSubCategory(): Promise<IContestSubCategoryResponse[]> {
@@ -60,13 +89,63 @@ export class ContestSubCategoryServices implements IContestSubCategoryService {
     );
   }
 
-    async updateContestSubCategoryById(id: string, updateData: Partial<IContestSubCategory>): Promise<IContestSubCategoryResponse | null> { 
-        const contestSubCategory = await this.contestSubCategoryRepository.updateContestSubCategoryById(id, updateData);
-        if (!contestSubCategory) {
-            throw new Error("Contest sub category not found");
+  async updateContestSubCategoryById(
+    id: string,
+    updateData: Partial<{
+      name?: string;
+      description?: string;
+      contestInstance?: string;
+    }>
+  ): Promise<IContestSubCategoryResponse | null> {
+    try {
+      // Kiểm tra subcategory tồn tại
+      const existingSubCategory = await this.contestSubCategoryRepository.getContestSubCategoryById(id);
+      if (!existingSubCategory) {
+        throw new Error("Contest sub category not found");
+      }
+
+      // Xử lý contestInstance ID nếu có
+      const processedData: Partial<IContestSubCategory> = { ...updateData };
+      if (updateData.contestInstance) {
+        // Kiểm tra contestInstance tồn tại
+        const contestInstance = await ContestInstance.findById(updateData.contestInstance);
+        if (!contestInstance) {
+          throw new Error("Contest instance not found");
         }
-        return mapContestSubCategoryResponse(
-            contestSubCategory as IContestSubCategory & { _id: string; createdAt: Date; updatedAt: Date }
-        )
+        // Chuyển string ID thành ObjectId
+        processedData.contestInstance = new mongoose.Types.ObjectId(updateData.contestInstance);
+      }
+
+      // Kiểm tra trùng tên nếu có cập nhật tên
+      if (updateData.name) {
+        const existingName = await ContestSubCategory.findOne({
+          contestInstance: existingSubCategory.contestInstance,
+          name: updateData.name,
+        });
+        if (existingName) {
+          throw new Error("A subcategory with this name already exists in this contest instance");
+        }
+      }
+
+      const updatedSubCategory = await this.contestSubCategoryRepository.updateContestSubCategoryById(
+        id,
+        processedData
+      );
+
+      if (!updatedSubCategory) {
+        throw new Error("Failed to update contest subcategory");
+      }
+
+      return mapContestSubCategoryResponse(updatedSubCategory as IContestSubCategory & {
+        _id: string;
+        createdAt: Date;
+        updatedAt: Date;
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error("Failed to update contest subcategory");
     }
+  }
 }

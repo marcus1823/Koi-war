@@ -6,4 +6,5 @@ export interface IVarietyRepository {
     getAllVarieties(): Promise<IVariety[]>;
     updateVarietyById(id: string, updateData: Partial<IVariety>): Promise<IVariety | null>;
     deleteVarietyById(id: string): Promise<IVariety | null>;
+    findByName(name: string): Promise<IVariety | null>;
 }

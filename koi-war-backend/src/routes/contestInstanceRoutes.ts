@@ -1,7 +1,7 @@
 import { ContestInstanceController } from "../controllers/contestInstanceController";
 import { Router } from "express";
 import { validate } from "../middleware/validateResource";
-import { createContestInstanceSchema } from "../schema/contestInstance.schema";
+import { createContestInstanceSchema, updateContestInstanceSchema } from "../schema/contestInstance.schema";
 
 export function contestInstanceRoutes(contestInstanceController: ContestInstanceController): Router {
     const router = Router();
@@ -26,9 +26,18 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
      *         content:
      *           application/json:
      *             schema:
-     *               $ref: '#/components/schemas/ContestInstanceResponse'
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 message:
+     *                   type: string
+     *                   example: Contest instance created successfully
+     *                 data:
+     *                   $ref: '#/components/schemas/ContestInstanceResponse'
      *       '400':
-     *         description: Validation error
+     *         description: Bad request - Invalid input data
      *       '500':
      *         description: Internal server error
      */
@@ -48,13 +57,19 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
      *     description: Retrieve a list of all contest instances
      *     responses:
      *       '200':
-     *         description: A list of contest instances
+     *         description: List of contest instances retrieved successfully
      *         content:
      *           application/json:
      *             schema:
-     *               type: array
-     *               items:
-     *                 $ref: '#/components/schemas/ContestInstanceResponse'
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 data:
+     *                   type: array
+     *                   items:
+     *                     $ref: '#/components/schemas/ContestInstanceResponse'
      *       '500':
      *         description: Internal server error
      */
@@ -69,7 +84,7 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
      *   get:
      *     tags:
      *       - Contest Instances
-     *     summary: Get a contest instance by ID
+     *     summary: Get contest instance by ID
      *     description: Retrieve a specific contest instance by its ID
      *     parameters:
      *       - in: path
@@ -77,14 +92,20 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
      *         required: true
      *         schema:
      *           type: string
-     *         description: The ID of the contest instance to retrieve
+     *         description: Contest instance ID
      *     responses:
      *       '200':
-     *         description: The requested contest instance
+     *         description: Contest instance retrieved successfully
      *         content:
      *           application/json:
      *             schema:
-     *               $ref: '#/components/schemas/ContestInstanceResponse'
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 data:
+     *                   $ref: '#/components/schemas/ContestInstanceResponse'
      *       '404':
      *         description: Contest instance not found
      *       '500':
@@ -101,15 +122,15 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
      *   put:
      *     tags:
      *       - Contest Instances
-     *     summary: Update a contest instance by ID
-     *     description: Update a specific contest instance's details by its ID
+     *     summary: Update contest instance by ID
+     *     description: Update a specific contest instance's details
      *     parameters:
      *       - in: path
      *         name: id
      *         required: true
      *         schema:
      *           type: string
-     *         description: The ID of the contest instance to update
+     *         description: Contest instance ID
      *     requestBody:
      *       required: true
      *       content:
@@ -122,9 +143,18 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
      *         content:
      *           application/json:
      *             schema:
-     *               $ref: '#/components/schemas/ContestInstanceResponse'
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 message:
+     *                   type: string
+     *                   example: Contest instance updated successfully
+     *                 data:
+     *                   $ref: '#/components/schemas/ContestInstanceResponse'
      *       '400':
-     *         description: Validation error
+     *         description: Bad request - Invalid input data
      *       '404':
      *         description: Contest instance not found
      *       '500':
@@ -132,9 +162,48 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
      */
     router.put(
         "/updateContestInstanceById/:id",
+        validate(updateContestInstanceSchema),
         contestInstanceController.updateContestInstanceById
     );
 
+    /**
+     * @openapi
+     * /api/contestInstance/disableContestInstanceById/{id}:
+     *   put:
+     *     tags:
+     *       - Contest Instances
+     *     summary: Disable contest instance
+     *     description: Disable a specific contest instance if it hasn't started yet
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: Contest instance ID
+     *     responses:
+     *       '200':
+     *         description: Contest instance disabled successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 message:
+     *                   type: string
+     *                   example: Contest instance disabled successfully
+     *                 data:
+     *                   $ref: '#/components/schemas/ContestInstanceResponse'
+     *       '400':
+     *         description: Contest has already started or is ongoing
+     *       '404':
+     *         description: Contest instance not found
+     *       '500':
+     *         description: Internal server error
+     */
     router.put(
         "/disableContestInstanceById/:id",
         contestInstanceController.disableContestInstance

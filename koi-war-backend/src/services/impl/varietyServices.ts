@@ -2,7 +2,7 @@ import {IVarietyService} from "../IVarietyService";
 import {IVarietyRepository} from "../../repositories/IVarietyRepository";
 import {IFish} from "../../models/fish.model";
 import {IVarietyResponse, mapVarietyResponse} from "../../types/variety";
-import {IVariety} from "../../models/variety.model";
+import {IVariety, IVarietyDocument} from "../../models/variety.model";
 import {mapFishProfileResponse} from "../../types/fish";
 
 export class VarietyServices implements IVarietyService {
@@ -11,11 +11,30 @@ export class VarietyServices implements IVarietyService {
     constructor(varietyRepository: IVarietyRepository) {
         this.varietyRepository = varietyRepository;
     }
+
     async createVariety(data: any): Promise<IVarietyResponse> {
-        const variety = await this.varietyRepository.createVariety(data);
-        return mapVarietyResponse(
-            variety as IVariety & { _id: string; createdAt: Date; updatedAt: Date}
-        )
+        try {
+            // Check if variety with same name exists
+            const existingVariety = await this.varietyRepository.findByName(data.name);
+            if (existingVariety) {
+                throw new Error("Variety with this name already exists");
+            }
+
+            // Validate images array
+            if (!Array.isArray(data.images) || data.images.length === 0) {
+                throw new Error("At least one image is required");
+            }
+
+            const variety = await this.varietyRepository.createVariety(data);
+            return mapVarietyResponse(
+                variety as IVariety & { _id: string; createdAt: Date; updatedAt: Date }
+            );
+        } catch (error) {
+            if (error instanceof Error) {
+                throw error;
+            }
+            throw new Error("Failed to create variety");
+        }
     }
 
     async getVarietyById(id: string): Promise<IVarietyResponse> {
@@ -37,14 +56,40 @@ export class VarietyServices implements IVarietyService {
     }
 
     async updateVarietyById(id: string, updateData: Partial<IVariety>): Promise<IVarietyResponse> {
-        const variety = await this.varietyRepository.updateVarietyById(id, updateData);
-        if (!variety) {
-            throw new Error("Variety not found");
-        }
+        try {
+            // Check if variety exists
+            const existingVariety = await this.varietyRepository.getVarietyById(id);
+            if (!existingVariety) {
+                throw new Error("Variety not found");
+            }
 
-        return mapVarietyResponse(
-            variety as IVariety & { _id: string; createdAt: Date; updatedAt: Date }
-        );
+            // If updating name, check for duplicates
+            if (updateData.name) {
+                const duplicateVariety = await this.varietyRepository.findByName(updateData.name) as IVarietyDocument;
+                if (duplicateVariety && duplicateVariety._id.toString() !== id) {
+                    throw new Error("Variety with this name already exists");
+                }
+            }
+
+            // If updating images, validate array
+            if (updateData.images && (!Array.isArray(updateData.images) || updateData.images.length === 0)) {
+                throw new Error("At least one image is required");
+            }
+
+            const variety = await this.varietyRepository.updateVarietyById(id, updateData);
+            if (!variety) {
+                throw new Error("Failed to update variety");
+            }
+
+            return mapVarietyResponse(
+                variety as IVariety & { _id: string; createdAt: Date; updatedAt: Date }
+            );
+        } catch (error) {
+            if (error instanceof Error) {
+                throw error;
+            }
+            throw new Error("Failed to update variety");
+        }
     }
 
     async deleteVarietyById(id: string): Promise<IVarietyResponse> {

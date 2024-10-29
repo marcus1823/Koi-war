@@ -23,4 +23,8 @@ export class VarietyRepository implements IVarietyRepository  {
         async deleteVarietyById(id: string): Promise<IVariety | null> {
             return Variety.findByIdAndDelete(id)
         }
+
+        async findByName(name: string): Promise<IVariety | null> {
+            return Variety.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } });
+        }
 }

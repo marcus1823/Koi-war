@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import {IVarietyService} from "../services/IVarietyService";
-import {CreateVarietyInput} from "../schema/variety.schema";
+import {CreateVarietyInput, UpdateVarietyInput} from "../schema/variety.schema";
 import {GetUserInput} from "../schema/user.schema";
 import {IVariety} from "../models/variety.model";
 
@@ -12,18 +12,27 @@ export class VarietyController {
     }
 
     createVariety = async (
-        req: Request<{}, {}, CreateVarietyInput>,
+        req: Request<{}, {}, CreateVarietyInput["body"]>,
         res: Response
     ) => {
         try {
             const variety = await this.varietyServices.createVariety(req.body);
-
-            res.status(201).json(variety);
+            res.status(201).json({
+                success: true,
+                message: "Variety created successfully",
+                data: variety
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(409).send(error.message);
+                res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
             } else {
-                res.status(409).send("An unknown error occurred");
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to create variety"
+                });
             }
         }
     }
@@ -31,20 +40,31 @@ export class VarietyController {
     getVarietyById = async (
         req: Request<{id: string}>,
         res: Response
-    )=> {
+    ) => {
         try {
             const variety = await this.varietyServices.getVarietyById(req.params.id);
-
-            if (!variety) {
-                res.status(404).json({ message: "Variety not found" });
-            } else {
-                res.status(200).json(variety);
-            }
-        }catch (error) {
+            res.status(200).json({
+                success: true,
+                data: variety
+            });
+        } catch (error) {
             if (error instanceof Error) {
-                res.status(500).send(error.message);
-            }else {
-                res.status(500).send("An unknown error occurred");
+                if (error.message === "Variety not found") {
+                    res.status(404).json({
+                        success: false,
+                        message: error.message
+                    });
+                } else {
+                    res.status(400).json({
+                        success: false,
+                        message: error.message
+                    });
+                }
+            } else {
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to fetch variety"
+                });
             }
         }
     }
@@ -52,40 +72,50 @@ export class VarietyController {
     getAllVarieties = async (req: Request, res: Response) => {
         try {
             const varieties = await this.varietyServices.getAllVarieties();
-            if (varieties.length > 0) {
-                res.status(200).json(varieties);
-            }else {
-                res.status(404).json({ message: "Varieties not found" });
-            }
-        }catch (error) {
-            if (error instanceof Error) {
-                res.status(500).send(error.message);
-            }else {
-                res.status(500).send("An unknown error occurred");
-            }
+            res.status(200).json({
+                success: true,
+                data: varieties
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: "Failed to fetch varieties"
+            });
         }
     }
 
     updateVarietyById = async (
-        req: Request<{id: string, updateData: Partial<IVariety>}>,
+        req: Request<{id: string}, {}, UpdateVarietyInput["body"]>,
         res: Response
-    )=> {
+    ) => {
         try {
-            const updateVariety = await this.varietyServices.updateVarietyById(req.params.id, req.body);
-
-            if (!updateVariety) {
-                res.status(404).json({ message: "Variety not found" });
-            } else {
-                res.status(200).json({
-                    message: "Variety updated successfully",
-                    variety: updateVariety
-                });
-            }
+            const updatedVariety = await this.varietyServices.updateVarietyById(
+                req.params.id,
+                req.body
+            );
+            res.status(200).json({
+                success: true,
+                message: "Variety updated successfully",
+                data: updatedVariety
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(500).send(error.message);
+                if (error.message === "Variety not found") {
+                    res.status(404).json({
+                        success: false,
+                        message: error.message
+                    });
+                } else {
+                    res.status(400).json({
+                        success: false,
+                        message: error.message
+                    });
+                }
             } else {
-                res.status(500).send("An unknown error occurred");
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to update variety"
+                });
             }
         }
     }
@@ -93,24 +123,32 @@ export class VarietyController {
     deleteVarietyById = async (
         req: Request<{id: string}>,
         res: Response
-    )=> {
+    ) => {
         try {
-            const deleteVariety = await this.varietyServices.deleteVarietyById(req.params.id);
-            if (!deleteVariety) {
-                res.status(404).json({ message: "Variety not found" });
-            } else {
-                res.status(200).json({
-                    message: "Variety deleted successfully",
-                    variety: deleteVariety
-                })
-            }
+            await this.varietyServices.deleteVarietyById(req.params.id);
+            res.status(200).json({
+                success: true,
+                message: "Variety deleted successfully"
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(500).send(error.message);
-            }else {
-                res.status(500).send("An unknown error occurred");
+                if (error.message === "Variety not found") {
+                    res.status(404).json({
+                        success: false,
+                        message: error.message
+                    });
+                } else {
+                    res.status(400).json({
+                        success: false,
+                        message: error.message
+                    });
+                }
+            } else {
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to delete variety"
+                });
             }
         }
     }
-
 }

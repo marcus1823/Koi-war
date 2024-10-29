@@ -1,7 +1,8 @@
 import {IContestSubCategoryService} from "../services/IContestSubCategoryService";
-import {ContestSubCategoryInput} from "../schema/contestSubCategory.schema";
+import {ContestSubCategoryInput, UpdateContestSubCategoryInput} from "../schema/contestSubCategory.schema";
 import {Request, Response} from "express";
 import { IContestSubCategory } from "../models/contestSubCategory.model";
+
 export class ContestSubCategoryController {
     private contestSubCategoryService: IContestSubCategoryService;
 
@@ -10,17 +11,39 @@ export class ContestSubCategoryController {
     }
 
     createContestSubCategory = async (
-        req: Request<{}, {}, ContestSubCategoryInput>,
+        req: Request<{}, {}, ContestSubCategoryInput["body"]>,
         res: Response
     ) => {
         try {
             const contestSubCategory = await this.contestSubCategoryService.createContestSubCategory(req.body);
-            res.status(201).json(contestSubCategory);
+            res.status(201).json({
+                success: true,
+                message: "Contest subcategory created successfully",
+                data: contestSubCategory
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(409).send(error.message);
-            }else  {
-                res.status(409).send("An unknown error occurred");
+                if (error.message === "Contest instance not found") {
+                    res.status(404).json({
+                        success: false,
+                        message: error.message
+                    });
+                } else if (error.message.includes("already exists")) {
+                    res.status(409).json({
+                        success: false,
+                        message: error.message
+                    });
+                } else {
+                    res.status(400).json({
+                        success: false,
+                        message: error.message
+                    });
+                }
+            } else {
+                res.status(500).json({
+                    success: false,
+                    message: "Internal server error"
+                });
             }
         }
     }
@@ -28,48 +51,79 @@ export class ContestSubCategoryController {
     getAllContestSubCategory = async (
         req: Request,
         res: Response,
-        ) => {
+    ) => {
         try {
-            const contestSubCategory = await this.contestSubCategoryService.getAllContestSubCategory();
-            res.status(200).json(contestSubCategory);
+            const contestSubCategories = await this.contestSubCategoryService.getAllContestSubCategory();
+            res.status(200).json({
+                success: true,
+                data: contestSubCategories
+            });
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(500).send(error.message);
-            } else {
-                res.status(5000).send("An unknown error occurred");
-            }
+            res.status(500).json({
+                success: false,
+                message: "Failed to fetch contest subcategories"
+            });
         }
     }
 
-    getContestSubCategoryById = async ( 
-        req: Request<{id: string}>,
+    getContestSubCategoryById = async (
+        req: Request<{ id: string }>,
         res: Response,
     ) => {
         try {
             const contestSubCategory = await this.contestSubCategoryService.getContestSubCategoryById(req.params.id);
-            res.status(200).json(contestSubCategory);
+            res.status(200).json({
+                success: true,
+                data: contestSubCategory
+            });
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(500).send(error.message);
+            if (error instanceof Error && error.message === "Contest sub category not found") {
+                res.status(404).json({
+                    success: false,
+                    message: "Contest subcategory not found"
+                });
             } else {
-                res.status(500).send("An unknown error occurred");
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to fetch contest subcategory"
+                });
             }
-        }   
+        }
     }
 
-    updateContestSubCategoryById = async (  
-        req: Request<{id: string}, {}, Partial<IContestSubCategory>>,
+    updateContestSubCategoryById = async (
+        req: Request<{ id: string }, {}, UpdateContestSubCategoryInput["body"]>,
         res: Response,
     ) => {
         try {
-            const updateContestSubCategory = await this.contestSubCategoryService.updateContestSubCategoryById(req.params.id, req.body);
-            res.status(200).json(updateContestSubCategory);
+            const updatedSubCategory = await this.contestSubCategoryService.updateContestSubCategoryById(
+                req.params.id,
+                req.body
+            );
+            res.status(200).json({
+                success: true,
+                message: "Contest subcategory updated successfully",
+                data: updatedSubCategory
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(500).send(error.message);
+                if (error.message === "Contest sub category not found") {
+                    res.status(404).json({
+                        success: false,
+                        message: "Contest subcategory not found"
+                    });
+                } else {
+                    res.status(400).json({
+                        success: false,
+                        message: error.message
+                    });
+                }
             } else {
-                res.status(500).send("An unknown error occurred");
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to update contest subcategory"
+                });
             }
-        }   
+        }
     }
 }

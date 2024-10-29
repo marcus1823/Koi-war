@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { ClassificationContestRuleController } from "../controllers/classificationContestRuleController";
 import { validate } from "../middleware/validateResource";
-import { createClassificationContestRuleSchema } from "../schema/classificationContestRule.schema";
+import { createClassificationContestRuleSchema, updateClassificationContestRuleSchema } from "../schema/classificationContestRule.schema";
 
 export function classificationContestRuleRoutes(
   classificationContestRuleController: ClassificationContestRuleController
@@ -166,6 +166,7 @@ export function classificationContestRuleRoutes(
      */
     router.put(
         "/updateClassificationById/:id",
+        validate(updateClassificationContestRuleSchema),
         classificationContestRuleController.updateClassificationContestRuleById
     );
 

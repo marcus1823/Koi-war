@@ -2,9 +2,7 @@ import { IClassificationContestRuleRepository } from "../IClassificationContestR
 import ClassificationContestRule, {
   IClassificationContestRule,
 } from "../../models/classificationContestRule.model";
-import ContestSubCategory, {
-  IContestSubCategory,
-} from "../../models/contestSubCategory.model";
+import mongoose from "mongoose";
 
 export class ClassificationContestRuleRepository
   implements IClassificationContestRuleRepository
@@ -16,49 +14,58 @@ export class ClassificationContestRuleRepository
     return classificationContestRule.save();
   }
 
-  async getAllClassificationContestRules(): Promise<
-    IClassificationContestRule[]
-  > {
-    const classificationContestRules =
-      await ClassificationContestRule.find().populate("contestSubCategory");
-    return classificationContestRules;
+  async getAllClassificationContestRules(): Promise<IClassificationContestRule[]> {
+    return ClassificationContestRule.find()
+      .populate({
+        path: 'contestSubCategory',
+        populate: {
+          path: 'contestInstance'
+        }
+      })
+      .populate('varieties');
   }
 
-  async getClassificationContestRuleById(
-    id: string
-  ): Promise<IClassificationContestRule | null> {
-    const classificationContestRule = await ClassificationContestRule.findById(
-      id
-    ).populate("contestSubCategory");
-    return classificationContestRule;
+  async getClassificationContestRuleById(id: string): Promise<IClassificationContestRule | null> {
+    return ClassificationContestRule.findById(id)
+      .populate({
+        path: 'contestSubCategory',
+        populate: {
+          path: 'contestInstance'
+        }
+      })
+      .populate('varieties');
   }
 
   async getClassificationContestRuleByContestSubCategoryId(
     contestSubCategoryId: string
   ): Promise<IClassificationContestRule | null> {
-    const classificationContestRule = await ClassificationContestRule.findOne({
-      contestSubCategory: contestSubCategoryId,
-    }).populate("contestSubCategory");
-    return classificationContestRule;
+    return ClassificationContestRule.findOne({
+      contestSubCategory: new mongoose.Types.ObjectId(contestSubCategoryId)
+    })
+      .populate({
+        path: 'contestSubCategory',
+        populate: {
+          path: 'contestInstance'
+        }
+      })
+      .populate('varieties');
   }
-  
-   async getAllClassificationContestRules(): Promise<IClassificationContestRule[]> {
-        const classificationContestRules = await ClassificationContestRule.find()
-            .populate('contestSubCategory')
-            .populate('varieties');
-         return classificationContestRules;
-   }
 
-   async getClassificationContestRuleById(id: string): Promise<IClassificationContestRule | null> {
-        const classificationContestRule = await ClassificationContestRule.findById(id)
-            .populate('contestSubCategory')
-            .populate('varieties');
-        return classificationContestRule;
-   }
-
-   async updateClassificationContestRuleById(id: string, updateData: Partial<IClassificationContestRule>): Promise<IClassificationContestRule | null> {
-       return ClassificationContestRule.findByIdAndUpdate(id, updateData, {new: true})
-            .populate('contestSubCategory')
-            .populate('varieties');
-   }
+  async updateClassificationContestRuleById(
+    id: string,
+    updateData: Partial<IClassificationContestRule>
+  ): Promise<IClassificationContestRule | null> {
+    return ClassificationContestRule.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true }
+    )
+      .populate({
+        path: 'contestSubCategory',
+        populate: {
+          path: 'contestInstance'
+        }
+      })
+      .populate('varieties');
+  }
 }
