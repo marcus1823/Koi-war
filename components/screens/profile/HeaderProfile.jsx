@@ -1,4 +1,4 @@
-import { getUserById } from '@/api/profileApi';
+import { getUserById } from '@/api/profile/profileApi';
 import Feather from '@expo/vector-icons/Feather';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
