@@ -1,10 +1,26 @@
-import { Image, Text, TextInput, View } from "react-native";
-import React from "react";
+import { getUserById } from '@/api/profile/profileApi';
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { Colors } from "../../../constants/Colors";
 import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useState } from "react";
+import { Image, Text, TextInput, View } from "react-native";
+import { Colors } from "../../../constants/Colors";
 
 export default function Header() {
+    const [userHome, setUserHome] = useState({ username: "loading..", role: "loading.." });
+
+    useEffect(() => {
+        const getuserHome = async () => {
+            try {
+                const userHome = await getUserById();
+                setUserHome(userHome);
+            } catch (error) {
+                console.error("Error getting user information!",error)
+            }
+        }
+
+        getuserHome();
+    }, []);
+
   return (
     <View style={{ position: "relative" }}>
       <LinearGradient
@@ -54,7 +70,7 @@ export default function Header() {
                 fontWeight: "bold",
               }}
             >
-              Người dùng
+                {userHome.username}
             </Text>
           </View>
         </View>
