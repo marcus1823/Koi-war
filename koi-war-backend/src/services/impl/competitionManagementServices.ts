@@ -1,24 +1,29 @@
 import {ICompetitionManagementServices} from "../ICompetitionManagementServices";
 import {IScoreServices} from "../IScoreServices";
 import {IContestRegistrationServices} from "../IContestRegistrationServices";
-import {
-    IContestRegistrationResponse,
-    mapContestRegistrationResponse,
-} from "../../types/contestRegistration";
+import {IContestRegistrationResponse, mapContestRegistrationResponse,} from "../../types/contestRegistration";
 import {totalScoreOfAReferee} from "../../utils/expression.utils";
-import { IRegistration, RegistrationStatus } from "../../models/registration.model";
+import {IContestInstanceServices} from "../IContestInstanceServices";
+import {IContestSubCategoryService} from "../IContestSubCategoryService";
+import {IRegistration, RegistrationStatus} from "../../models/registration.model";
 
 export class CompetitionManagementServices
     implements ICompetitionManagementServices {
     private scoreServices: IScoreServices;
     private registrationServices: IContestRegistrationServices;
+    private contestInstanceServices: IContestInstanceServices;
+    private contestSubCategoryServices: IContestSubCategoryService;
 
     constructor(
         scoreServices: IScoreServices,
-        registrationServices: IContestRegistrationServices
+        registrationServices: IContestRegistrationServices,
+        contestInstanceServices: IContestInstanceServices,
+        contestSubCategoryServices: IContestSubCategoryService
     ) {
         this.scoreServices = scoreServices;
         this.registrationServices = registrationServices;
+        this.contestInstanceServices = contestInstanceServices;
+        this.contestSubCategoryServices = contestSubCategoryServices;
     }
 
     createContestRegistration(data: any): Promise<any> {
@@ -64,32 +69,35 @@ export class CompetitionManagementServices
     }
 
     async rankingContestRegistration(contestSubCategoryId: string): Promise<any> {
-        const registrations =
-            await this.registrationServices.getContestRegistrationsBySubCategoryId(
-                contestSubCategoryId
-            );
+        const registrationsWithScores = await this.getRegistrationsWithScores(contestSubCategoryId);
+        return this.assignRanks(registrationsWithScores);
+    }
 
-        const registrationsWithScores = await Promise.all(
-            registrations.map(async (registration) => {
-                registration.scores = await this.scoreServices.getScoreByRegistrationId(
-                    registration._id
+    async updateRankingEndedContestInstances(): Promise<void> {
+        const endedContestInstances = await this.getEndedContestInstances();
+        await Promise.all(
+            endedContestInstances.map(async (contestInstance) => {
+                const contestSubCategories = await this.contestSubCategoryServices.getAllContestSubCategoryByContestInstance(contestInstance.id);
+                await Promise.all(
+                    contestSubCategories.map(async (contestSubCategory) => {
+                        await this.updateContestSubCategoryRankings(contestSubCategory.id);
+                    })
                 );
-                const totalScore = registration.scores?.reduce(
-                    (acc, score) => acc + totalScoreOfAReferee(score),
-                    0
-                );
-                return {
-                    registration,
-                    totalScore,
-                };
+                await this.contestInstanceServices.updateContestInstanceRankedStatus(contestInstance.id);
             })
         );
+    }
 
-        registrationsWithScores.sort((a, b) => {
-            return (b.totalScore ?? 0) - (a.totalScore ?? 0);
-        });
+    async updateContestRegistrationStatus(
+        id: string,
+        status: RegistrationStatus
+    ): Promise<IRegistration & { _id: string }> {
+        // Delegate to contestRegistrationServices
+        return this.registrationServices.updateContestRegistrationStatus(id, status);
+    }
 
-        return this.assignRanks(registrationsWithScores);
+    private calculateTotalScore(scores: any[]): number {
+        return (scores?.reduce((acc, score) => acc + totalScoreOfAReferee(score), 0) ?? 0) / scores.length;
     }
 
     private assignRanks(
@@ -119,11 +127,43 @@ export class CompetitionManagementServices
         });
     }
 
-    async updateContestRegistrationStatus(
-        id: string, 
-        status: RegistrationStatus
-    ): Promise<IRegistration & { _id: string }> {
-        // Delegate to contestRegistrationServices
-        return this.registrationServices.updateContestRegistrationStatus(id, status);
+    private async getRegistrationsWithScores(contestSubCategoryId: string): Promise<{
+        registration: any,
+        totalScore: number | null | undefined
+    }[]> {
+        const registrations = await this.registrationServices.getContestRegistrationsBySubCategoryId(contestSubCategoryId);
+
+        return Promise.all(
+            registrations.map(async (registration) => {
+                registration.scores = await this.scoreServices.getScoreByRegistrationId(
+                    registration._id
+                );
+                const totalScore = this.calculateTotalScore(registration.scores ?? []);
+                return {
+                    registration,
+                    totalScore,
+                };
+            })
+        );
+    }
+
+    private async getEndedContestInstances(): Promise<any[]> {
+        return this.contestInstanceServices.getEndedContestInstances();
+    }
+
+    private async updateContestSubCategoryRankings(contestSubCategoryId: string): Promise<void> {
+        const registrationsWithScores = await this.getRegistrationsWithScores(contestSubCategoryId);
+        const rankedRegistrations = this.assignRanks(registrationsWithScores).filter(
+            (rankedRegistration) => rankedRegistration.rank <= 5
+        );
+        await Promise.all(
+            rankedRegistrations.map(
+                async (rankedRegistration: { registration: { _id: any; }; rank: any; }) => {
+                    await this.registrationServices.updateContestRegistrationRank(
+                        rankedRegistration.registration._id,
+                        rankedRegistration.rank
+                    );
+                })
+        )
     }
 }

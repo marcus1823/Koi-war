@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import {Request, Response} from "express";
 import {IContestServices} from "../services/IContestServices";
 import {CreateContestInput} from "../schema/contest.schema";
-import { IContest } from "../models/contest.model";
+import {IContest} from "../models/contest.model";
 
 export class ContestController {
     private contestServices: IContestServices;
@@ -55,7 +55,7 @@ export class ContestController {
     }
 
     getContestById = async (
-        req: Request<{id: string}>,
+        req: Request<{ id: string }>,
         res: Response
     ): Promise<void> => {
         try {
@@ -80,7 +80,7 @@ export class ContestController {
     }
 
     updateContestById = async (
-        req: Request<{id: string}, {}, Partial<IContest>>,
+        req: Request<{ id: string }, {}, Partial<IContest>>,
         res: Response
     ): Promise<void> => {
         try {
@@ -116,7 +116,7 @@ export class ContestController {
     }
 
     deleteContestById = async (
-        req: Request<{id: string}>,
+        req: Request<{ id: string }>,
         res: Response
     ): Promise<void> => {
         try {

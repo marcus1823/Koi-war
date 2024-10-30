@@ -1,6 +1,6 @@
-import { IClassificationContestRuleServices } from "../services/IClassificationContestRuleServices";
-import { Request, Response } from "express";
-import { ClassificationContestRuleInput } from "../schema/classificationContestRule.schema";
+import {IClassificationContestRuleServices} from "../services/IClassificationContestRuleServices";
+import {Request, Response} from "express";
+import {ClassificationContestRuleInput} from "../schema/classificationContestRule.schema";
 
 export class ClassificationContestRuleController {
     private classificationContestRuleService: IClassificationContestRuleServices;
@@ -93,22 +93,22 @@ export class ClassificationContestRuleController {
     };
 
     getClassificationContestRuleByContestSubCategoryId = async (
-      req: Request<{ contestSubCategoryId: string }>,
-      res: Response
+        req: Request<{ contestSubCategoryId: string }>,
+        res: Response
     ) => {
-      try {
-        const classificationContestRule =
-          await this.classificationContestRuleService.getClassificationContestRuleByContestSubCategoryId(
-            req.params.contestSubCategoryId
-          );
-        res.status(200).json(classificationContestRule);
-      } catch (error) {
-        if (error instanceof Error) {
-          res.status(500).send(error.message);
-        } else {
-          res.status(500).send("An unknown error occurred");
+        try {
+            const classificationContestRule =
+                await this.classificationContestRuleService.getClassificationContestRuleByContestSubCategoryId(
+                    req.params.contestSubCategoryId
+                );
+            res.status(200).json(classificationContestRule);
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(500).send(error.message);
+            } else {
+                res.status(500).send("An unknown error occurred");
+            }
         }
-      }
     };
 
     updateClassificationContestRuleById = async (

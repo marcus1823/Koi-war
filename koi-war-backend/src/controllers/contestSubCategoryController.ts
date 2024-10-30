@@ -1,7 +1,6 @@
 import {IContestSubCategoryService} from "../services/IContestSubCategoryService";
 import {ContestSubCategoryInput, UpdateContestSubCategoryInput} from "../schema/contestSubCategory.schema";
 import {Request, Response} from "express";
-import { IContestSubCategory } from "../models/contestSubCategory.model";
 
 export class ContestSubCategoryController {
     private contestSubCategoryService: IContestSubCategoryService;

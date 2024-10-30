@@ -1,4 +1,4 @@
-import Registration, { RegistrationStatus } from "../../models/registration.model";
+import Registration, {RegistrationStatus} from "../../models/registration.model";
 import {IContestRegistrationRepository} from "../IContestRegistrationRepository";
 
 export class ContestRegistrationRepository
@@ -25,12 +25,25 @@ export class ContestRegistrationRepository
             .populate("fish");
     }
 
-    getContestRegistrationsBySubCategoryId(contestSubCategoryId: string): Promise<any[]> {
+    getContestRegistrationsBySubCategoryId(
+        contestSubCategoryId: string
+    ): Promise<any[]> {
         return Registration.find({contestSubCategory: contestSubCategoryId})
             .populate("scores")
             .populate("contestInstance")
             .populate("contestSubCategory")
             .populate("fish");
+    }
+
+    async updateContestRegistrationRank(
+        registrationId: string,
+        rank: number
+    ): Promise<any> {
+        return await Registration.findByIdAndUpdate(
+            registrationId,
+            {rank},
+            {new: true}
+        );
     }
 
     async updateContestRegistrationStatus(id: string, status: RegistrationStatus): Promise<any> {
