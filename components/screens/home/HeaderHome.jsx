@@ -1,10 +1,25 @@
-import { Image, Text, TextInput, View } from 'react-native'
-import React from 'react'
+import { getUserById } from '@/api/profile/profileApi';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { Colors } from '../../../constants/Colors';
 import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useState } from 'react';
+import { Image, Text, TextInput, View } from 'react-native';
+import { Colors } from '../../../constants/Colors';
 
 export default function Header() {
+    const [userHome, setUserHome] = useState({ username: "loading..", role: "loading.." });
+
+    useEffect(() => {
+        const getUserHome = async () => {
+          try {
+            const userHome = await getUserById();
+            setUserHome(userHome);
+          } catch (error) {
+            console.error("Error getting user information: ", error);
+          }
+        };
+    
+        getUserHome();
+      }, []);
 
     return (
         <LinearGradient
@@ -13,8 +28,8 @@ export default function Header() {
                 padding: 20,
                 paddingTop: 40,
                 backgroundColor: Colors.PRIMARY,
-                borderBottomLeftRadius: 20,
-                borderBottomRightRadius: 20,
+                // borderBottomLeftRadius: 20,
+                // borderBottomRightRadius: 20,
             }}>
             <View style={{
                 display: 'flex',
@@ -37,7 +52,7 @@ export default function Header() {
                     <Text style={{
                         fontSize: 19,
                         color: 'black'
-                    }}>Ngoc</Text>
+                    }}>{userHome.username}</Text>
                 </View>
             </View>
             {/* Search Bar */}
