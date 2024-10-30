@@ -15,15 +15,50 @@ export class ContestInstanceServices implements IContestInstanceServices {
   }
 
   async createContestInstance(data: any): Promise<IContestInstanceResponse> {
-    const contestInstance =
-      await this.contestInstanceRepository.createContestInstance(data);
-    return mapContestInstanceResponse(
-      contestInstance as IContestInstance & {
-        _id: string;
-        createdAt: Date;
-        updatedAt: Date;
+    try {
+      // Xử lý chuyển đổi ngày tháng
+      const processedData = { ...data };
+
+      if (typeof data.startDate === 'string') {
+        const parsedStartDate = parseDateFromString(data.startDate);
+        if (!parsedStartDate) {
+          throw new Error("Invalid start date format. Use dd-MM-yyyy");
+        }
+        processedData.startDate = parsedStartDate;
       }
-    );
+
+      if (typeof data.endDate === 'string') {
+        const parsedEndDate = parseDateFromString(data.endDate);
+        if (!parsedEndDate) {
+          throw new Error("Invalid end date format. Use dd-MM-yyyy");
+        }
+        processedData.endDate = parsedEndDate;
+      }
+
+      // Validate dates
+      if (processedData.startDate && processedData.endDate) {
+        const startDate = processedData.startDate as Date;
+        const endDate = processedData.endDate as Date;
+        
+        if (endDate < startDate) {
+          throw new Error("End date must be after start date");
+        }
+      }
+
+      const contestInstance = await this.contestInstanceRepository.createContestInstance(processedData);
+      return mapContestInstanceResponse(
+        contestInstance as IContestInstance & {
+          _id: string;
+          createdAt: Date;
+          updatedAt: Date;
+        }
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error("Failed to create contest instance");
+    }
   }
 
   async getAllContestInstances(): Promise<IContestInstanceResponse[]> {

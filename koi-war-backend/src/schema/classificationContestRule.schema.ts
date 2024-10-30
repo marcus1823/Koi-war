@@ -127,20 +127,23 @@ export const updateClassificationContestRuleSchema = object({
         /^[a-zA-Z0-9\sÀ-ỹ\-_.,!?()'"]+$/u,
         "Name can only contain letters, numbers, Vietnamese characters, spaces, and basic punctuation"
       )
-      .transform(val => val.replace(/\s+/g, ' ')), // Thay thế nhiều khoảng trắng liên tiếp bằng một khoảng trắng
-    
+      .transform(val => val.replace(/\s+/g, ' ')) // Thay thế nhiều khoảng trắng liên tiếp bằng một khoảng trắng
+    .optional(),
+
     description: string({
       required_error: "Description is required",
     })
     .trim()
     .min(8, "Description must be at least 8 characters long")
-    .max(1000, "Description must be less than 1000 characters"),
+    .max(1000, "Description must be less than 1000 characters")
+    .optional(),
 
     contestSubCategory: string({
       required_error: "Contest Sub Category is required",
     })
     .trim()
-    .regex(/^[0-9a-fA-F]{24}$/, "Invalid Contest Sub Category ID format"),
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid Contest Sub Category ID format")
+    .optional(),
     
     varieties: array(
       string({
@@ -148,12 +151,11 @@ export const updateClassificationContestRuleSchema = object({
       })
       .trim()
       .regex(/^[0-9a-fA-F]{24}$/, "Invalid Variety ID format")
-    ),
-    weightRange: optionalRangeSchema('weight'),
-    sizeRange: optionalRangeSchema('size'),
-    ageRange: optionalRangeSchema('age', 100),
+    ).optional(),
+    weightRange: optionalRangeSchema('weight').optional(),
+    sizeRange: optionalRangeSchema('size').optional(),
+    ageRange: optionalRangeSchema('age', 100).optional(),
   }),
 });
 
 export type ClassificationContestRuleInput = TypeOf<typeof createClassificationContestRuleSchema>;
-export type UpdateClassificationContestRuleInput = TypeOf<typeof updateClassificationContestRuleSchema>;

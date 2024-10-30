@@ -3,15 +3,19 @@ import {IFishProfileResponse, mapFishProfileResponse} from "../../types/fish";
 import {IFishService} from "../IFishService";
 import {IFishRepository} from "../../repositories/IFishRepository";
 import {IUserService} from "../IUserService";
+import {IVarietyRepository} from "../../repositories/IVarietyRepository";
 import * as console from "node:console";
+import { IVarietyDocument } from "../../models/variety.model";
 
 export class FishServices implements IFishService {
     private fishRepository: IFishRepository;
     private userService: IUserService
+    private varietyRepository: IVarietyRepository;
 
-    constructor(fishRepository: IFishRepository, userService: IUserService) {
+    constructor(fishRepository: IFishRepository, userService: IUserService, varietyRepository: IVarietyRepository) {
         this.fishRepository = fishRepository;
         this.userService = userService;
+        this.varietyRepository = varietyRepository;
     }
 
     async createFish(data: IFish): Promise<IFishProfileResponse> {
@@ -19,7 +23,18 @@ export class FishServices implements IFishService {
         if (!user) {
             throw new Error("User not found");
         }
-        const fishCreateRequest = {...data, user};
+
+        const variety = await this.varietyRepository.getVarietyById(data.variety as string);
+        if (!variety) {
+            throw new Error("Variety not found");
+        }
+
+        const fishCreateRequest = {
+            ...data,
+            user,
+            variety: (variety as IVarietyDocument)._id
+        };
+
         console.log("fishCreateRequest", fishCreateRequest);
         const fish = await this.fishRepository.createFish(fishCreateRequest);
         return mapFishProfileResponse(
@@ -79,9 +94,22 @@ export class FishServices implements IFishService {
     }
 
     async updateFishById(id: string, updateData: Partial<IFish>): Promise<IFishProfileResponse> {
-        const fish = await this.fishRepository.updateFishById(id, updateData);
+        if (updateData.variety) {
+            const variety = await this.varietyRepository.getVarietyById(updateData.variety as string);
+            if (!variety) {
+                throw new Error("Variety not found");
+            }
+            updateData.variety = (variety as IVarietyDocument)._id;
+        }
 
-        return fish as IFishProfileResponse;
+        const fish = await this.fishRepository.updateFishById(id, updateData);
+        if (!fish) {
+            throw new Error("Fish not found");
+        }
+
+        return mapFishProfileResponse(
+            fish as IFish & { _id: string; createdAt: Date; updatedAt: Date }
+        );
     }
 
 }

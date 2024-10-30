@@ -3,6 +3,64 @@ import { Router } from "express";
 import { validate } from "../middleware/validateResource";
 import { createContestSubCategorySchema, updateContestSubCategorySchema } from "../schema/contestSubCategory.schema";
 
+/**
+ * @openapi
+ * tags:
+ *   name: Contest Sub Categories
+ *   description: Contest sub-category management APIs
+ */
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     CreateContestSubCategoryInput:
+ *       type: object
+ *       required:
+ *         - name
+ *         - contestInstance
+ *       properties:
+ *         name:
+ *           type: string
+ *           minLength: 2
+ *           maxLength: 150
+ *           example: "Cá Koi 20-30cm"
+ *           description: Name of the sub-category
+ *         description:
+ *           type: string
+ *           minLength: 8
+ *           maxLength: 1000
+ *           example: "Hạng mục dành cho cá Koi có kích thước từ 20-30cm"
+ *         contestInstance:
+ *           type: string
+ *           pattern: "^[0-9a-fA-F]{24}$"
+ *           example: "6721e27443d22c42e4c1d989"
+ *           description: ID of the parent contest instance
+ *     
+ *     ContestSubCategoryResponse:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: "6721f38553d22c42e4c1d990"
+ *         name:
+ *           type: string
+ *           example: "Cá Koi 20-30cm"
+ *         description:
+ *           type: string
+ *           example: "Hạng mục dành cho cá Koi có kích thước từ 20-30cm"
+ *         contestInstance:
+ *           $ref: '#/components/schemas/ContestInstanceResponse'
+ *         classificationContestRule:
+ *           $ref: '#/components/schemas/ClassificationContestRuleResponse'
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ */
+
 export function contestSubCategoryRoutes(contestSubCategoryController: ContestSubCategoryController): Router {
     const router = Router();
 
@@ -11,9 +69,9 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
      * /api/contestSubCategory/createContestSubCategory:
      *   post:
      *     tags:
-     *       - Contest SubCategories
-     *     summary: Create a new contest subcategory
-     *     description: Create a new subcategory under a specific contest instance
+     *       - Contest Sub Categories
+     *     summary: Create a new contest sub-category
+     *     description: Create a new sub-category for a contest instance
      *     requestBody:
      *       required: true
      *       content:
@@ -21,16 +79,123 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
      *           schema:
      *             $ref: '#/components/schemas/CreateContestSubCategoryInput'
      *     responses:
-     *       '201':
-     *         description: Contest subcategory created successfully
+     *       201:
+     *         description: Contest sub-category created successfully
      *         content:
      *           application/json:
      *             schema:
-     *               $ref: '#/components/schemas/ContestSubCategoryResponse'
-     *       '400':
-     *         description: Validation error
-     *       '500':
-     *         description: Internal server error
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 message:
+     *                   type: string
+     *                   example: "Contest subcategory created successfully"
+     *                 data:
+     *                   $ref: '#/components/schemas/ContestSubCategoryResponse'
+     *       404:
+     *         description: Contest instance not found
+     *       409:
+     *         description: Sub-category with this name already exists
+     *
+     * /api/contestSubCategory/getAll:
+     *   get:
+     *     tags:
+     *       - Contest Sub Categories
+     *     summary: Get all contest sub-categories
+     *     description: Retrieve all contest sub-categories with their contest instances
+     *     responses:
+     *       200:
+     *         description: List of contest sub-categories
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 data:
+     *                   type: array
+     *                   items:
+     *                     $ref: '#/components/schemas/ContestSubCategoryResponse'
+     *
+     * /api/contestSubCategory/{id}:
+     *   get:
+     *     tags:
+     *       - Contest Sub Categories
+     *     summary: Get contest sub-category by ID
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         schema:
+     *           type: string
+     *         example: "6721f38553d22c42e4c1d990"
+     *     responses:
+     *       200:
+     *         description: Contest sub-category details
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 data:
+     *                   $ref: '#/components/schemas/ContestSubCategoryResponse'
+     *       404:
+     *         description: Contest sub-category not found
+     *
+     *   put:
+     *     tags:
+     *       - Contest Sub Categories
+     *     summary: Update contest sub-category
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         schema:
+     *           type: string
+     *         example: "6721f38553d22c42e4c1d990"
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               name:
+     *                 type: string
+     *                 example: "Cá Koi 20-30cm - Cập nhật"
+     *               description:
+     *                 type: string
+     *                 example: "Mô tả cập nhật cho hạng mục"
+     *               contestInstance:
+     *                 type: string
+     *                 example: "6721e27443d22c42e4c1d989"
+     *     responses:
+     *       200:
+     *         description: Contest sub-category updated successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 message:
+     *                   type: string
+     *                   example: "Contest subcategory updated successfully"
+     *                 data:
+     *                   $ref: '#/components/schemas/ContestSubCategoryResponse'
+     *       404:
+     *         description: Contest sub-category or contest instance not found
+     *       409:
+     *         description: Sub-category with this name already exists in this contest instance
      */
     router.post(
         "/createContestSubCategory",
@@ -38,98 +203,16 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
         contestSubCategoryController.createContestSubCategory
     );
 
-    /**
-     * @openapi
-     * /api/contestSubCategory/getAllContestSubCategories:
-     *   get:
-     *     tags:
-     *       - Contest SubCategories
-     *     summary: Get all contest subcategories
-     *     description: Retrieve a list of all contest subcategories
-     *     responses:
-     *       '200':
-     *         description: A list of contest subcategories
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: array
-     *               items:
-     *                 $ref: '#/components/schemas/ContestSubCategoryResponse'
-     *       '500':
-     *         description: Internal server error
-     */
     router.get(
         "/getAllContestSubCategory",
         contestSubCategoryController.getAllContestSubCategory
     );
 
-    /**
-     * @openapi
-     * /api/contestSubCategory/getContestSubCategoryById/{id}:
-     *   get:
-     *     tags:
-     *       - Contest SubCategories
-     *     summary: Get a contest subcategory by ID
-     *     description: Retrieve a specific contest subcategory by its ID
-     *     parameters:
-     *       - in: path
-     *         name: id
-     *         required: true
-     *         schema:
-     *           type: string
-     *         description: The ID of the contest subcategory to retrieve
-     *     responses:
-     *       '200':
-     *         description: The requested contest subcategory
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/ContestSubCategoryResponse'
-     *       '404':
-     *         description: Contest subcategory not found
-     *       '500':
-     *         description: Internal server error
-     */
     router.get(
         "/getContestSubCategoryById/:id",
         contestSubCategoryController.getContestSubCategoryById
     );
 
-    /**
-     * @openapi
-     * /api/contestSubCategory/updateContestSubCategoryById/{id}:
-     *   put:
-     *     tags:
-     *       - Contest SubCategories
-     *     summary: Update a contest subcategory by ID
-     *     description: Update a specific contest subcategory's details by its ID
-     *     parameters:
-     *       - in: path
-     *         name: id
-     *         required: true
-     *         schema:
-     *           type: string
-     *         description: The ID of the contest subcategory to update
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             $ref: '#/components/schemas/UpdateContestSubCategoryInput'
-     *     responses:
-     *       '200':
-     *         description: Contest subcategory updated successfully
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/ContestSubCategoryResponse'
-     *       '400':
-     *         description: Validation error
-     *       '404':
-     *         description: Contest subcategory not found
-     *       '500':
-     *         description: Internal server error
-     */
     router.put(
         "/updateContestSubCategoryById/:id",
         validate(updateContestSubCategorySchema),

@@ -36,9 +36,18 @@ export class ContestSubCategoryRepository
     return contestSubCategory;
   }
 
+  async updateContestSubCategoryById(id: string, updateData: Partial<IContestSubCategory>): Promise<IContestSubCategory | null> {
+    return ContestSubCategory.findByIdAndUpdate(id, updateData, {new: true})
+      .populate("contestInstance");
+  }
 
-    async updateContestSubCategoryById(id: string, updateData: Partial<IContestSubCategory>): Promise<IContestSubCategory | null> {
-        return ContestSubCategory.findByIdAndUpdate(id, updateData, {new: true})
-            .populate("contestInstance");
+  async getContestSubCategoryByNameAndInstance(
+    name: string, 
+    instanceId: string
+  ): Promise<IContestSubCategory | null> {
+    return ContestSubCategory.findOne({
+      contestInstance: instanceId,
+      name: name
+    });
   }
 }

@@ -8,8 +8,8 @@ export interface IFish {
     length: number;
     images?: string[];
     description?: string;
-    user: IUser,
-    variety: IVariety;
+    user: IUser;
+    variety: IVariety | string;
 }
 
 interface FishDocument extends IFish, mongoose.Document {

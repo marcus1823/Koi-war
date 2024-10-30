@@ -5,54 +5,51 @@ import { IClassificationContestRule } from "../../models/classificationContestRu
 import ContestSubCategory from "../../models/contestSubCategory.model";
 import Variety from "../../models/variety.model";
 import { IContestInstance } from "../../models/contestInstance.model";
+import { IContestSubCategoryService } from "../IContestSubCategoryService";
+import { IVarietyService } from "../IVarietyService";
 
 export class ClassificationContestRuleService implements IClassificationContestRuleServices {
     private classificationContestRuleRepository: IClassificationContestRuleRepository;
+    private contestSubCategoryService: IContestSubCategoryService;
+    private varietyService: IVarietyService;
 
-    constructor(classificationContestRuleRepository: IClassificationContestRuleRepository) {
+    constructor(
+        classificationContestRuleRepository: IClassificationContestRuleRepository,
+        contestSubCategoryService: IContestSubCategoryService,
+        varietyService: IVarietyService
+    ) {
         this.classificationContestRuleRepository = classificationContestRuleRepository;
+        this.contestSubCategoryService = contestSubCategoryService;
+        this.varietyService = varietyService;
     }
 
     async createClassificationContestRule(data: any): Promise<IClassificationContestRuleResponse> {
         try {
-            // Check if contestSubCategory exists
-            const contestSubCategory = await ContestSubCategory.findById(data.contestSubCategory);
+            // Sử dụng service thay vì truy vấn trực tiếp
+            const contestSubCategory = await this.contestSubCategoryService
+                .getContestSubCategoryById(data.contestSubCategory);
             if (!contestSubCategory) {
                 throw new Error("Contest subcategory not found");
             }
 
-            // Check if contestInstance is disabled
-            if (contestSubCategory.contestInstance) {
-                const instance = await ContestSubCategory.findById(data.contestSubCategory)
-                    .populate<{ contestInstance: IContestInstance }>('contestInstance');
-                if (instance?.contestInstance?.isDisabled) {
-                    throw new Error("Cannot create classification rule for disabled contest instance");
+            // Kiểm tra varieties thông qua service
+            if (data.varieties) {
+                for (const varietyId of data.varieties) {
+                    const variety = await this.varietyService.getVarietyById(varietyId);
+                    if (!variety) {
+                        throw new Error(`Variety with id ${varietyId} not found`);
+                    }
                 }
-            }
-
-            // Check if varieties exist
-            const varieties = await Variety.find({ _id: { $in: data.varieties } });
-            if (varieties.length !== data.varieties.length) {
-                throw new Error("One or more varieties not found");
-            }
-
-            // Check if name already exists for this contestSubCategory
-            const existingRule = await this.classificationContestRuleRepository
-                .getClassificationContestRuleByContestSubCategoryId(data.contestSubCategory);
-            if (existingRule) {
-                throw new Error("A classification rule already exists for this contest subcategory");
             }
 
             const classificationContestRule = await this.classificationContestRuleRepository
                 .createClassificationContestRule(data);
 
-            return mapClassificationContestRuleResponse(
-                classificationContestRule as IClassificationContestRule & {
-                    _id: string;
-                    createdAt: Date;
-                    updatedAt: Date;
-                }
-            );
+            return mapClassificationContestRuleResponse(classificationContestRule as IClassificationContestRule & {
+                _id: string;
+                createdAt: Date;
+                updatedAt: Date;
+            });
         } catch (error) {
             if (error instanceof Error) {
                 throw error;

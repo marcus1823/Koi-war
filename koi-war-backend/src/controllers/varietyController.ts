@@ -91,7 +91,7 @@ export class VarietyController {
         try {
             const updatedVariety = await this.varietyServices.updateVarietyById(
                 req.params.id,
-                req.body
+                req.body as Partial<IVariety>
             );
             res.status(200).json({
                 success: true,
