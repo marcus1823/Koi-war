@@ -8,11 +8,6 @@ const fishProfiles = [
   { id: '2', code: '224', type: 'Karashigoi', size: 'Medium', age: '2 years', awardWinning: 'No', image: require('../../../assets/images/caKoi.png') },
   { id: '3', code: '227', type: 'Koi', size: 'Medium', age: '2 years', awardWinning: 'No', image: require('../../../assets/images/caKoi.png') },
   { id: '4', code: '228', type: 'Karashigoi', size: 'Medium', age: '2 years', awardWinning: 'No', image: require('../../../assets/images/caKoi.png') },
-  { id: '5', code: '229', type: 'Koi', size: 'Medium', age: '2 years', awardWinning: 'No', image: require('../../../assets/images/caKoi.png') },
-  { id: '6', code: '230', type: 'Karashigoi', size: 'Medium', age: '2 years', awardWinning: 'No', image: require('../../../assets/images/caKoi.png') },
-  { id: '7', code: '232', type: 'Koi', size: 'Medium', age: '2 years', awardWinning: 'No', image: require('../../../assets/images/caKoi.png') },
-  { id: '8', code: '234', type: 'Karashigoi', size: 'Medium', age: '2 years', awardWinning: 'No', image: require('../../../assets/images/caKoi.png') },
-  { id: '9', code: '245', type: 'Koi', size: 'Medium', age: '2 years', awardWinning: 'No', image: require('../../../assets/images/caKoi.png') },
 
 ];
 

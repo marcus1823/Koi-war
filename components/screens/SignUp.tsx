@@ -257,7 +257,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     textAlign: "center",
     fontWeight: "600",
-    fontFamily: "outfit-regular",
   },
   slogan: {
     color: "rgba(255, 255, 255, 0.8)",

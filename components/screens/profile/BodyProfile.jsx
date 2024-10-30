@@ -1,139 +1,143 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import AntDesign from '@expo/vector-icons/AntDesign';
 
 export default function BodyProfile() {
   const router = useRouter();
+  const [fishData, setFishData] = useState([
+    { id: '1', name: 'Cá Dự Thi 1' },
+    { id: '2', name: 'Cá Dự Thi 2' },
+    { id: '3', name: 'Cá Dự Thi 3' },
+    { id: '4', name: 'Cá Dự Thi 4' },
+  ]);
 
-  const navigateToFishProfile = () => {
-    router.push("/fishprofile"); 
+  const navigateToFishDetail = (fish) => {
+    router.push({
+      pathname: "/fishdetail",
+      params: { fishId: fish.id, fishName: fish.name },
+    });
+  };
+  const navigateToWaittingApproval = () => {
+    router.push("/waittingapproval");
+  };
+  const navigateToApprove = () => {
+    router.push("/approve");
+  };
+  const navigateToIsGoing = () => {
+    router.push("/isgoing");
   };
 
-  const navigateToProgress = () => {
-    router.push("/progress"); 
-  };
-
-  const navigateToResults = () => {
-    router.push("/predictresults"); 
-  };
+  const renderFishItem = ({ item }) => (
+    <TouchableOpacity style={styles.fishItem} onPress={() => navigateToFishDetail(item)}>
+      <Text style={styles.fishText}>{item.name}</Text>
+    </TouchableOpacity>
+  );
 
   return (
-    <View>
-      <View style={styles.container}>
-        
-        {/* Section for Achievements */}
-        <View style={styles.achievementsContainer}>
-          <Text style={styles.achievementsTitle}>Achievements</Text>
-          <View style={styles.achievementsList}>
-            <View style={styles.achievementBadge}>
-              <Text style={styles.badgeText}>🏆 Top Koi Breeder</Text>
+    <View style={styles.container}>
+      <View style={styles.section}>
+        <Text style={styles.title}>Cuộc thi</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statusContainer}>
+          <TouchableOpacity style={styles.statusItem} onPress={navigateToWaittingApproval}>
+            <View style={styles.card}>
+              <AntDesign name="filetext1" size={24} color="black" />
+              <Text style={styles.statusText}>Chờ duyệt đơn</Text>
             </View>
-            <View style={styles.achievementBadge}>
-              <Text style={styles.badgeText}>🥇 Exhibition Champion</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.statusItem} onPress={navigateToApprove}>
+            <View style={styles.card}>
+              <AntDesign name="inbox" size={24} color="black" />
+              <Text style={styles.statusText}>Đã duyệt</Text>
             </View>
-            <View style={styles.achievementBadge}>
-              <Text style={styles.badgeText}>🎖️ Best Fish Caretaker</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.statusItem} onPress={navigateToIsGoing}>
+            <View style={styles.card}>
+              <AntDesign name="clockcircleo" size={24} color="black" />
+              <Text style={styles.statusText}>Đang diễn ra</Text>
             </View>
-          </View>
-          <View style={styles.underline} />
-        </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.statusItem}>
+            <View style={styles.card}>
+              <AntDesign name="staro" size={24} color="black" />
+              <Text style={styles.statusText}>Kết thúc</Text>
+            </View>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
 
-        {/* Section for Fish Profile */}
-        <TouchableOpacity style={styles.fishProfileContainer} onPress={navigateToFishProfile}>
-          <Image source={{ uri: 'https://i.pinimg.com/enabled/236x/4e/e2/d0/4ee2d057d1585e55f8052609c8e4d060.jpg' }} style={styles.fishImage} />
-          <View style={styles.textContainer}>
-            <Text style={styles.name}>My Fish Profile</Text>
-            <Text style={styles.description}>View and edit your fish details</Text>
-          </View>
-          <AntDesign name="right" size={24} color="black" style={{ marginTop: 8 }} />
-        </TouchableOpacity>
-        <View style={styles.underline} />
+      <View style={styles.separator} />
 
-        {/* Section for Ongoing Contest */}
-        <TouchableOpacity style={styles.fishProfileContainer} onPress={navigateToProgress}>
-          <Image source={{ uri: 'https://i.pinimg.com/enabled/236x/4e/e2/d0/4ee2d057d1585e55f8052609c8e4d060.jpg' }} style={styles.fishImage} />
-          <View style={styles.textContainer}>
-            <Text style={styles.name}>Contest currently in progress</Text>
-            <Text style={styles.description}>See which contests are ongoing</Text>
-          </View>
-          <AntDesign name="right" size={24} color="black" style={{ marginTop: 8 }} />
-        </TouchableOpacity>
-        <View style={styles.underline} />
-
-        {/* Section for Predict Results */}
-        <TouchableOpacity style={styles.fishProfileContainer} onPress={navigateToResults}>
-          <Image source={{ uri: 'https://i.pinimg.com/enabled/236x/4e/e2/d0/4ee2d057d1585e55f8052609c8e4d060.jpg' }} style={styles.fishImage} />
-          <View style={styles.textContainer}>
-            <Text style={styles.name}>Predict results</Text>
-            <Text style={styles.description}>Guess the winners and see predictions</Text>
-          </View>
-          <AntDesign name="right" size={24} color="black" style={{ marginTop: 8 }} />
-        </TouchableOpacity>
-        <View style={styles.underline} />
-        
+      <View style={styles.section}>
+        <Text style={styles.title}>Cá Profile</Text>
+        <FlatList
+          data={fishData.slice(0, 3)}
+          renderItem={renderFishItem}
+          keyExtractor={(item) => item.id}
+        />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  container: { 
+    flex: 1, 
     padding: 20,
-    backgroundColor: '#fff', // Light background for better contrast
   },
-  achievementsContainer: {
+  section: {
     marginBottom: 20,
   },
-  achievementsTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  achievementsList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-  },
-  achievementBadge: {
-    backgroundColor: '#e1f5fe',
-    borderRadius: 5,
-    padding: 5,
-    margin: 5,
-  },
-  badgeText: {
-    fontSize: 14,
-  },
-  fishProfileContainer: {
-    backgroundColor: 'transparent', // Remove background color for the container
-    padding: 8,
-    marginBottom: 15,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  fishImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 15,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  name: {
+  title: {
     fontSize: 20,
-    fontWeight: '500',
-    marginBottom: 5,
+    fontWeight: 'bold',
+    marginBottom: 14,
   },
-  description: {
+  statusContainer: {
+    flexDirection: 'row',
+  },
+  statusItem: {
+    alignItems: 'center',
+    marginHorizontal: 5, // Add horizontal margin for spacing
+  },
+  statusText: {
     fontSize: 14,
-    color: '#6c757d',
+    marginTop: 4,
+    textAlign: 'center',
   },
-  underline: {
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 1,
-    marginVertical: 10,
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 6,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#f28f35', // Border color to match your theme
+    alignItems: 'center', // Center items inside the card
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 3, // For Android shadow
+    width: 100, // Fixed width for cards to make them equal
+    height: 100, // Fixed height for consistency
+    justifyContent: 'center', // Center content vertically
+  },
+  fishItem: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#fff',
+    marginVertical: 4,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#f28f35',
+  },
+  fishText: {
+    fontSize: 15,
+    color: '#b55600',
+    fontWeight: 'medium',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#ccc', // Color of the separator
+    marginVertical: 15,
+    width: '100%',
   },
 });
