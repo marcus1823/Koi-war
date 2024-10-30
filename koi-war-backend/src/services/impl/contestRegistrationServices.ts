@@ -4,7 +4,7 @@ import {IContestInstanceServices} from "../IContestInstanceServices";
 import {IContestRegistrationServices} from "../IContestRegistrationServices";
 import {IContestSubCategoryService} from "../IContestSubCategoryService";
 import {IFishService} from "../IFishService";
-import {IRegistration} from "../../models/registration.model";
+import {IRegistration, RegistrationStatus} from "../../models/registration.model";
 
 export class ContestRegistrationServices
     implements IContestRegistrationServices {
@@ -91,6 +91,24 @@ export class ContestRegistrationServices
             rank
         );
         return contestRegistration;
+    }
+
+    async updateContestRegistrationStatus(id: string, status: RegistrationStatus): Promise<IRegistration & {
+        _id: string
+    }> {
+        const registration = await this.contestRegistrationRepository.getContestRegistrationById(id);
+        if (!registration) {
+            throw new Error("Contest registration not found");
+        }
+        const currentStatus = registration.status;
+        if (currentStatus === RegistrationStatus.REJECTED) {
+            throw new Error("Registration already rejected, cannot update status");
+        }
+        const updatedRegistration = await this.contestRegistrationRepository.updateContestRegistrationStatus(id, status);
+        if (!updatedRegistration) {
+            throw new Error("Failed to update registration status");
+        }
+        return updatedRegistration;
     }
 
     private async checkFishClassification(

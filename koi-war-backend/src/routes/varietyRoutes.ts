@@ -2,6 +2,8 @@ import {VarietyController} from "../controllers/varietyController";
 import {Router} from "express";
 import {validate} from "../middleware/validateResource";
 import {createVarietySchema, updateVarietySchema} from "../schema/variety.schema";
+import { authorizeRole } from "../middleware/authorizeMiddleware";
+import { UserRole } from "../models/user.model";
 
 export function varietyRoutes(varietyController: VarietyController): Router {
     const router = Router();
@@ -30,7 +32,13 @@ export function varietyRoutes(varietyController: VarietyController): Router {
      *       '400':
      *         description: Validation error
      */
-    router.post("/createVariety", validate(createVarietySchema), varietyController.createVariety);
+    router.post(
+        "/createVariety",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN, UserRole.USER], req, res, next),
+        validate(createVarietySchema),
+        varietyController.createVariety
+    );
 
     /**
      * @openapi
@@ -108,7 +116,13 @@ export function varietyRoutes(varietyController: VarietyController): Router {
      *       '404':
      *         description: Variety not found
      */
-    router.put("/updateVarietyById/:id", validate(updateVarietySchema), varietyController.updateVarietyById);
+    router.put(
+        "/updateVarietyById/:id",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
+        validate(updateVarietySchema),
+        varietyController.updateVarietyById
+    );
 
     /**
      * @openapi
@@ -130,7 +144,12 @@ export function varietyRoutes(varietyController: VarietyController): Router {
      *       '404':
      *         description: Variety not found
      */
-    router.delete("/deleteVarietyById/:id", varietyController.deleteVarietyById);
+    router.delete(
+        "/deleteVarietyById/:id",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
+        varietyController.deleteVarietyById
+    );
 
     return router;
 }

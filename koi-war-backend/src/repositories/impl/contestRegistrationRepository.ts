@@ -1,4 +1,4 @@
-import Registration from "../../models/registration.model";
+import Registration, {RegistrationStatus} from "../../models/registration.model";
 import {IContestRegistrationRepository} from "../IContestRegistrationRepository";
 
 export class ContestRegistrationRepository
@@ -44,5 +44,13 @@ export class ContestRegistrationRepository
             {rank},
             {new: true}
         );
+    }
+
+    async updateContestRegistrationStatus(id: string, status: RegistrationStatus): Promise<any> {
+        return Registration.findByIdAndUpdate(id, {status}, {new: true})
+            .populate("scores")
+            .populate("contestInstance")
+            .populate("contestSubCategory")
+            .populate("fish");
     }
 }

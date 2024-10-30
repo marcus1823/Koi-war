@@ -2,6 +2,8 @@ import {ContestController} from "../controllers/contestController";
 import {Router} from "express";
 import {validate} from "../middleware/validateResource";
 import {createContestSchema, updateContestSchema} from "../schema/contest.schema";
+import {authorizeRole} from "../middleware/authorizeMiddleware";
+import {UserRole} from "../models/user.model";
 
 /**
  * @openapi
@@ -143,6 +145,8 @@ export function contestRoutes(contestController: ContestController): Router {
      */
     router.post(
         "/createContest",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
         validate(createContestSchema),
         contestController.createContest
     );
@@ -198,7 +202,67 @@ export function contestRoutes(contestController: ContestController): Router {
 
     /**
      * @openapi
-     * /api/contest/{id}:
+     * /api/contest/getContestById/{id}:
+     *   get:
+     *     tags: [Contests]
+     *     summary: Get contest by ID
+     *     description: Retrieve contest details by its ID
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         schema:
+     *           type: string
+     *         example: "672100e85eaba638c1ff4e0b"
+     *         description: The contest ID
+     *     responses:
+     *       200:
+     *         description: Contest found successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 message:
+     *                   type: string
+     *                   example: "Contest found successfully"
+     *                 data:
+     *                   $ref: '#/components/schemas/ContestResponse'
+     *       404:
+     *         description: Contest not found
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: false
+     *                 message:
+     *                   type: string
+     *                   example: "Contest not found"
+     *       500:
+     *         description: Internal server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: false
+     *                 message:
+     *                   type: string
+     *                   example: "Internal server error"
+     */
+    router.get("/getContestById/:id", contestController.getContestById);
+
+    /**
+     * @openapi
+     * /api/contest/updateContestById/{id}:
      *   get:
      *     tags:
      *       - Contests
@@ -343,6 +407,8 @@ export function contestRoutes(contestController: ContestController): Router {
      */
     router.put(
         "/updateContestById/:id",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
         validate(updateContestSchema),
         contestController.updateContestById
     );
@@ -419,7 +485,12 @@ export function contestRoutes(contestController: ContestController): Router {
      *                   type: string
      *                   example: "Failed to delete contest"
      */
-    router.delete("/deleteContestById/:id", contestController.deleteContestById);
+    router.delete(
+        "/deleteContestById/:id",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
+        contestController.deleteContestById
+    );
 
     return router;
 }

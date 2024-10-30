@@ -1,13 +1,15 @@
-import {ContestSubCategoryController} from "../controllers/contestSubCategoryController";
-import {Router} from "express";
-import {validate} from "../middleware/validateResource";
-import {createContestSubCategorySchema, updateContestSubCategorySchema} from "../schema/contestSubCategory.schema";
+import { ContestSubCategoryController } from "../controllers/contestSubCategoryController";
+import { Router } from "express";
+import { validate } from "../middleware/validateResource";
+import { createContestSubCategorySchema, updateContestSubCategorySchema } from "../schema/contestSubCategory.schema";
+import { UserRole } from "../models/user.model";
+import { authorizeRole } from "../middleware/authorizeMiddleware";
 
 /**
  * @openapi
  * tags:
  *   name: Contest Sub Categories
- *   description: Contest sub-category management APIs
+ *   description: APIs for managing contest sub-categories
  */
 
 /**
@@ -36,29 +38,6 @@ import {createContestSubCategorySchema, updateContestSubCategorySchema} from "..
  *           pattern: "^[0-9a-fA-F]{24}$"
  *           example: "6721e27443d22c42e4c1d989"
  *           description: ID of the parent contest instance
- *
- *     ContestSubCategoryResponse:
- *       type: object
- *       properties:
- *         id:
- *           type: string
- *           example: "6721f38553d22c42e4c1d990"
- *         name:
- *           type: string
- *           example: "Cá Koi 20-30cm"
- *         description:
- *           type: string
- *           example: "Hạng mục dành cho cá Koi có kích thước từ 20-30cm"
- *         contestInstance:
- *           $ref: '#/components/schemas/ContestInstanceResponse'
- *         classificationContestRule:
- *           $ref: '#/components/schemas/ClassificationContestRuleResponse'
- *         createdAt:
- *           type: string
- *           format: date-time
- *         updatedAt:
- *           type: string
- *           format: date-time
  */
 
 export function contestSubCategoryRoutes(contestSubCategoryController: ContestSubCategoryController): Router {
@@ -68,10 +47,9 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
      * @openapi
      * /api/contestSubCategory/createContestSubCategory:
      *   post:
-     *     tags:
-     *       - Contest Sub Categories
+     *     tags: [Contest Sub Categories]
      *     summary: Create a new contest sub-category
-     *     description: Create a new sub-category for a contest instance
+     *     description: Creates a new sub-category within a contest instance
      *     requestBody:
      *       required: true
      *       content:
@@ -94,20 +72,31 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
      *                   example: "Contest subcategory created successfully"
      *                 data:
      *                   $ref: '#/components/schemas/ContestSubCategoryResponse'
+     *       400:
+     *         description: Invalid input data
      *       404:
      *         description: Contest instance not found
      *       409:
      *         description: Sub-category with this name already exists
-     *
-     * /api/contestSubCategory/getAll:
+     */
+    router.post(
+        "/createContestSubCategory",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
+        validate(createContestSubCategorySchema),
+        contestSubCategoryController.createContestSubCategory
+    );
+
+    /**
+     * @openapi
+     * /api/contestSubCategory/getAllContestSubCategory:
      *   get:
-     *     tags:
-     *       - Contest Sub Categories
+     *     tags: [Contest Sub Categories]
      *     summary: Get all contest sub-categories
-     *     description: Retrieve all contest sub-categories with their contest instances
+     *     description: Retrieves a list of all contest sub-categories with their associated contest instances
      *     responses:
      *       200:
-     *         description: List of contest sub-categories
+     *         description: List of all contest sub-categories
      *         content:
      *           application/json:
      *             schema:
@@ -120,12 +109,21 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
      *                   type: array
      *                   items:
      *                     $ref: '#/components/schemas/ContestSubCategoryResponse'
-     *
-     * /api/contestSubCategory/{id}:
+     *       500:
+     *         description: Internal server error
+     */
+    router.get(
+        "/getAllContestSubCategory",
+        contestSubCategoryController.getAllContestSubCategory
+    );
+
+    /**
+     * @openapi
+     * /api/contestSubCategory/getContestSubCategoryById/{id}:
      *   get:
-     *     tags:
-     *       - Contest Sub Categories
+     *     tags: [Contest Sub Categories]
      *     summary: Get contest sub-category by ID
+     *     description: Retrieves detailed information about a specific contest sub-category
      *     parameters:
      *       - name: id
      *         in: path
@@ -133,9 +131,10 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
      *         schema:
      *           type: string
      *         example: "6721f38553d22c42e4c1d990"
+     *         description: The ID of the contest sub-category
      *     responses:
      *       200:
-     *         description: Contest sub-category details
+     *         description: Contest sub-category details retrieved successfully
      *         content:
      *           application/json:
      *             schema:
@@ -148,11 +147,19 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
      *                   $ref: '#/components/schemas/ContestSubCategoryResponse'
      *       404:
      *         description: Contest sub-category not found
-     *
+     */
+    router.get(
+        "/getContestSubCategoryById/:id",
+        contestSubCategoryController.getContestSubCategoryById
+    );
+
+    /**
+     * @openapi
+     * /api/contestSubCategory/updateContestSubCategoryById/{id}:
      *   put:
-     *     tags:
-     *       - Contest Sub Categories
+     *     tags: [Contest Sub Categories]
      *     summary: Update contest sub-category
+     *     description: Updates an existing contest sub-category's information
      *     parameters:
      *       - name: id
      *         in: path
@@ -160,6 +167,7 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
      *         schema:
      *           type: string
      *         example: "6721f38553d22c42e4c1d990"
+     *         description: The ID of the contest sub-category to update
      *     requestBody:
      *       required: true
      *       content:
@@ -192,29 +200,17 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
      *                   example: "Contest subcategory updated successfully"
      *                 data:
      *                   $ref: '#/components/schemas/ContestSubCategoryResponse'
+     *       400:
+     *         description: Invalid input data
      *       404:
      *         description: Contest sub-category or contest instance not found
      *       409:
      *         description: Sub-category with this name already exists in this contest instance
      */
-    router.post(
-        "/createContestSubCategory",
-        validate(createContestSubCategorySchema),
-        contestSubCategoryController.createContestSubCategory
-    );
-
-    router.get(
-        "/getAllContestSubCategory",
-        contestSubCategoryController.getAllContestSubCategory
-    );
-
-    router.get(
-        "/getContestSubCategoryById/:id",
-        contestSubCategoryController.getContestSubCategoryById
-    );
-
     router.put(
         "/updateContestSubCategoryById/:id",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
         validate(updateContestSubCategorySchema),
         contestSubCategoryController.updateContestSubCategoryById
     );

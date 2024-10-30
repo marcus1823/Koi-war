@@ -5,6 +5,7 @@ import {IContestRegistrationResponse, mapContestRegistrationResponse,} from "../
 import {totalScoreOfAReferee} from "../../utils/expression.utils";
 import {IContestInstanceServices} from "../IContestInstanceServices";
 import {IContestSubCategoryService} from "../IContestSubCategoryService";
+import {IRegistration, RegistrationStatus} from "../../models/registration.model";
 
 export class CompetitionManagementServices
     implements ICompetitionManagementServices {
@@ -87,6 +88,14 @@ export class CompetitionManagementServices
         );
     }
 
+    async updateContestRegistrationStatus(
+        id: string,
+        status: RegistrationStatus
+    ): Promise<IRegistration & { _id: string }> {
+        // Delegate to contestRegistrationServices
+        return this.registrationServices.updateContestRegistrationStatus(id, status);
+    }
+
     private calculateTotalScore(scores: any[]): number {
         return (scores?.reduce((acc, score) => acc + totalScoreOfAReferee(score), 0) ?? 0) / scores.length;
     }
@@ -157,6 +166,4 @@ export class CompetitionManagementServices
                 })
         )
     }
-
-
 }
