@@ -66,17 +66,17 @@ export default function CompetitionHomePage() {
     <>
       <Stack.Screen 
         options={{ 
-          title: "Competitions",
+          title: "Cuộc Thi",
           headerShown: true,
         }} 
       />
       <LinearGradient
-        colors={['rgb(245, 177, 109)', 'rgb(204, 0, 0)']}
+        colors={["#eb7452", "#5C98BB"]}
         style={styles.container}
       >
         <View style={styles.headerContainer}>
-          <Text style={styles.headerTitle}>EXPLORE</Text>
-          <Text style={styles.headerSubtitle}>Upcoming Competitions</Text>
+          <Text style={styles.headerTitle}>KHÁM PHÁ</Text>
+          <Text style={styles.headerSubtitle}>Cuộc Thi Sắp Diễn Ra</Text>
         </View>
 
         <View style={styles.tabContainer}>
@@ -84,19 +84,19 @@ export default function CompetitionHomePage() {
             style={[styles.tab, activeTab === 'all' && styles.activeTab]}
             onPress={() => setActiveTab('all')}
           >
-            <Text style={[styles.tabText, activeTab === 'all' && styles.activeTabText]}>All</Text>
+            <Text style={[styles.tabText, activeTab === 'all' && styles.activeTabText]}>Tất Cả</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'open' && styles.activeTab]}
             onPress={() => setActiveTab('open')}
           >
-            <Text style={[styles.tabText, activeTab === 'open' && styles.activeTabText]}>Open</Text>
+            <Text style={[styles.tabText, activeTab === 'open' && styles.activeTabText]}>Mở</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'closed' && styles.activeTab]}
             onPress={() => setActiveTab('closed')}
           >
-            <Text style={[styles.tabText, activeTab === 'closed' && styles.activeTabText]}>Closed</Text>
+            <Text style={[styles.tabText, activeTab === 'closed' && styles.activeTabText]}>Đã Đóng</Text>
           </TouchableOpacity>
         </View>
 
@@ -116,10 +116,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 20,
+    paddingHorizontal: 10,
   },
   headerContainer: {
-    paddingHorizontal: 20,
     marginBottom: 20,
+    paddingHorizontal: 10,
   },
   headerTitle: {
     fontSize: 36,

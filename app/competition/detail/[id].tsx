@@ -46,7 +46,7 @@ export default function CompetitionDetailPage() {
       <ScrollView style={styles.container}>
         <Image source={{ uri: competition.image }} style={styles.image} />
         <LinearGradient
-          colors={['rgba(245, 177, 109, 0.8)', 'rgba(204, 0, 0, 0.8)']}
+          colors={["#eb7452", "#5C98BB"]}
           style={styles.gradientOverlay}
         />
         <View style={styles.contentContainer}>
