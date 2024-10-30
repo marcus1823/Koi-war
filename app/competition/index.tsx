@@ -1,21 +1,44 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Dimensions } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { competitionProfiles } from './competition';
+import { getAllContestInstances } from '../../api/competition/competitionApi';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 type CompetitionProfile = {
-  id: number;
-  Name: string;
-  Description: string;
-  Rule: string;
-  UpdateDate: string;
-  Status: string;
-  StartDate: string;
-  EndDate: string;
-  image: string;
+  id: string;
+  contest: {
+    id: string;
+    name: string;
+    description: string;
+    contestInstances: any[];
+  };
+  name: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  description: string;
+  rules: string;
+  images: string;
+  isDisabled: boolean;
+  contestSubCategories: {
+    id: string;
+    name: string;
+    description: string;
+    contestInstance: string;
+    classificationContestRule: string;
+    createdAt: string;
+    updatedAt: string;
+  }[];
+};
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
 };
 
 export default function CompetitionHomePage() {
@@ -24,13 +47,40 @@ export default function CompetitionHomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    setCompetitions(competitionProfiles);
+    const fetchCompetitions = async () => {
+      try {
+        const data = await getAllContestInstances();
+        const formattedData = data.map((item: any) => ({
+          id: item.id,
+          contest: {
+            id: item.contest.id,
+            name: item.contest.name,
+            description: item.contest.description,
+            contestInstances: item.contest.contestInstances,
+          },
+          name: item.name,
+          startDate: item.startDate,
+          endDate: item.endDate,
+          isActive: item.isActive,
+          description: item.description,
+          rules: item.rules,
+          images: item.images,
+          isDisabled: item.isDisabled,
+          contestSubCategories: item.contestSubCategories,
+        }));
+        setCompetitions(formattedData);
+      } catch (error) {
+        console.error('Error fetching competitions:', error);
+      }
+    };
+
+    fetchCompetitions();
   }, []);
 
   const filteredCompetitions = competitions.filter(comp => {
     if (activeTab === 'all') return true;
-    if (activeTab === 'open') return comp.Status === 'Open';
-    if (activeTab === 'closed') return comp.Status === 'Closed';
+    if (activeTab === 'open') return comp.isActive;
+    if (activeTab === 'closed') return !comp.isActive;
     return true;
   });
 
@@ -40,22 +90,22 @@ export default function CompetitionHomePage() {
         style={styles.competitionCard}
         onPress={() => router.push(`/competition/detail/${item.id}`)}
       >
-        <Image source={{ uri: item.image }} style={styles.competitionImage} />
+        <Image source={{ uri: item.images }} style={styles.competitionImage} />
         <View style={styles.competitionInfo}>
-          <Text style={styles.competitionName}>{item.Name}</Text>
-          <Text style={styles.competitionDescription} numberOfLines={2}>{item.Description}</Text>
+          <Text style={styles.competitionName}>{item.contest.name}</Text>
+          <Text style={styles.competitionDescription} numberOfLines={2}>{item.contest.description}</Text>
           <View style={styles.competitionDetails}>
             <View style={styles.detailItem}>
               <Ionicons name="calendar-outline" size={16} color="#666" />
-              <Text style={styles.detailText}>{item.StartDate} - {item.EndDate}</Text>
+              <Text style={styles.detailText}>{formatDate(item.startDate)} - {formatDate(item.endDate)}</Text>
             </View>
             <View style={styles.detailItem}>
               <Ionicons name="information-circle-outline" size={16} color="#666" />
-              <Text style={styles.detailText}>{item.Rule}</Text>
+              <Text style={styles.detailText}>{item.rules}</Text>
             </View>
           </View>
-          <View style={[styles.statusBadge, item.Status === 'Open' ? styles.statusOpen : styles.statusClosed]}>
-            <Text style={styles.statusText}>{item.Status}</Text>
+          <View style={[styles.statusBadge, item.isActive ? styles.statusOpen : styles.statusClosed]}>
+            <Text style={styles.statusText}>{item.isActive ? 'Open' : 'Closed'}</Text>
           </View>
         </View>
       </TouchableOpacity>
