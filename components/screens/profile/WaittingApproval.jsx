@@ -18,11 +18,12 @@ export default function WaitingApproval() {
 
   return (
     <View style={styles.container}>
+      <View style={{backgroundColor:'#F5B16D'}}>
       <Text style={styles.title}>Đơn của bạn đang chờ duyệt</Text>
       <Text style={styles.message}>
         Cảm ơn bạn đã đăng kí. Dưới đây là danh sách các đơn hàng đang chờ xử lý.
       </Text>
-      
+      </View>
       <FlatList
         data={pendingOrders}
         renderItem={renderOrderItem}
