@@ -5,6 +5,7 @@ import HeaderHome from "../../components/screens/home/HeaderHome";
 import IntroHome from "../../components/screens/home/IntroHome";
 import Menu from "../../components/screens/home/MenuHome";
 import NewContests from "../../components/screens/home/NewContests";
+import Fishwin from "../../components/screens/home/Fishwin";
 export default function Home() {
   const router = useRouter();
 
@@ -22,6 +23,7 @@ export default function Home() {
           <View>
             <Menu />
             <NewContests />
+            <Fishwin />
 
             {/* <Text>Home</Text>
             <Button

@@ -119,8 +119,8 @@ const styles = StyleSheet.create({
   },
   icon: {
     position: "absolute",
-    top: -12,
-    right: -12,
+    top: -15,
+    right: -15,
     marginLeft: 20,
   },
   imageContainer: {
