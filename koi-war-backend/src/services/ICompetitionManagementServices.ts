@@ -18,4 +18,6 @@ export interface ICompetitionManagementServices {
     }): Promise<any>;
 
     rankingContestRegistration(contestSubCategoryId: string): Promise<any>;
+
+    updateRankingEndedContestInstances(): Promise<any>;
 }

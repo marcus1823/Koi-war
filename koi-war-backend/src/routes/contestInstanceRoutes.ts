@@ -1,7 +1,7 @@
-import { ContestInstanceController } from "../controllers/contestInstanceController";
-import { Router } from "express";
-import { validate } from "../middleware/validateResource";
-import { createContestInstanceSchema, updateContestInstanceSchema } from "../schema/contestInstance.schema";
+import {ContestInstanceController} from "../controllers/contestInstanceController";
+import {Router} from "express";
+import {validate} from "../middleware/validateResource";
+import {createContestInstanceSchema, updateContestInstanceSchema} from "../schema/contestInstance.schema";
 
 /**
  * @openapi
@@ -54,7 +54,7 @@ import { createContestInstanceSchema, updateContestInstanceSchema } from "../sch
  *         isDisabled:
  *           type: boolean
  *           default: false
- *     
+ *
  *     ContestInstanceResponse:
  *       type: object
  *       properties:
@@ -147,7 +147,7 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
         validate(createContestInstanceSchema),
         contestInstanceController.createContestInstance
     );
-    
+
     /**
      * @openapi
      * /api/contestInstance/getAllContestInstances:

@@ -1,7 +1,7 @@
-import { ContestSubCategoryController } from "../controllers/contestSubCategoryController";
-import { Router } from "express";
-import { validate } from "../middleware/validateResource";
-import { createContestSubCategorySchema, updateContestSubCategorySchema } from "../schema/contestSubCategory.schema";
+import {ContestSubCategoryController} from "../controllers/contestSubCategoryController";
+import {Router} from "express";
+import {validate} from "../middleware/validateResource";
+import {createContestSubCategorySchema, updateContestSubCategorySchema} from "../schema/contestSubCategory.schema";
 
 /**
  * @openapi
@@ -36,7 +36,7 @@ import { createContestSubCategorySchema, updateContestSubCategorySchema } from "
  *           pattern: "^[0-9a-fA-F]{24}$"
  *           example: "6721e27443d22c42e4c1d989"
  *           description: ID of the parent contest instance
- *     
+ *
  *     ContestSubCategoryResponse:
  *       type: object
  *       properties:

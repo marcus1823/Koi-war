@@ -1,12 +1,13 @@
-import { IClassificationContestRuleServices } from "../IClassificationContestRuleServices";
-import { IClassificationContestRuleRepository } from "../../repositories/IClassificationContestRuleRepository";
-import { IClassificationContestRuleResponse, mapClassificationContestRuleResponse } from "../../types/classificationContestRule";
-import { IClassificationContestRule } from "../../models/classificationContestRule.model";
-import ContestSubCategory from "../../models/contestSubCategory.model";
+import {IClassificationContestRuleServices} from "../IClassificationContestRuleServices";
+import {IClassificationContestRuleRepository} from "../../repositories/IClassificationContestRuleRepository";
+import {
+    IClassificationContestRuleResponse,
+    mapClassificationContestRuleResponse
+} from "../../types/classificationContestRule";
+import {IClassificationContestRule} from "../../models/classificationContestRule.model";
 import Variety from "../../models/variety.model";
-import { IContestInstance } from "../../models/contestInstance.model";
-import { IContestSubCategoryService } from "../IContestSubCategoryService";
-import { IVarietyService } from "../IVarietyService";
+import {IContestSubCategoryService} from "../IContestSubCategoryService";
+import {IVarietyService} from "../IVarietyService";
 
 export class ClassificationContestRuleService implements IClassificationContestRuleServices {
     private classificationContestRuleRepository: IClassificationContestRuleRepository;
@@ -61,7 +62,7 @@ export class ClassificationContestRuleService implements IClassificationContestR
     async getAllClassificationContestRules(): Promise<IClassificationContestRuleResponse[]> {
         try {
             const rules = await this.classificationContestRuleRepository.getAllClassificationContestRules();
-            return rules.map(rule => 
+            return rules.map(rule =>
                 mapClassificationContestRuleResponse(
                     rule as IClassificationContestRule & {
                         _id: string;
@@ -102,7 +103,7 @@ export class ClassificationContestRuleService implements IClassificationContestR
 
             // If updating varieties, check if they exist
             if (updateData.varieties) {
-                const varieties = await Variety.find({ _id: { $in: updateData.varieties } });
+                const varieties = await Variety.find({_id: {$in: updateData.varieties}});
                 if (varieties.length !== updateData.varieties.length) {
                     throw new Error("One or more varieties not found");
                 }
@@ -131,21 +132,21 @@ export class ClassificationContestRuleService implements IClassificationContestR
     }
 
     async getClassificationContestRuleByContestSubCategoryId(
-      contestSubCategoryId: string
+        contestSubCategoryId: string
     ): Promise<IClassificationContestRuleResponse | null> {
-      const classificationContestRule =
-        await this.classificationContestRuleRepository.getClassificationContestRuleByContestSubCategoryId(
-          contestSubCategoryId
-        );
-      if (!classificationContestRule) {
-        return null;
-      }
-      return mapClassificationContestRuleResponse(
-        classificationContestRule as IClassificationContestRule & {
-          _id: string;
-          createdAt: Date;
-          updatedAt: Date;
+        const classificationContestRule =
+            await this.classificationContestRuleRepository.getClassificationContestRuleByContestSubCategoryId(
+                contestSubCategoryId
+            );
+        if (!classificationContestRule) {
+            return null;
         }
-      );
+        return mapClassificationContestRuleResponse(
+            classificationContestRule as IClassificationContestRule & {
+                _id: string;
+                createdAt: Date;
+                updatedAt: Date;
+            }
+        );
     }
 }

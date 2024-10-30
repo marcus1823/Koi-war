@@ -1,9 +1,7 @@
 import {IVarietyService} from "../IVarietyService";
 import {IVarietyRepository} from "../../repositories/IVarietyRepository";
-import {IFish} from "../../models/fish.model";
 import {IVarietyResponse, mapVarietyResponse} from "../../types/variety";
 import {IVariety} from "../../models/variety.model";
-import {mapFishProfileResponse} from "../../types/fish";
 
 export class VarietyServices implements IVarietyService {
     private varietyRepository: IVarietyRepository;
@@ -21,7 +19,7 @@ export class VarietyServices implements IVarietyService {
             }
 
             // Xử lý images
-            const processedData = { ...data };
+            const processedData = {...data};
             if (typeof data.images === 'string') {
                 processedData.images = [data.images];
             }
@@ -44,7 +42,7 @@ export class VarietyServices implements IVarietyService {
             throw new Error("Variety not found");
         }
         return mapVarietyResponse(
-            variety as IVariety & { _id: string; createdAt: Date; updatedAt: Date}
+            variety as IVariety & { _id: string; createdAt: Date; updatedAt: Date }
         )
     }
 
@@ -52,7 +50,7 @@ export class VarietyServices implements IVarietyService {
         const varieties = await this.varietyRepository.getAllVarieties();
         return varieties.map(variety =>
             mapVarietyResponse(
-                variety as IVariety & { _id: string; createdAt: Date; updatedAt: Date}
+                variety as IVariety & { _id: string; createdAt: Date; updatedAt: Date }
             ))
     }
 
@@ -73,7 +71,7 @@ export class VarietyServices implements IVarietyService {
             }
 
             // Xử lý images nếu có
-            const processedData = { ...updateData };
+            const processedData = {...updateData};
             if (typeof updateData.images === 'string') {
                 processedData.images = [updateData.images];
             }
@@ -99,9 +97,9 @@ export class VarietyServices implements IVarietyService {
 
         if (!variety) {
             throw new Error("Variety not found");
-        }else {
+        } else {
             return mapVarietyResponse(
-                variety as IVariety & { _id: string; createdAt: Date; updatedAt: Date}
+                variety as IVariety & { _id: string; createdAt: Date; updatedAt: Date }
             )
         }
     }

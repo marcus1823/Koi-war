@@ -10,4 +10,9 @@ export interface IContestRegistrationServices {
     ): Promise<IRegistration & { _id: string }>;
 
     getContestRegistrationsBySubCategoryId(contestSubCategoryId: string): Promise<(IRegistration & { _id: string })[]>;
+
+    updateContestRegistrationRank(
+        registrationId: string,
+        rank: number
+    ): Promise<any>;
 }

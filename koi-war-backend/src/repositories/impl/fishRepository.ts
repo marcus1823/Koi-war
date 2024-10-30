@@ -2,9 +2,9 @@ import Fish, {IFish} from "../../models/fish.model";
 import {IFishRepository} from "../IFishRepository";
 import Variety from "../../models/variety.model";
 
-export class FishRepository implements IFishRepository{
+export class FishRepository implements IFishRepository {
 
-    async createFish(data: any): Promise<IFish>{
+    async createFish(data: any): Promise<IFish> {
         const fish = new Fish(data);
         return fish.save();
     }
@@ -41,7 +41,7 @@ export class FishRepository implements IFishRepository{
         if (!variety) return [];
 
         // Sử dụng ObjectId để tìm cá
-        return Fish.find({ variety: variety._id }).populate("variety").exec()
+        return Fish.find({variety: variety._id}).populate("variety").exec()
     }
 
     async deleteFishById(id: string): Promise<IFish | null> {
@@ -49,7 +49,7 @@ export class FishRepository implements IFishRepository{
     }
 
     //Partial<IFish> là một utility type có chức năng tạo ra một phiên bản mới của type IFish nhưng tất cả các thuộc tính của IFish đều là tùy chọn (optional).
-    async updateFishById(id: string, updateData: Partial<IFish>) : Promise<IFish | null> {
+    async updateFishById(id: string, updateData: Partial<IFish>): Promise<IFish | null> {
         return Fish.findByIdAndUpdate(id, updateData, {new: true})
             .populate("variety")
             .populate("user")

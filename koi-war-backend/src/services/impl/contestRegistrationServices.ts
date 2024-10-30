@@ -60,6 +60,39 @@ export class ContestRegistrationServices
         return this.contestRegistrationRepository.createContestRegistration(data);
     }
 
+    async getContestRegistrationById(id: string): Promise<any> {
+        return this.contestRegistrationRepository.getContestRegistrationById(id);
+    }
+
+    async getContestRegistrationByFishId(
+        fishId: string
+    ): Promise<IRegistration & { _id: string }> {
+        const contestRegistration =
+            await this.contestRegistrationRepository.getContestRegistrationByFishId(
+                fishId
+            );
+        if (!contestRegistration) {
+            throw new Error("Contest registration not found");
+        }
+
+        return contestRegistration;
+    }
+
+    getContestRegistrationsBySubCategoryId(contestSubCategoryId: string): Promise<(IRegistration & { _id: string })[]> {
+        return this.contestRegistrationRepository.getContestRegistrationsBySubCategoryId(contestSubCategoryId);
+    }
+
+    async updateContestRegistrationRank(
+        registrationId: string,
+        rank: number
+    ): Promise<any> {
+        const contestRegistration = this.contestRegistrationRepository.updateContestRegistrationRank(
+            registrationId,
+            rank
+        );
+        return contestRegistration;
+    }
+
     private async checkFishClassification(
         fishId: string,
         contestSubCategoryId: string
@@ -82,27 +115,5 @@ export class ContestRegistrationServices
             );
         }
         return true;
-    }
-
-    async getContestRegistrationById(id: string): Promise<any> {
-        return this.contestRegistrationRepository.getContestRegistrationById(id);
-    }
-
-    async getContestRegistrationByFishId(
-        fishId: string
-    ): Promise<IRegistration & {_id: string}> {
-        const contestRegistration =
-            await this.contestRegistrationRepository.getContestRegistrationByFishId(
-                fishId
-            );
-        if (!contestRegistration) {
-            throw new Error("Contest registration not found");
-        }
-
-        return contestRegistration;
-    }
-
-    getContestRegistrationsBySubCategoryId(contestSubCategoryId: string): Promise<(IRegistration & { _id: string })[]> {
-        return this.contestRegistrationRepository.getContestRegistrationsBySubCategoryId(contestSubCategoryId);
     }
 }

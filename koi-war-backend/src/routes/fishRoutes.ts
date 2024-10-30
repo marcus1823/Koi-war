@@ -1,4 +1,4 @@
-import  {Router} from "express";
+import {Router} from "express";
 import {FishController} from "../controllers/fishController";
 import {validate} from "../middleware/validateResource";
 import {createFishSchema} from "../schema/fish.schema";
@@ -60,7 +60,7 @@ import {UserRole} from "../models/user.model";
  *           minLength: 8
  *           maxLength: 1000
  *           example: "Cá Koi Kohaku màu trắng đỏ, 2 tuổi"
- *     
+ *
  *     FishResponse:
  *       type: object
  *       properties:
