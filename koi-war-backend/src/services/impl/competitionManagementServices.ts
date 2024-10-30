@@ -1,10 +1,14 @@
 import {ICompetitionManagementServices} from "../ICompetitionManagementServices";
 import {IScoreServices} from "../IScoreServices";
 import {IContestRegistrationServices} from "../IContestRegistrationServices";
-import {IContestRegistrationResponse, mapContestRegistrationResponse} from "../../types/contestRegistration";
+import {
+    IContestRegistrationResponse,
+    mapContestRegistrationResponse,
+} from "../../types/contestRegistration";
 import {totalScoreOfAReferee} from "../../utils/expression.utils";
 
-export class CompetitionManagementServices implements ICompetitionManagementServices {
+export class CompetitionManagementServices
+    implements ICompetitionManagementServices {
     private scoreServices: IScoreServices;
     private registrationServices: IContestRegistrationServices;
 
@@ -20,13 +24,16 @@ export class CompetitionManagementServices implements ICompetitionManagementServ
         return this.registrationServices.createContestRegistration(data);
     }
 
-    async getContestRegistrationByFishId(fishId: string): Promise<IContestRegistrationResponse> {
+    async getContestRegistrationByFishId(
+        fishId: string
+    ): Promise<IContestRegistrationResponse> {
+        const contestRegistration =
+            await this.registrationServices.getContestRegistrationByFishId(fishId);
 
-        const contestRegistration = await this.registrationServices.getContestRegistrationByFishId(fishId);
-
-        contestRegistration.scores = await this.scoreServices.getScoreByRegistrationId(
-            contestRegistration._id
-        );
+        contestRegistration.scores =
+            await this.scoreServices.getScoreByRegistrationId(
+                contestRegistration._id
+            );
 
         // return contestRegistration;
         return mapContestRegistrationResponse(contestRegistration);
@@ -41,9 +48,8 @@ export class CompetitionManagementServices implements ICompetitionManagementServ
         bodyScore: number;
         patternScore: number;
         colorScore: number;
-        referee: string
+        referee: string;
     }): Promise<any> {
-
         // Check if the registration exists
         const registration =
             await this.registrationServices.getContestRegistrationById(
@@ -57,7 +63,10 @@ export class CompetitionManagementServices implements ICompetitionManagementServ
     }
 
     async rankingContestRegistration(contestSubCategoryId: string): Promise<any> {
-        const registrations = await this.registrationServices.getContestRegistrationsBySubCategoryId(contestSubCategoryId);
+        const registrations =
+            await this.registrationServices.getContestRegistrationsBySubCategoryId(
+                contestSubCategoryId
+            );
 
         const registrationsWithScores = await Promise.all(
             registrations.map(async (registration) => {
@@ -67,10 +76,10 @@ export class CompetitionManagementServices implements ICompetitionManagementServ
                 const totalScore = registration.scores?.reduce(
                     (acc, score) => acc + totalScoreOfAReferee(score),
                     0
-                )
+                );
                 return {
                     registration,
-                    totalScore
+                    totalScore,
                 };
             })
         );
@@ -79,11 +88,33 @@ export class CompetitionManagementServices implements ICompetitionManagementServ
             return (b.totalScore ?? 0) - (a.totalScore ?? 0);
         });
 
-        return registrationsWithScores.map((entry, index) => ({
-            rank: index + 1,
-            registration: entry.registration,
-            totalScore: entry.totalScore,
-        }));
+        return this.assignRanks(registrationsWithScores);
     }
 
+    private assignRanks(
+        registrationsWithScores: {
+            registration: any;
+            totalScore: number | null | undefined;
+        }[]
+    ): any[] {
+        let rank = 1;
+        let previousScore: number | null | undefined = null;
+        let previousRank = 1;
+
+        return registrationsWithScores.map((entry, index) => {
+            if (entry.totalScore !== previousScore) {
+                rank = index + 1;
+                previousScore = entry.totalScore;
+                previousRank = rank;
+            } else {
+                rank = previousRank;
+            }
+
+            return {
+                rank: rank,
+                registration: entry.registration,
+                totalScore: entry.totalScore,
+            };
+        });
+    }
 }
