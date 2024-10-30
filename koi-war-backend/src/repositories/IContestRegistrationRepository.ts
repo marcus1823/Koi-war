@@ -1,3 +1,5 @@
+import { RegistrationStatus } from "../models/registration.model";
+
 export interface IContestRegistrationRepository {
   createContestRegistration(data: {
     fish: string;
@@ -9,5 +11,7 @@ export interface IContestRegistrationRepository {
 
   getContestRegistrationByFishId(fishId: string): Promise<any>;
 
-    getContestRegistrationsBySubCategoryId(contestSubCategoryId: string): Promise<any[]>;
+  getContestRegistrationsBySubCategoryId(contestSubCategoryId: string): Promise<any[]>;
+
+  updateContestRegistrationStatus(id: string, status: RegistrationStatus): Promise<any>;
 }

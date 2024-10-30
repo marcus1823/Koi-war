@@ -4,7 +4,7 @@ import {
   mapContestSubCategoryResponse,
 } from "./contestSubCategory";
 import { IScoreResponse, mapScoreResponse } from "./score";
-import { IRegistration } from "../models/registration.model";
+import { IRegistration, RegistrationStatus } from "../models/registration.model";
 import { IScore } from "../models/score.model";
 import { IFish } from "../models/fish.model";
 import { IContestSubCategory } from "../models/contestSubCategory.model";
@@ -14,6 +14,7 @@ export interface IContestRegistrationResponse {
   fish: IFishProfileResponse;
   scores: IScoreResponse[];
   contestSubCategory: IContestSubCategoryResponse;
+  status: RegistrationStatus;
 }
 
 export function mapContestRegistrationResponse(
@@ -40,5 +41,6 @@ export function mapContestRegistrationResponse(
         updatedAt: Date;
       }
     ),
+    status: data.status,
   };
 }

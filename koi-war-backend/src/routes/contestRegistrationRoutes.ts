@@ -1,7 +1,7 @@
 import {Router} from "express";
 import {ContestRegistrationController} from "../controllers/contestRegistrationController";
 import {validate} from "../middleware/validateResource";
-import {CreateContestRegistrationInput} from "../schema/contestRegistration.schema";
+import {CreateContestRegistrationInput, UpdateRegistrationStatusInput} from "../schema/contestRegistration.schema";
 
 export function contestRegistrationRoutes(
     contestRegistrationController: ContestRegistrationController
@@ -98,5 +98,74 @@ export function contestRegistrationRoutes(
      */
     router.get("/ranking/:contestSubCategoryId", contestRegistrationController.rankingContest);
 
+    /**
+ * @openapi
+ * /api/contestRegistration/updateStatus/{id}:
+ *   patch:
+ *     tags:
+ *       - Contest Registration
+ *     summary: Update registration status
+ *     description: Update the status of a contest registration (pending/approved/checked/rejected)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The registration ID
+ *         example: "6721f38553d22c42e4c1d991"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [pending, approved, checked, rejected]
+ *                 description: New status for the registration
+ *                 example: "approved"
+ *     responses:
+ *       200:
+ *         description: Registration status updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Registration status updated successfully"
+ *                 data:
+ *                   $ref: '#/components/schemas/ContestRegistrationResponse'
+ *       400:
+ *         description: Invalid status or business rule violation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Registration already rejected, cannot update status"
+ *       404:
+ *         description: Registration not found
+ *       500:
+ *         description: Internal server error
+ */
+    router.patch(
+        "/updateStatus/:id",
+        validate(UpdateRegistrationStatusInput),
+        contestRegistrationController.updateContestRegistrationStatus
+      );
     return router;
 }

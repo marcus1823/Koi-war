@@ -1,4 +1,4 @@
-import {IRegistration} from "../models/registration.model";
+import {IRegistration, RegistrationStatus} from "../models/registration.model";
 
 export interface IContestRegistrationServices {
     createContestRegistration(data: any): Promise<any>;
@@ -10,4 +10,6 @@ export interface IContestRegistrationServices {
     ): Promise<IRegistration & { _id: string }>;
 
     getContestRegistrationsBySubCategoryId(contestSubCategoryId: string): Promise<(IRegistration & { _id: string })[]>;
+
+    updateContestRegistrationStatus(id: string, status: RegistrationStatus): Promise<IRegistration & { _id: string }>;
 }

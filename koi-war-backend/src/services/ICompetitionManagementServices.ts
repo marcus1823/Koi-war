@@ -1,3 +1,4 @@
+import { IRegistration, RegistrationStatus } from "../models/registration.model";
 import {IContestRegistrationResponse} from "../types/contestRegistration";
 
 export interface ICompetitionManagementServices {
@@ -18,4 +19,6 @@ export interface ICompetitionManagementServices {
     }): Promise<any>;
 
     rankingContestRegistration(contestSubCategoryId: string): Promise<any>;
+
+    updateContestRegistrationStatus(id: string, status: RegistrationStatus): Promise<IRegistration & { _id: string }>;
 }

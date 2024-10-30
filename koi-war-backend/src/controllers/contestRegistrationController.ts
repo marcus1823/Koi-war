@@ -59,4 +59,29 @@ export class ContestRegistrationController {
         }
     }
 
+    updateContestRegistrationStatus = async (req: Request, res: Response) => {
+        try {
+            const {id} = req.params;
+            const {status} = req.body;
+            const updatedRegistration = await this.competitionManagementServices.updateContestRegistrationStatus(id, status);
+            res.status(200).json({
+                success: true,
+                message: "Registration status updated successfully",
+                data: updatedRegistration
+            });
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
+            } else {
+                res.status(500).json({
+                    success: false,
+                    message: "An unknown error occurred"
+                });
+            }
+        }
+    }
+
 }

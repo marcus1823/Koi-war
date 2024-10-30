@@ -6,6 +6,7 @@ import {
     mapContestRegistrationResponse,
 } from "../../types/contestRegistration";
 import {totalScoreOfAReferee} from "../../utils/expression.utils";
+import { IRegistration, RegistrationStatus } from "../../models/registration.model";
 
 export class CompetitionManagementServices
     implements ICompetitionManagementServices {
@@ -116,5 +117,13 @@ export class CompetitionManagementServices
                 totalScore: entry.totalScore,
             };
         });
+    }
+
+    async updateContestRegistrationStatus(
+        id: string, 
+        status: RegistrationStatus
+    ): Promise<IRegistration & { _id: string }> {
+        // Delegate to contestRegistrationServices
+        return this.registrationServices.updateContestRegistrationStatus(id, status);
     }
 }
