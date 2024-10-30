@@ -16,4 +16,6 @@ export interface ICompetitionManagementServices {
         colorScore: number;
         referee: string;
     }): Promise<any>;
+
+    rankingContestRegistration(contestSubCategoryId: string): Promise<any>;
 }
