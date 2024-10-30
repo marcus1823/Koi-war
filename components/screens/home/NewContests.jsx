@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import React, { Component } from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import AntDesign from "@expo/vector-icons/AntDesign";
 const koiCompetitionData = [
   {
     openday: "2023-10-01",
@@ -55,7 +56,13 @@ export class NewContests extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.header}>Cuộc thi mới cho bạn:</Text>
+        <View style={styles.headerContent}>
+          <Text style={styles.header}>Cuộc thi mới cho bạn:</Text>
+          <TouchableOpacity style={{ flexDirection: "row" }}>
+            <Text style={styles.seeMore}>Xem thêm </Text>
+            <AntDesign name="right" size={20} color="gray" />
+          </TouchableOpacity>
+        </View>
         <FlatList
           data={koiCompetitionData}
           renderItem={({ item }) => (
@@ -94,6 +101,18 @@ const styles = StyleSheet.create({
     marginTop: 10,
 
     padding: 20,
+  },
+  headerContent: {
+    marginBottom: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  seeMore: { color: "gray" },
+  header: {
+    fontSize: 18,
+    fontWeight: "700",
+
+    color: "#f45124",
   },
   header: {
     fontSize: 18,

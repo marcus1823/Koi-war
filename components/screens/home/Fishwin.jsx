@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import React, { Component } from "react";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 const FishWin = [
   {
@@ -65,7 +66,13 @@ export class Fishwin extends Component {
     const itemWidthImage = itemWidth - 10;
     return (
       <View style={styles.container}>
-        <Text style={styles.header}>Cá Koi quán quân:</Text>
+        <View style={styles.headerContent}>
+          <Text style={styles.header}>Cá Koi quán quân:</Text>
+          <TouchableOpacity style={{ flexDirection: "row" }}>
+            <Text style={styles.seeMore}>Xem thêm </Text>
+            <AntDesign name="right" size={20} color="gray" />
+          </TouchableOpacity>
+        </View>
         <FlatList
           data={FishWin}
           renderItem={({ item }) => (
@@ -122,10 +129,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
   },
+  headerContent: {
+    marginBottom: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  seeMore: { color: "gray" },
   header: {
     fontSize: 18,
     fontWeight: "700",
-    marginBottom: 20,
+
     color: "#f45124",
   },
   contestItem: {
