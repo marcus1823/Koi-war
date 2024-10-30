@@ -2,6 +2,8 @@ import { ContestInstanceController } from "../controllers/contestInstanceControl
 import { Router } from "express";
 import { validate } from "../middleware/validateResource";
 import { createContestInstanceSchema, updateContestInstanceSchema } from "../schema/contestInstance.schema";
+import { authorizeRole } from "../middleware/authorizeMiddleware";
+import { UserRole } from "../models/user.model";
 
 /**
  * @openapi
@@ -144,6 +146,8 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
      */
     router.post(
         "/createContestInstance",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
         validate(createContestInstanceSchema),
         contestInstanceController.createContestInstance
     );

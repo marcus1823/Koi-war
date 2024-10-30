@@ -2,6 +2,8 @@ import { ContestSubCategoryController } from "../controllers/contestSubCategoryC
 import { Router } from "express";
 import { validate } from "../middleware/validateResource";
 import { createContestSubCategorySchema, updateContestSubCategorySchema } from "../schema/contestSubCategory.schema";
+import { UserRole } from "../models/user.model";
+import { authorizeRole } from "../middleware/authorizeMiddleware";
 
 /**
  * @openapi
@@ -79,6 +81,8 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
      */
     router.post(
         "/createContestSubCategory",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
         validate(createContestSubCategorySchema),
         contestSubCategoryController.createContestSubCategory
     );
@@ -205,6 +209,8 @@ export function contestSubCategoryRoutes(contestSubCategoryController: ContestSu
      */
     router.put(
         "/updateContestSubCategoryById/:id",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
         validate(updateContestSubCategorySchema),
         contestSubCategoryController.updateContestSubCategoryById
     );

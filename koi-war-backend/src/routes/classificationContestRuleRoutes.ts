@@ -2,6 +2,8 @@ import { Router } from "express";
 import { ClassificationContestRuleController } from "../controllers/classificationContestRuleController";
 import { validate } from "../middleware/validateResource";
 import { createClassificationContestRuleSchema, updateClassificationContestRuleSchema } from "../schema/classificationContestRule.schema";
+import { authorizeRole } from "../middleware/authorizeMiddleware";
+import { UserRole } from "../models/user.model";
 
 /**
  * @openapi
@@ -145,6 +147,8 @@ export function classificationContestRuleRoutes(
    */
   router.post(
     "/createClassification",
+    (req, res, next) =>
+      authorizeRole([UserRole.ADMIN], req, res, next),
     validate(createClassificationContestRuleSchema),
     classificationContestRuleController.createClassificationContestRule
   );
@@ -282,8 +286,10 @@ export function classificationContestRuleRoutes(
      */
     router.put(
         "/updateClassificationById/:id",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
         validate(updateClassificationContestRuleSchema),
-        classificationContestRuleController.updateClassificationContestRuleById
+    classificationContestRuleController.updateClassificationContestRuleById
     );
 
     return router;

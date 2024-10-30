@@ -2,6 +2,8 @@ import {Router} from "express";
 import {ContestRegistrationController} from "../controllers/contestRegistrationController";
 import {validate} from "../middleware/validateResource";
 import {CreateContestRegistrationInput, UpdateRegistrationStatusInput} from "../schema/contestRegistration.schema";
+import { authorizeRole } from "../middleware/authorizeMiddleware";
+import { UserRole } from "../models/user.model";
 
 export function contestRegistrationRoutes(
     contestRegistrationController: ContestRegistrationController
@@ -36,6 +38,8 @@ export function contestRegistrationRoutes(
      */
     router.post(
         "/registerContest",
+        (req, res, next) =>
+            authorizeRole([UserRole.USER], req, res, next),
         validate(CreateContestRegistrationInput),
         contestRegistrationController.createContestRegistration
     );
@@ -164,6 +168,8 @@ export function contestRegistrationRoutes(
  */
     router.patch(
         "/updateStatus/:id",
+        (req, res, next) =>
+            authorizeRole([UserRole.STAFF], req, res, next),
         validate(UpdateRegistrationStatusInput),
         contestRegistrationController.updateContestRegistrationStatus
       );

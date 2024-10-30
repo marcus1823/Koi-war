@@ -2,6 +2,8 @@ import { ContestController } from "../controllers/contestController";
 import { Router } from "express";
 import { validate } from "../middleware/validateResource";
 import { createContestSchema, updateContestSchema } from "../schema/contest.schema";
+import { authorizeRole } from "../middleware/authorizeMiddleware";
+import { UserRole } from "../models/user.model";
 
 /**
  * @openapi
@@ -143,6 +145,8 @@ export function contestRoutes(contestController: ContestController): Router {
    */
   router.post(
     "/createContest",
+    (req, res, next) =>
+      authorizeRole([UserRole.ADMIN], req, res, next),
     validate(createContestSchema),
     contestController.createContest
   );
@@ -403,6 +407,8 @@ export function contestRoutes(contestController: ContestController): Router {
    */
   router.put(
     "/updateContestById/:id",
+    (req, res, next) =>
+      authorizeRole([UserRole.ADMIN], req, res, next),
     validate(updateContestSchema),
     contestController.updateContestById
   );
@@ -479,7 +485,12 @@ export function contestRoutes(contestController: ContestController): Router {
    *                   type: string
    *                   example: "Failed to delete contest"
    */
-  router.delete("/deleteContestById/:id", contestController.deleteContestById);
+  router.delete(
+    "/deleteContestById/:id",
+    (req, res, next) =>
+      authorizeRole([UserRole.ADMIN], req, res, next),
+    contestController.deleteContestById
+  );
 
   return router;
 }

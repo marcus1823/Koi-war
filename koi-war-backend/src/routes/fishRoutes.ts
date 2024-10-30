@@ -128,7 +128,14 @@ export function fishRoutes(fishController: FishController): Router {
      *       404:
      *         description: Variety not found
      */
-    router.post("/createFish", validate(createFishSchema), verifyToken, fishController.createFish);
+    router.post(
+        "/createFish",
+        (req, res, next) =>
+            authorizeRole([UserRole.USER], req, res, next),
+        validate(createFishSchema),
+        verifyToken,
+        fishController.createFish
+    );
 
     /**
      * @openapi
