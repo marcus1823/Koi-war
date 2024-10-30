@@ -258,7 +258,7 @@ export function contestRoutes(contestController: ContestController): Router {
 
   /**
    * @openapi
-   * /api/contest/{id}:
+   * /api/contest/updateContestById/{id}:
    *   get:
    *     tags:
    *       - Contests

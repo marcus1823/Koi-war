@@ -179,7 +179,7 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
 
     /**
      * @openapi
-     * /api/contestInstance/{id}:
+     * /api/contestInstance/getContestInstanceById/{id}:
      *   get:
      *     tags:
      *       - Contest Instances
