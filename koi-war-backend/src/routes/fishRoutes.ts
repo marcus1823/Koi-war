@@ -23,15 +23,15 @@ import {UserRole} from "../models/user.model";
  *         - name
  *         - weight
  *         - length
- *         - images
  *         - variety
+ *         - images
  *         - description
  *       properties:
  *         name:
  *           type: string
  *           minLength: 2
  *           maxLength: 150
- *           example: "Koi Kohaku A1"
+ *           example: "Kohaku A1"
  *           description: Name of the fish
  *         weight:
  *           type: number
@@ -43,6 +43,11 @@ import {UserRole} from "../models/user.model";
  *           minimum: 1
  *           example: 35
  *           description: Length in centimeters
+ *         variety:
+ *           type: string
+ *           pattern: "^[0-9a-fA-F]{24}$"
+ *           example: "6721f38553d22c42e4c1d990"
+ *           description: ID of the fish variety
  *         images:
  *           type: array
  *           items:
@@ -50,11 +55,6 @@ import {UserRole} from "../models/user.model";
  *             format: uri
  *           minItems: 1
  *           example: ["https://example.com/fish1.jpg"]
- *         variety:
- *           type: string
- *           pattern: "^[0-9a-fA-F]{24}$"
- *           example: "6721f38553d22c42e4c1d990"
- *           description: ID of the fish variety
  *         description:
  *           type: string
  *           minLength: 8
@@ -69,200 +69,31 @@ import {UserRole} from "../models/user.model";
  *           example: "6721f38553d22c42e4c1d991"
  *         name:
  *           type: string
- *           example: "Koi Kohaku A1"
+ *           example: "Kohaku A1"
  *         weight:
  *           type: number
  *           example: 2.5
  *         length:
  *           type: number
  *           example: 35
+ *         variety:
+ *           $ref: '#/components/schemas/VarietyResponse'
  *         images:
  *           type: array
  *           items:
  *             type: string
  *           example: ["https://example.com/fish1.jpg"]
- *         variety:
- *           $ref: '#/components/schemas/VarietyResponse'
- *         user:
- *           $ref: '#/components/schemas/UserResponse'
  *         description:
  *           type: string
  *           example: "Cá Koi Kohaku màu trắng đỏ, 2 tuổi"
+ *         user:
+ *           $ref: '#/components/schemas/UserResponse'
  *         createdAt:
  *           type: string
  *           format: date-time
  *         updatedAt:
  *           type: string
  *           format: date-time
- */
-
-/**
- * @openapi
- * /api/fish/createFish:
- *   post:
- *     tags: [Fishes]
- *     summary: Create a new fish
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreateFishInput'
- *     responses:
- *       201:
- *         description: Fish created successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/FishResponse'
- *       400:
- *         description: Invalid input
- *       401:
- *         description: Unauthorized
- *
- * /api/fish/getAllFishes:
- *   get:
- *     tags: [Fishes]
- *     summary: Get all fishes
- *     responses:
- *       200:
- *         description: List of all fishes
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/FishResponse'
- *
- * /api/fish/myFishes:
- *   get:
- *     tags: [Fishes]
- *     summary: Get current user's fishes
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: List of user's fishes
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/FishResponse'
- *       401:
- *         description: Unauthorized
- *
- * /api/fish/{id}:
- *   get:
- *     tags: [Fishes]
- *     summary: Get fish by ID
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *         example: "6721f38553d22c42e4c1d991"
- *     responses:
- *       200:
- *         description: Fish details
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/FishResponse'
- *       404:
- *         description: Fish not found
- *
- * /api/fish/variety/{varietyId}:
- *   get:
- *     tags: [Fishes]
- *     summary: Get fishes by variety ID
- *     parameters:
- *       - name: varietyId
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *         example: "6721f38553d22c42e4c1d990"
- *     responses:
- *       200:
- *         description: List of fishes of specified variety
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/FishResponse'
- *
- * /api/fish/update/{id}:
- *   put:
- *     tags: [Fishes]
- *     summary: Update fish by ID
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *         example: "6721f38553d22c42e4c1d991"
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CreateFishInput'
- *     responses:
- *       200:
- *         description: Fish updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Fish updated successfully"
- *                 fish:
- *                   $ref: '#/components/schemas/FishResponse'
- *       404:
- *         description: Fish not found
- *       401:
- *         description: Unauthorized
- *
- * /api/fish/delete/{id}:
- *   delete:
- *     tags: [Fishes]
- *     summary: Delete fish by ID
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         schema:
- *           type: string
- *         example: "6721f38553d22c42e4c1d991"
- *     responses:
- *       200:
- *         description: Fish deleted successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Fish deleted successfully"
- *                 fish:
- *                   $ref: '#/components/schemas/FishResponse'
- *       404:
- *         description: Fish not found
- *       401:
- *         description: Unauthorized
  */
 
 export function fishRoutes(fishController: FishController): Router {
@@ -272,10 +103,11 @@ export function fishRoutes(fishController: FishController): Router {
      * @openapi
      * /api/fishes/createFish:
      *   post:
-     *     tags:
-     *       - Fishes
-     *     summary: Create a new fish entry
-     *     description: Create a new fish with name, weight, length, images, variety, and description
+     *     tags: [Fishes]
+     *     summary: Create a new fish
+     *     description: Creates a new fish profile with the provided details
+     *     security:
+     *       - bearerAuth: []
      *     requestBody:
      *       required: true
      *       content:
@@ -283,14 +115,18 @@ export function fishRoutes(fishController: FishController): Router {
      *           schema:
      *             $ref: '#/components/schemas/CreateFishInput'
      *     responses:
-     *       '201':
+     *       201:
      *         description: Fish created successfully
      *         content:
      *           application/json:
      *             schema:
      *               $ref: '#/components/schemas/FishResponse'
-     *       '400':
-     *         description: Validation error
+     *       400:
+     *         description: Invalid input data
+     *       401:
+     *         description: Unauthorized - Token missing or invalid
+     *       404:
+     *         description: Variety not found
      */
     router.post("/createFish", validate(createFishSchema), verifyToken, fishController.createFish);
 
@@ -298,13 +134,12 @@ export function fishRoutes(fishController: FishController): Router {
      * @openapi
      * /api/fishes/getAllFishes:
      *   get:
-     *     tags:
-     *       - Fishes
+     *     tags: [Fishes]
      *     summary: Get all fishes
-     *     description: Retrieve a list of all fishes
+     *     description: Retrieves a list of all fish profiles
      *     responses:
-     *       '200':
-     *         description: Successfully retrieved list of fishes
+     *       200:
+     *         description: List of all fishes
      *         content:
      *           application/json:
      *             schema:
@@ -318,25 +153,27 @@ export function fishRoutes(fishController: FishController): Router {
      * @openapi
      * /api/fishes/getFishByUserId/{userId}:
      *   get:
-     *     tags:
-     *       - Fishes
+     *     tags: [Fishes]
      *     summary: Get fishes by user ID
-     *     description: Retrieve a list of fishes based on the user ID
+     *     description: Retrieves all fish profiles owned by a specific user
      *     parameters:
      *       - name: userId
      *         in: path
      *         required: true
      *         schema:
      *           type: string
+     *         example: "6721f38553d22c42e4c1d992"
      *     responses:
-     *       '200':
-     *         description: Successfully retrieved fishes
+     *       200:
+     *         description: List of user's fishes
      *         content:
      *           application/json:
      *             schema:
      *               type: array
      *               items:
      *                 $ref: '#/components/schemas/FishResponse'
+     *       404:
+     *         description: User not found
      */
     router.get("/getFishByUserId/:userId", fishController.getFishByUserId);
 
@@ -344,25 +181,27 @@ export function fishRoutes(fishController: FishController): Router {
      * @openapi
      * /api/fishes/getFishByVarietyId/{varietyId}:
      *   get:
-     *     tags:
-     *       - Fishes
+     *     tags: [Fishes]
      *     summary: Get fishes by variety ID
-     *     description: Retrieve fishes by variety ID
+     *     description: Retrieves all fish profiles of a specific variety
      *     parameters:
      *       - name: varietyId
      *         in: path
      *         required: true
      *         schema:
      *           type: string
+     *         example: "6721f38553d22c42e4c1d990"
      *     responses:
-     *       '200':
-     *         description: Successfully retrieved fishes
+     *       200:
+     *         description: List of fishes of the specified variety
      *         content:
      *           application/json:
      *             schema:
      *               type: array
      *               items:
      *                 $ref: '#/components/schemas/FishResponse'
+     *       404:
+     *         description: Variety not found
      */
     router.get("/getFishByVarietyId/:varietyId", fishController.getFishByVarietyId);
 
@@ -370,25 +209,27 @@ export function fishRoutes(fishController: FishController): Router {
      * @openapi
      * /api/fishes/getFishByVarietyName/{varietyName}:
      *   get:
-     *     tags:
-     *       - Fishes
+     *     tags: [Fishes]
      *     summary: Get fishes by variety name
-     *     description: Retrieve fishes by variety name
+     *     description: Retrieves all fish profiles of a specific variety name
      *     parameters:
      *       - name: varietyName
      *         in: path
      *         required: true
      *         schema:
      *           type: string
+     *         example: "Kohaku"
      *     responses:
-     *       '200':
-     *         description: Successfully retrieved fishes
+     *       200:
+     *         description: List of fishes of the specified variety
      *         content:
      *           application/json:
      *             schema:
      *               type: array
      *               items:
      *                 $ref: '#/components/schemas/FishResponse'
+     *       404:
+     *         description: Variety not found
      */
     router.get("/getFishByVarietyName/:varietyName", fishController.getFishByVarietyName);
 
@@ -396,84 +237,53 @@ export function fishRoutes(fishController: FishController): Router {
      * @openapi
      * /api/fishes/{id}:
      *   get:
-     *     tags:
-     *       - Fishes
+     *     tags: [Fishes]
      *     summary: Get fish by ID
-     *     description: Retrieve a fish by its ID
+     *     description: Retrieves detailed information about a specific fish
      *     parameters:
      *       - name: id
      *         in: path
      *         required: true
      *         schema:
      *           type: string
+     *         example: "6721f38553d22c42e4c1d991"
      *     responses:
-     *       '200':
-     *         description: Successfully retrieved fish
+     *       200:
+     *         description: Fish details retrieved successfully
      *         content:
      *           application/json:
      *             schema:
      *               $ref: '#/components/schemas/FishResponse'
-     *       '404':
+     *       404:
      *         description: Fish not found
      */
     router.get("/:id", fishController.getFishById);
 
     /**
      * @openapi
-     * /api/fishes/updateFishById/{id}:
-     *   put:
-     *     tags:
-     *       - Fishes
-     *     summary: Update fish by ID
-     *     description: Update an existing fish by its ID
-     *     parameters:
-     *       - name: id
-     *         in: path
-     *         required: true
-     *         schema:
-     *           type: string
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             $ref: '#/components/schemas/CreateFishInput'
+     * /api/fishes/myFishes:
+     *   get:
+     *     tags: [Fishes]
+     *     summary: Get current user's fishes
+     *     description: Retrieves all fish profiles owned by the authenticated user
+     *     security:
+     *       - bearerAuth: []
      *     responses:
-     *       '200':
-     *         description: Fish updated successfully
+     *       200:
+     *         description: List of user's fishes
      *         content:
      *           application/json:
      *             schema:
-     *               $ref: '#/components/schemas/FishResponse'
-     *       '404':
-     *         description: Fish not found
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/FishResponse'
+     *       401:
+     *         description: Unauthorized - Token missing or invalid
      */
-    router.put("/updateFishById/:id", fishController.updateFishById);
-
-    /**
-     * @openapi
-     * /api/fishes/deleteFishById/{id}:
-     *   delete:
-     *     tags:
-     *       - Fishes
-     *     summary: Delete fish by ID
-     *     description: Delete an existing fish by its ID
-     *     parameters:
-     *       - name: id
-     *         in: path
-     *         required: true
-     *         schema:
-     *           type: string
-     *     responses:
-     *       '200':
-     *         description: Fish deleted successfully
-     *       '404':
-     *         description: Fish not found
-     */
-    router.delete("/deleteFishById/:id", fishController.deleteFishById);
-
-    router.get("/myFishes", verifyToken, (req, res, next) =>
-        authorizeRole([UserRole.USER], req, res, next), fishController.getAllMyFishes);
+    router.get("/myFishes", verifyToken, 
+        (req, res, next) => authorizeRole([UserRole.USER], req, res, next), 
+        fishController.getAllMyFishes
+    );
 
     return router;
 }

@@ -197,6 +197,66 @@ export function contestRoutes(contestController: ContestController): Router {
   router.get("/getAllContests", contestController.getAllContests);
 
   /**
+ * @openapi
+ * /api/contest/getContestById/{id}:
+ *   get:
+ *     tags: [Contests]
+ *     summary: Get contest by ID
+ *     description: Retrieve contest details by its ID
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "672100e85eaba638c1ff4e0b"
+ *         description: The contest ID
+ *     responses:
+ *       200:
+ *         description: Contest found successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Contest found successfully"
+ *                 data:
+ *                   $ref: '#/components/schemas/ContestResponse'
+ *       404:
+ *         description: Contest not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Contest not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+  router.get("/getContestById/:id", contestController.getContestById);
+
+  /**
    * @openapi
    * /api/contest/{id}:
    *   get:
