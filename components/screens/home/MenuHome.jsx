@@ -86,7 +86,7 @@ export class MenuHome extends Component {
                 textAlign: "center",
               }}
             >
-              Các Koi của bạn
+              Cá Koi của bạn
             </Text>
           </TouchableOpacity>
         </View>
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   icon: {
     width: 70,
     padding: 10,
-    borderColor: "gray",
+    borderColor: "#C0C0C0",
     borderWidth: 1,
     borderRadius: 10,
     alignItems: "center",

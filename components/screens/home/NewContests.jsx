@@ -125,6 +125,6 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     position: "relative",
-    marginTop: 10,
+    marginTop: 12,
   },
 });
