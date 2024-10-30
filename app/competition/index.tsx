@@ -50,24 +50,27 @@ export default function CompetitionHomePage() {
     const fetchCompetitions = async () => {
       try {
         const data = await getAllContestInstances();
-        const formattedData = data.map((item: any) => ({
-          id: item.id,
-          contest: {
-            id: item.contest.id,
-            name: item.contest.name,
-            description: item.contest.description,
-            contestInstances: item.contest.contestInstances,
-          },
-          name: item.name,
-          startDate: item.startDate,
-          endDate: item.endDate,
-          isActive: item.isActive,
-          description: item.description,
-          rules: item.rules,
-          images: item.images,
-          isDisabled: item.isDisabled,
-          contestSubCategories: item.contestSubCategories,
-        }));
+        const formattedData = data.map((item: any) => {
+          const contest = item.contest || {};
+          return {
+            id: item.id,
+            contest: {
+              id: contest.id || '',
+              name: contest.name || '',
+              description: contest.description || '',
+              contestInstances: contest.contestInstances || [],
+            },
+            name: item.name,
+            startDate: item.startDate,
+            endDate: item.endDate,
+            isActive: item.isActive,
+            description: item.description,
+            rules: item.rules,
+            images: item.images,
+            isDisabled: item.isDisabled,
+            contestSubCategories: item.contestSubCategories,
+          };
+        });
         setCompetitions(formattedData);
       } catch (error) {
         console.error('Error fetching competitions:', error);
