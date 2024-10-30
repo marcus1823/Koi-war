@@ -3,6 +3,221 @@ import { ClassificationContestRuleController } from "../controllers/classificati
 import { validate } from "../middleware/validateResource";
 import { createClassificationContestRuleSchema, updateClassificationContestRuleSchema } from "../schema/classificationContestRule.schema";
 
+/**
+ * @openapi
+ * tags:
+ *   name: Classification Contest Rules
+ *   description: APIs for managing classification rules in contests
+ */
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     CreateClassificationContestRuleInput:
+ *       type: object
+ *       required:
+ *         - name
+ *         - description
+ *         - contestSubCategory
+ *         - varieties
+ *         - weightRange
+ *         - sizeRange
+ *         - ageRange
+ *       properties:
+ *         name:
+ *           type: string
+ *           minLength: 2
+ *           maxLength: 150
+ *           example: "Quy tắc phân loại cá Koi 20-30cm"
+ *         description:
+ *           type: string
+ *           minLength: 8
+ *           maxLength: 1000
+ *           example: "Quy tắc phân loại cho cá Koi có kích thước từ 20-30cm"
+ *         contestSubCategory:
+ *           type: string
+ *           pattern: "^[0-9a-fA-F]{24}$"
+ *           example: "6721f38553d22c42e4c1d990"
+ *         varieties:
+ *           type: array
+ *           items:
+ *             type: string
+ *             pattern: "^[0-9a-fA-F]{24}$"
+ *           example: ["65f2a1b3c4d5e6f7a8b9c0e1", "65f2a1b3c4d5e6f7a8b9c0e2"]
+ *         weightRange:
+ *           type: object
+ *           required:
+ *             - min
+ *             - max
+ *           properties:
+ *             min:
+ *               type: number
+ *               minimum: 0
+ *               example: 0.5
+ *             max:
+ *               type: number
+ *               minimum: 0
+ *               example: 2
+ *         sizeRange:
+ *           type: object
+ *           required:
+ *             - min
+ *             - max
+ *           properties:
+ *             min:
+ *               type: number
+ *               minimum: 0
+ *               example: 20
+ *             max:
+ *               type: number
+ *               minimum: 0
+ *               example: 30
+ *         ageRange:
+ *           type: object
+ *           required:
+ *             - min
+ *             - max
+ *           properties:
+ *             min:
+ *               type: number
+ *               minimum: 0
+ *               example: 12
+ *             max:
+ *               type: number
+ *               minimum: 0
+ *               example: 24
+ */
+
+/**
+ * @openapi
+ * /api/classificationContestRule/create:
+ *   post:
+ *     tags: [Classification Contest Rules]
+ *     summary: Create a new classification rule
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateClassificationContestRuleInput'
+ *     responses:
+ *       201:
+ *         description: Classification rule created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Classification contest rule created successfully"
+ *                 data:
+ *                   $ref: '#/components/schemas/ClassificationContestRuleResponse'
+ *       404:
+ *         description: Contest subcategory or variety not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Contest subcategory not found"
+ */
+
+/**
+ * @openapi
+ * /api/classificationContestRule/getAll:
+ *   get:
+ *     tags: [Classification Contest Rules]
+ *     summary: Get all classification rules
+ *     responses:
+ *       200:
+ *         description: List of all classification rules
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ClassificationContestRuleResponse'
+ */
+
+/**
+ * @openapi
+ * /api/classificationContestRule/bySubCategory/{contestSubCategoryId}:
+ *   get:
+ *     tags: [Classification Contest Rules]
+ *     summary: Get classification rule by contest sub-category ID
+ *     parameters:
+ *       - name: contestSubCategoryId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "6721f38553d22c42e4c1d990"
+ *     responses:
+ *       200:
+ *         description: Classification rule found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ClassificationContestRuleResponse'
+ *       404:
+ *         description: Classification rule not found
+ */
+
+/**
+ * @openapi
+ * /api/classificationContestRule/update/{id}:
+ *   put:
+ *     tags: [Classification Contest Rules]
+ *     summary: Update an existing classification rule
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "6721f38553d22c42e4c1d991"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateClassificationContestRuleInput'
+ *     responses:
+ *       200:
+ *         description: Classification rule updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Classification contest rule updated successfully"
+ *                 data:
+ *                   $ref: '#/components/schemas/ClassificationContestRuleResponse'
+ *       404:
+ *         description: Classification rule not found
+ */
+
 export function classificationContestRuleRoutes(
   classificationContestRuleController: ClassificationContestRuleController
 ): Router {
@@ -10,12 +225,10 @@ export function classificationContestRuleRoutes(
 
   /**
    * @openapi
-   * /api/classificationRule/createClassification:
+   * /api/classificationContestRule/create:
    *   post:
-   *     tags:
-   *       - Classification Contest Rules
-   *     summary: Create a new classification contest rule
-   *     description: Create a new classification contest rule for a specific contest subcategory
+   *     tags: [Classification Contest Rules]
+   *     summary: Create a new classification rule
    *     requestBody:
    *       required: true
    *       content:
@@ -23,152 +236,139 @@ export function classificationContestRuleRoutes(
    *           schema:
    *             $ref: '#/components/schemas/CreateClassificationContestRuleInput'
    *     responses:
-   *       '201':
-   *         description: Classification contest rule created successfully
+   *       201:
+   *         description: Classification rule created successfully
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/ClassificationContestRuleResponse'
-   *       '400':
-   *         description: Validation error
-   *       '500':
-   *         description: Internal server error
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Classification contest rule created successfully"
+   *                 data:
+   *                   $ref: '#/components/schemas/ClassificationContestRuleResponse'
+   *       404:
+   *         description: Contest subcategory or variety not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: false
+   *                 message:
+   *                   type: string
+   *                   example: "Contest subcategory not found"
    */
   router.post(
-    "/createClassification",
+    "/create",
     validate(createClassificationContestRuleSchema),
     classificationContestRuleController.createClassificationContestRule
   );
 
   /**
    * @openapi
-   * /api/classificationRule/getAllClassification:
+   * /api/classificationContestRule/getAll:
    *   get:
-   *     tags:
-   *       - Classification Contest Rules
-   *     summary: Get all classification contest rules
-   *     description: Retrieve a list of all classification contest rules
+   *     tags: [Classification Contest Rules]
+   *     summary: Get all classification rules
    *     responses:
-   *       '200':
-   *         description: A list of classification contest rules
+   *       200:
+   *         description: List of all classification rules
    *         content:
    *           application/json:
    *             schema:
-   *               type: array
-   *               items:
-   *                 $ref: '#/components/schemas/ClassificationContestRuleResponse'
-   *       '500':
-   *         description: Internal server error
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     $ref: '#/components/schemas/ClassificationContestRuleResponse'
    */
   router.get(
-    "/getAllClassification",
+    "/getAll",
     classificationContestRuleController.getAllClassificationContestRules
   );
 
   /**
    * @openapi
-   * /api/classificationRule/getClassificationById/{id}:
+   * /api/classificationContestRule/bySubCategory/{contestSubCategoryId}:
    *   get:
-   *     tags:
-   *       - Classification Contest Rules
-   *     summary: Get a classification contest rule by ID
-   *     description: Retrieve a specific classification contest rule by its ID
+   *     tags: [Classification Contest Rules]
+   *     summary: Get classification rule by contest sub-category ID
    *     parameters:
-   *       - in: path
-   *         name: id
+   *       - name: contestSubCategoryId
+   *         in: path
    *         required: true
    *         schema:
    *           type: string
-   *         description: The ID of the classification contest rule to retrieve
+   *         example: "6721f38553d22c42e4c1d990"
    *     responses:
-   *       '200':
-   *         description: The requested classification contest rule
+   *       200:
+   *         description: Classification rule found
    *         content:
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/ClassificationContestRuleResponse'
-   *       '404':
-   *         description: Classification contest rule not found
-   *       '500':
-   *         description: Internal server error
+   *       404:
+   *         description: Classification rule not found
    */
   router.get(
-    "/getClassificationById/:id",
-    classificationContestRuleController.getClassificationContestRuleById
+    "/bySubCategory/:contestSubCategoryId",
+    classificationContestRuleController.getClassificationContestRuleByContestSubCategoryId
   );
 
   /**
    * @openapi
-   * /api/classificationRule/getClassificationByContestSubCategoryId/{contestSubCategoryId}:
-   *   get:
-   *     tags:
-   *       - Classification Contest Rules
-   *     summary: Get a classification contest rule by contest subcategory ID
-   *     description: Retrieve a specific classification contest rule by its contest subcategory ID
+   * /api/classificationContestRule/update/{id}:
+   *   put:
+   *     tags: [Classification Contest Rules]
+   *     summary: Update an existing classification rule
    *     parameters:
-   *       - in: path
-   *         name: contestSubCategoryId
+   *       - name: id
+   *         in: path
    *         required: true
    *         schema:
    *           type: string
-   *         description: The contest subcategory ID of the classification contest rule to retrieve
+   *         example: "6721f38553d22c42e4c1d991"
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/CreateClassificationContestRuleInput'
    *     responses:
-   *       '200':
-   *         description: The requested classification contest rule
+   *       200:
+   *         description: Classification rule updated successfully
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/ClassificationContestRuleResponse'
-   *       '404':
-   *         description: Classification contest rule not found
-   *       '500':
-   *         description: Internal server error
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Classification contest rule updated successfully"
+   *                 data:
+   *                   $ref: '#/components/schemas/ClassificationContestRuleResponse'
+   *       404:
+   *         description: Classification rule not found
    */
-  router.get(
-    "/getClassificationByContestSubCategoryId/:contestSubCategoryId",
-    classificationContestRuleController.getClassificationContestRuleByContestSubCategoryId
+  router.put(
+    "/update/:id",
+    validate(updateClassificationContestRuleSchema),
+    classificationContestRuleController.updateClassificationContestRuleById
   );
 
-    /**
-     * @openapi
-     * /api/classificationRule/updateClassificationById/{id}:
-     *   put:
-     *     tags:
-     *       - Classification Contest Rules
-     *     summary: Update a classification contest rule by ID
-     *     description: Update a specific classification contest rule's details by its ID
-     *     parameters:
-     *       - in: path
-     *         name: id
-     *         required: true
-     *         schema:
-     *           type: string
-     *         description: The ID of the classification contest rule to update
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         application/json:
-     *           schema:
-     *             $ref: '#/components/schemas/UpdateClassificationContestRuleInput'
-     *     responses:
-     *       '200':
-     *         description: Classification contest rule updated successfully
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/ClassificationContestRuleResponse'
-     *       '400':
-     *         description: Validation error
-     *       '404':
-     *         description: Classification contest rule not found
-     *       '500':
-     *         description: Internal server error
-     */
-    router.put(
-        "/updateClassificationById/:id",
-        validate(updateClassificationContestRuleSchema),
-        classificationContestRuleController.updateClassificationContestRuleById
-    );
-
-    return router;
+  return router;
 }

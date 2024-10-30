@@ -128,16 +128,30 @@ export class ContestController {
             });
         } catch (error) {
             if (error instanceof Error) {
-                if (error.message === "Contest not found") {
-                    res.status(404).json({
-                        success: false,
-                        message: "Contest not found"
-                    });
-                } else if (error.message === "Cannot delete contest with existing instances") {
-                    res.status(400).json({
-                        success: false,
-                        message: "Cannot delete contest with existing instances"
-                    });
+                switch (error.message) {
+                    case "Invalid contest ID format":
+                        res.status(400).json({
+                            success: false,
+                            message: "Invalid contest ID format"
+                        });
+                        break;
+                    case "Contest not found":
+                        res.status(404).json({
+                            success: false,
+                            message: "Contest not found"
+                        });
+                        break;
+                    case "Cannot delete contest with existing instances":
+                        res.status(400).json({
+                            success: false,
+                            message: "Cannot delete contest with existing instances"
+                        });
+                        break;
+                    default:
+                        res.status(500).json({
+                            success: false,
+                            message: "Failed to delete contest"
+                        });
                 }
             } else {
                 res.status(500).json({

@@ -13,6 +13,10 @@ export interface IVarietyDocument extends IVariety, mongoose.Document {
   classificationContestRules: mongoose.Types.Array<string>;
 }
 
+export interface IVarietyWithId extends IVariety {
+  _id: string;
+}
+
 const varietySchema = new mongoose.Schema<IVarietyDocument>(
   {
     name: {
@@ -38,7 +42,6 @@ const varietySchema = new mongoose.Schema<IVarietyDocument>(
   },
   { timestamps: true }
 );
-
 
 const Variety = mongoose.model<IVarietyDocument>("Variety", varietySchema);
 

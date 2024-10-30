@@ -8,48 +8,45 @@ import ContestSubCategory, { IContestSubCategory } from "../../models/contestSub
 import ContestInstance from "../../models/contestInstance.model";
 import mongoose from "mongoose";
 import { IClassificationContestRule } from "../../models/classificationContestRule.model";
+import { IContestInstanceServices } from "../IContestInstanceServices";
 
 export class ContestSubCategoryServices implements IContestSubCategoryService {
   private contestSubCategoryRepository: IContestSubCategoryRepository;
+  private contestInstanceServices: IContestInstanceServices;
 
-  constructor(contestSubCategoryRepository: IContestSubCategoryRepository) {
+  constructor(
+    contestSubCategoryRepository: IContestSubCategoryRepository,
+    contestInstanceServices: IContestInstanceServices
+  ) {
     this.contestSubCategoryRepository = contestSubCategoryRepository;
+    this.contestInstanceServices = contestInstanceServices;
   }
 
   async createContestSubCategory(
     data: any
   ): Promise<IContestSubCategoryResponse> {
     try {
-      // Kiểm tra contestInstance có tồn tại không
-      const contestInstance = await ContestInstance.findById(data.contestInstance);
+      const contestInstance = await this.contestInstanceServices.getContestInstanceById(data.contestInstance);
       if (!contestInstance) {
         throw new Error("Contest instance not found");
       }
 
-      // Kiểm tra contestInstance có bị disable không
       if (contestInstance.isDisabled) {
         throw new Error("Cannot create subcategory for disabled contest instance");
       }
 
-      // Kiểm tra tên subcategory đã tồn tại trong contest instance này chưa
-      const existingSubCategory = await ContestSubCategory.findOne({
-        contestInstance: data.contestInstance,
-        name: data.name
-      } );
+      const existingSubCategory = await this.contestSubCategoryRepository
+        .getContestSubCategoryByNameAndInstance(data.name, data.contestInstance);
       if (existingSubCategory) {
         throw new Error("A subcategory with this name already exists in this contest instance");
       }
 
-      const contestSubCategory =
-        await this.contestSubCategoryRepository.createContestSubCategory(data);
-
-      return mapContestSubCategoryResponse(
-        contestSubCategory as IContestSubCategory & {
-          _id: string;
-          createdAt: Date;
-          updatedAt: Date;
-        }
-      );
+      const contestSubCategory = await this.contestSubCategoryRepository.createContestSubCategory(data);
+      return mapContestSubCategoryResponse(contestSubCategory as IContestSubCategory & {
+        _id: string;
+        createdAt: Date;
+        updatedAt: Date;
+      });
     } catch (error) {
       if (error instanceof Error) {
         throw error;

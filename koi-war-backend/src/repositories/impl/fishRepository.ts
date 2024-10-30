@@ -10,7 +10,10 @@ export class FishRepository implements IFishRepository{
     }
 
     async findFishById(id: string): Promise<IFish | null> {
-        return Fish.findById(id);
+        return Fish.findById(id)
+            .populate("variety")
+            .populate("user")
+            .exec();
     }
 
     async getAllFishes(): Promise<IFish[]> {

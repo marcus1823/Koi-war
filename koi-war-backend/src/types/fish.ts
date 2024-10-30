@@ -22,7 +22,7 @@ export function mapFishProfileResponse(
     name: fishProfile.name,
     weight: fishProfile.weight,
     length: fishProfile.length,
-    variety: fishProfile.variety,
+    variety: fishProfile.variety as IVariety,
     description: fishProfile.description ?? "",
     images: fishProfile.images,
     _id: fishProfile._id,

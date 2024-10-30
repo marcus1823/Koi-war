@@ -3,6 +3,81 @@ import { Router } from "express";
 import { validate } from "../middleware/validateResource";
 import { createContestSchema, updateContestSchema } from "../schema/contest.schema";
 
+/**
+ * @openapi
+ * tags:
+ *   name: Contests
+ *   description: Contest management APIs
+ */
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     CreateContestInput:
+ *       type: object
+ *       required:
+ *         - name
+ *         - description
+ *       properties:
+ *         name:
+ *           type: string
+ *           minLength: 2
+ *           maxLength: 150
+ *           example: "Giải Đấu Cá Koi Miền Bắc 2024"
+ *         description:
+ *           type: string
+ *           minLength: 8
+ *           maxLength: 1000
+ *           example: "Giải đấu cá Koi lớn nhất Miền Bắc năm 2024, quy tụ những con cá Koi đẹp nhất từ các nhà nuôi cá chuyên nghiệp"
+ *     
+ *     UpdateContestInput:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           minLength: 2
+ *           maxLength: 150
+ *           example: "Giải Đấu Cá Koi Miền Bắc 2024 - Cập nhật"
+ *         description:
+ *           type: string
+ *           minLength: 8
+ *           maxLength: 1000
+ *           example: "Mô tả cập nhật cho giải đấu cá Koi lớn nhất Miền Bắc năm 2024"
+ *     
+ *     ContestResponse:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           example: "672100e85eaba638c1ff4e0b"
+ *         name:
+ *           type: string
+ *           example: "Giải Đấu Cá Koi Miền Bắc 2024"
+ *         description:
+ *           type: string
+ *           example: "Giải đấu cá Koi lớn nhất Miền Bắc năm 2024"
+ *         contestInstances:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/ContestInstanceResponse'
+ *           example: []
+ *     
+ *     ApiResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *         message:
+ *           type: string
+ *         data:
+ *           oneOf:
+ *             - $ref: '#/components/schemas/ContestResponse'
+ *             - type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ContestResponse'
+ */
+
 export function contestRoutes(contestController: ContestController): Router {
   const router = Router();
 
@@ -21,8 +96,8 @@ export function contestRoutes(contestController: ContestController): Router {
    *           schema:
    *             $ref: '#/components/schemas/CreateContestInput'
    *           example:
-   *             name: "Summer Fishing Contest"
-   *             description: "Annual summer fishing competition"
+   *             name: "Giải Đấu Cá Koi Miền Bắc 2024"
+   *             description: "Giải đấu cá Koi lớn nhất Miền Bắc năm 2024"
    *     responses:
    *       201:
    *         description: Contest created successfully
@@ -40,7 +115,7 @@ export function contestRoutes(contestController: ContestController): Router {
    *                 data:
    *                   $ref: '#/components/schemas/ContestResponse'
    *       400:
-   *         description: Bad request - Invalid input data
+   *         description: Bad request
    *         content:
    *           application/json:
    *             schema:
@@ -95,6 +170,16 @@ export function contestRoutes(contestController: ContestController): Router {
    *                   type: array
    *                   items:
    *                     $ref: '#/components/schemas/ContestResponse'
+   *             example:
+   *               success: true
+   *               data: [
+   *                 {
+   *                   id: "672100e85eaba638c1ff4e0b",
+   *                   name: "Giải Đấu Cá Koi Miền Bắc 2024",
+   *                   description: "Giải đấu cá Koi lớn nhất Miền Bắc năm 2024",
+   *                   contestInstances: []
+   *                 }
+   *               ]
    *       500:
    *         description: Internal server error
    *         content:
@@ -113,20 +198,19 @@ export function contestRoutes(contestController: ContestController): Router {
 
   /**
    * @openapi
-   * /api/contest/getContestById/{id}:
+   * /api/contest/{id}:
    *   get:
    *     tags:
    *       - Contests
    *     summary: Get contest by ID
-   *     description: Retrieve a specific contest by its ID with associated contest instances
+   *     description: Retrieve a contest by its ID
    *     parameters:
-   *       - in: path
-   *         name: id
+   *       - name: id
+   *         in: path
    *         required: true
    *         schema:
    *           type: string
-   *         description: The contest ID
-   *         example: "64f5b3d12c064589a3c8c459"
+   *         example: "672100e85eaba638c1ff4e0b"
    *     responses:
    *       200:
    *         description: Contest retrieved successfully
@@ -153,47 +237,25 @@ export function contestRoutes(contestController: ContestController): Router {
    *                 message:
    *                   type: string
    *                   example: "Contest not found"
-   *       500:
-   *         description: Internal server error
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                   example: false
-   *                 message:
-   *                   type: string
-   *                   example: "Failed to fetch contest"
-   */
-  router.get("/getContestById/:id", contestController.getContestById);
-
-  /**
-   * @openapi
-   * /api/contest/updateContestById/{id}:
+   *   
    *   put:
    *     tags:
    *       - Contests
    *     summary: Update contest by ID
-   *     description: Update a specific contest's details by its ID
+   *     description: Update an existing contest's information
    *     parameters:
-   *       - in: path
-   *         name: id
+   *       - name: id
+   *         in: path
    *         required: true
    *         schema:
    *           type: string
-   *         description: The contest ID
-   *         example: "64f5b3d12c064589a3c8c459"
+   *         example: "672100e85eaba638c1ff4e0b"
    *     requestBody:
    *       required: true
    *       content:
    *         application/json:
    *           schema:
    *             $ref: '#/components/schemas/UpdateContestInput'
-   *           example:
-   *             name: "Updated Contest Name"
-   *             description: "Updated contest description"
    *     responses:
    *       200:
    *         description: Contest updated successfully
@@ -210,19 +272,6 @@ export function contestRoutes(contestController: ContestController): Router {
    *                   example: "Contest updated successfully"
    *                 data:
    *                   $ref: '#/components/schemas/ContestResponse'
-   *       400:
-   *         description: Bad request - Invalid input data
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                   example: false
-   *                 message:
-   *                   type: string
-   *                   example: "Name must be at least 2 characters long"
    *       404:
    *         description: Contest not found
    *         content:
@@ -236,8 +285,37 @@ export function contestRoutes(contestController: ContestController): Router {
    *                 message:
    *                   type: string
    *                   example: "Contest not found"
-   *       500:
-   *         description: Internal server error
+   *   
+   *   delete:
+   *     tags:
+   *       - Contests
+   *     summary: Delete contest by ID
+   *     description: Delete a contest if it has no contest instances
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         required: true
+   *         schema:
+   *           type: string
+   *         example: "672100e85eaba638c1ff4e0b"
+   *     responses:
+   *       200:
+   *         description: Contest deleted successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Contest deleted successfully"
+   *                 data:
+   *                   $ref: '#/components/schemas/ContestResponse'
+   *       400:
+   *         description: Bad request
    *         content:
    *           application/json:
    *             schema:
@@ -248,7 +326,20 @@ export function contestRoutes(contestController: ContestController): Router {
    *                   example: false
    *                 message:
    *                   type: string
-   *                   example: "Failed to update contest"
+   *                   example: "Cannot delete contest with existing instances"
+   *       404:
+   *         description: Contest not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: false
+   *                 message:
+   *                   type: string
+   *                   example: "Contest not found"
    */
   router.put(
     "/updateContestById/:id",

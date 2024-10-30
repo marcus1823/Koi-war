@@ -61,7 +61,8 @@ app.use(
         new FishController(
             new FishServices(
                 new FishRepository(),
-                new UserService(new UserRepository())
+                new UserService(new UserRepository()),
+                new VarietyRepository()
             )
         )
     )
@@ -86,7 +87,10 @@ app.use(
     "/api/contestSubCategory",
     contestSubCategoryRoutes(
         new ContestSubCategoryController(
-            new ContestSubCategoryServices(new ContestSubCategoryRepository())
+            new ContestSubCategoryServices(
+                new ContestSubCategoryRepository(),
+                new ContestInstanceServices(new ContestInstanceRepository())
+            )
         )
     )
 );
@@ -96,7 +100,12 @@ app.use(
     classificationContestRuleRoutes(
         new ClassificationContestRuleController(
             new ClassificationContestRuleService(
-                new ClassificationContestRuleRepository()
+                new ClassificationContestRuleRepository(),
+                new ContestSubCategoryServices(
+                    new ContestSubCategoryRepository(),
+                    new ContestInstanceServices(new ContestInstanceRepository())
+                ),
+                new VarietyServices(new VarietyRepository())
             )
         )
     )
@@ -127,11 +136,20 @@ app.use(
                     new ContestInstanceServices(new ContestInstanceRepository()),
                     new FishServices(
                         new FishRepository(),
-                        new UserService(new UserRepository())
+                        new UserService(new UserRepository()),
+                        new VarietyRepository()
                     ),
-                    new ContestSubCategoryServices(new ContestSubCategoryRepository()),
+                    new ContestSubCategoryServices(
+                        new ContestSubCategoryRepository(),
+                        new ContestInstanceServices(new ContestInstanceRepository())
+                    ),
                     new ClassificationContestRuleService(
-                        new ClassificationContestRuleRepository()
+                        new ClassificationContestRuleRepository(),
+                        new ContestSubCategoryServices(
+                            new ContestSubCategoryRepository(),
+                            new ContestInstanceServices(new ContestInstanceRepository())
+                        ),
+                        new VarietyServices(new VarietyRepository())
                     )
                 )
             )
@@ -150,11 +168,20 @@ app.use(
                     new ContestInstanceServices(new ContestInstanceRepository()),
                     new FishServices(
                         new FishRepository(),
-                        new UserService(new UserRepository())
+                        new UserService(new UserRepository()),
+                        new VarietyRepository()
                     ),
-                    new ContestSubCategoryServices(new ContestSubCategoryRepository()),
+                    new ContestSubCategoryServices(
+                        new ContestSubCategoryRepository(),
+                        new ContestInstanceServices(new ContestInstanceRepository())
+                    ),
                     new ClassificationContestRuleService(
-                        new ClassificationContestRuleRepository()
+                        new ClassificationContestRuleRepository(),
+                        new ContestSubCategoryServices(
+                            new ContestSubCategoryRepository(),
+                            new ContestInstanceServices(new ContestInstanceRepository())
+                        ),
+                        new VarietyServices(new VarietyRepository())
                     )
                 )
             )

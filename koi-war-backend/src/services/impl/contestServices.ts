@@ -2,6 +2,7 @@ import { IContestServices } from "../IContestServices";
 import { IContestResponse, mapContestResponse } from "../../types/contest";
 import { IContestRepository } from "../../repositories/IContestRepository";
 import { IContest } from "../../models/contest.model";
+import { isValidObjectId } from '../../utils/validation.utils';
 
 export class ContestService implements IContestServices {
   private contestRepository: IContestRepository;
@@ -48,11 +49,20 @@ export class ContestService implements IContestServices {
 
 
   async deleteContestById(id: string): Promise<IContestResponse | null> {
+    if (!isValidObjectId(id)) {
+      throw new Error("Invalid contest ID format");
+    }
+
     const hasContestInstance = await this.contestRepository.hasContestInstance(id);
-    if (hasContestInstance){
+    if (hasContestInstance) {
       throw new Error("Cannot delete contest with existing instances");
     }
+
     const contest = await this.contestRepository.deleteContest(id);
+    if (!contest) {
+      throw new Error("Contest not found");
+    }
+
     return mapContestResponse(
       contest as IContest & { _id: string; createdAt: Date; updatedAt: Date }
     );

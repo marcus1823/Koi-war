@@ -2,7 +2,7 @@ import {IVarietyService} from "../IVarietyService";
 import {IVarietyRepository} from "../../repositories/IVarietyRepository";
 import {IFish} from "../../models/fish.model";
 import {IVarietyResponse, mapVarietyResponse} from "../../types/variety";
-import {IVariety, IVarietyDocument} from "../../models/variety.model";
+import {IVariety} from "../../models/variety.model";
 import {mapFishProfileResponse} from "../../types/fish";
 
 export class VarietyServices implements IVarietyService {
@@ -20,12 +20,13 @@ export class VarietyServices implements IVarietyService {
                 throw new Error("Variety with this name already exists");
             }
 
-            // Validate images array
-            if (!Array.isArray(data.images) || data.images.length === 0) {
-                throw new Error("At least one image is required");
+            // Xử lý images
+            const processedData = { ...data };
+            if (typeof data.images === 'string') {
+                processedData.images = [data.images];
             }
 
-            const variety = await this.varietyRepository.createVariety(data);
+            const variety = await this.varietyRepository.createVariety(processedData);
             return mapVarietyResponse(
                 variety as IVariety & { _id: string; createdAt: Date; updatedAt: Date }
             );
@@ -65,18 +66,19 @@ export class VarietyServices implements IVarietyService {
 
             // If updating name, check for duplicates
             if (updateData.name) {
-                const duplicateVariety = await this.varietyRepository.findByName(updateData.name) as IVarietyDocument;
-                if (duplicateVariety && duplicateVariety._id.toString() !== id) {
+                const duplicateVariety = await this.varietyRepository.findByName(updateData.name);
+                if (duplicateVariety && (duplicateVariety as IVariety & { _id: string })._id.toString() !== id) {
                     throw new Error("Variety with this name already exists");
                 }
             }
 
-            // If updating images, validate array
-            if (updateData.images && (!Array.isArray(updateData.images) || updateData.images.length === 0)) {
-                throw new Error("At least one image is required");
+            // Xử lý images nếu có
+            const processedData = { ...updateData };
+            if (typeof updateData.images === 'string') {
+                processedData.images = [updateData.images];
             }
 
-            const variety = await this.varietyRepository.updateVarietyById(id, updateData);
+            const variety = await this.varietyRepository.updateVarietyById(id, processedData);
             if (!variety) {
                 throw new Error("Failed to update variety");
             }

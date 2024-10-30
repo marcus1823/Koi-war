@@ -1,5 +1,6 @@
 import { IContestRepository } from "../IContestRepository";
 import Contest, { IContest } from "../../models/contest.model";
+import { isValidObjectId } from '../../utils/validation.utils';
 
 export class ContestRepository implements IContestRepository {
 
@@ -17,6 +18,9 @@ export class ContestRepository implements IContestRepository {
   }
 
   async getContestById(id: string): Promise<IContest | null> {
+    if (!isValidObjectId(id)) {
+      return null;
+    }
     const contest = await Contest.findById(id).populate({
       path: 'contestInstances',
       model: 'ContestInstance'
@@ -29,10 +33,16 @@ export class ContestRepository implements IContestRepository {
   }
 
   async deleteContest(id: string): Promise<IContest | null> {
+    if (!isValidObjectId(id)) {
+      return null;
+    }
     return Contest.findByIdAndDelete(id);
-}
+  }
 
   async hasContestInstance(id: string): Promise<boolean> {
+    if (!isValidObjectId(id)) {
+      return false;
+    }
     const contest = await Contest.findById(id);
     return contest ? contest.contestInstances.length > 0 : false;
   }

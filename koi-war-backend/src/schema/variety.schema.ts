@@ -1,4 +1,4 @@
-import { array, object, string, TypeOf } from "zod";
+import { object, string, TypeOf, union, array } from "zod";
 
 /**
  * @openapi
@@ -43,39 +43,37 @@ import { array, object, string, TypeOf } from "zod";
 
 export const createVarietySchema = object({
     body: object({
-        name: string({
-            required_error: "Name is required",
-        })
-        .trim()
-        .min(2, "Name must be at least 2 characters long")
-        .max(150, "Name must be less than 150 characters long")
-        .regex(
-            /^[a-zA-Z0-9\sÀ-ỹ\-_.,!?()'"]+$/u,
-            "Name can only contain letters, numbers, Vietnamese characters, spaces, and basic punctuation"
-        )
-        .transform(val => val.replace(/\s+/g, ' ')),
-
-        images: array(
-            string({
-                required_error: "Image URL is required",
-            })
+        name: string()
             .trim()
-            .url("Invalid image URL format")
-        ).min(1, "At least one image is required"),
+            .min(2, "Name must be at least 2 characters long")
+            .max(150, "Name must be less than 150 characters long")
+            .regex(
+                /^[a-zA-Z0-9\sÀ-ỹ\-_.,!?()'"]+$/u,
+                "Name can only contain letters, numbers, Vietnamese characters, spaces, and basic punctuation"
+            ),
 
-        description: string({
-            required_error: "Description is required",
-        })
-        .trim()
-        .min(8, "Description must be at least 8 characters long")
-        .max(1000, "Description must be less than 1000 characters"),
+        description: string()
+            .trim()
+            .min(8, "Description must be at least 8 characters long")
+            .max(1000, "Description must be less than 1000 characters"),
+
+        // Cho phép cả string và array of strings
+        images: union([
+            string()
+                .trim()
+                .url("Invalid image URL format"),
+            array(
+                string()
+                    .trim()
+                    .url("Invalid image URL format")
+            )
+        ])
     })
 });
 
 export const updateVarietySchema = object({
     params: object({
         id: string()
-            .trim()
             .regex(/^[0-9a-fA-F]{24}$/, "Invalid Variety ID format"),
     }),
     body: object({
@@ -87,22 +85,25 @@ export const updateVarietySchema = object({
                 /^[a-zA-Z0-9\sÀ-ỹ\-_.,!?()'"]+$/u,
                 "Name can only contain letters, numbers, Vietnamese characters, spaces, and basic punctuation"
             )
-            .transform(val => val.replace(/\s+/g, ' '))
             .optional(),
-
-        images: array(
-            string()
-                .trim()
-                .url("Invalid image URL format")
-        )
-        .min(1, "At least one image is required")
-        .optional(),
 
         description: string()
             .trim()
             .min(8, "Description must be at least 8 characters long")
             .max(1000, "Description must be less than 1000 characters")
             .optional(),
+
+        // Cho phép cả string và array of strings trong update
+        images: union([
+            string()
+                .trim()
+                .url("Invalid image URL format"),
+            array(
+                string()
+                    .trim()
+                    .url("Invalid image URL format")
+            )
+        ]).optional()
     })
 });
 
