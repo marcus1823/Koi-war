@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { competitionProfiles } from './competition';
@@ -20,11 +20,19 @@ type CompetitionProfile = {
 
 export default function CompetitionHomePage() {
   const [competitions, setCompetitions] = useState<CompetitionProfile[]>([]);
+  const [activeTab, setActiveTab] = useState('all');
   const router = useRouter();
 
   useEffect(() => {
     setCompetitions(competitionProfiles);
   }, []);
+
+  const filteredCompetitions = competitions.filter(comp => {
+    if (activeTab === 'all') return true;
+    if (activeTab === 'open') return comp.Status === 'Open';
+    if (activeTab === 'closed') return comp.Status === 'Closed';
+    return true;
+  });
 
   const renderItem = ({ item }: { item: CompetitionProfile }) => {
     return (
@@ -71,8 +79,29 @@ export default function CompetitionHomePage() {
           <Text style={styles.headerSubtitle}>Upcoming Competitions</Text>
         </View>
 
+        <View style={styles.tabContainer}>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'all' && styles.activeTab]}
+            onPress={() => setActiveTab('all')}
+          >
+            <Text style={[styles.tabText, activeTab === 'all' && styles.activeTabText]}>All</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'open' && styles.activeTab]}
+            onPress={() => setActiveTab('open')}
+          >
+            <Text style={[styles.tabText, activeTab === 'open' && styles.activeTabText]}>Open</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'closed' && styles.activeTab]}
+            onPress={() => setActiveTab('closed')}
+          >
+            <Text style={[styles.tabText, activeTab === 'closed' && styles.activeTabText]}>Closed</Text>
+          </TouchableOpacity>
+        </View>
+
         <FlatList
-          data={competitions}
+          data={filteredCompetitions}
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
@@ -169,5 +198,35 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    marginBottom: 15,
+    gap: 10,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    alignItems: 'center',
+  },
+  activeTab: {
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  tabText: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  activeTabText: {
+    color: '#eb7452',
   },
 });

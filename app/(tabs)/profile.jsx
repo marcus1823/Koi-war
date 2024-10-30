@@ -11,7 +11,6 @@ export default function profile() {
       ListHeaderComponent={() => (
         <>
           <HeaderProfile />
-
           <BodyProfile />
         </>
       )}

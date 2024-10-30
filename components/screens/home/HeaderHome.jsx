@@ -8,7 +8,7 @@ export default function Header() {
 
     return (
         <LinearGradient
-            colors={["#eb7452", "#5C98BB"]}
+            colors={['rgb(245, 177, 109)', 'rgb(204, 0, 0)']}
             style={{
                 padding: 20,
                 paddingTop: 40,
@@ -36,7 +36,6 @@ export default function Header() {
                     }}>Welcome,</Text>
                     <Text style={{
                         fontSize: 19,
-                        fontFamily: 'outfit-medium',
                         color: 'black'
                     }}>Ngoc</Text>
                 </View>
