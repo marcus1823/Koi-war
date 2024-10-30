@@ -55,7 +55,6 @@ export default function Header() {
                 <AntDesign name="search1" size={24} color={Colors.PRIMARY} />
                 <TextInput placeholder='Search...'
                     style={{
-                        fontFamily: 'outfit',
                         fontSize: 16
                     }}
                 />
