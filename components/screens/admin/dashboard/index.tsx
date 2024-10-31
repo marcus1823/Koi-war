@@ -103,11 +103,12 @@ const DashboardScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f4f4f4',
+    backgroundColor: '#faf0e6',
     padding: 16,
   },
   section: {
     marginBottom: 24,
+    marginTop: 50,
   },
   sectionTitle: {
     fontSize: 18,

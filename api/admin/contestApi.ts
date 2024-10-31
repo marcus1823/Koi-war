@@ -20,9 +20,8 @@ export const createContest = async (contestData: Contest) => {
         },
       }
     );
-    console.log("createContest", response);
-
     
+    console.log('API Response:', response.data); // Log the response to see its structure
     return response.data;
   } catch (error) {
     console.error('Error creating API Contest:', error);
@@ -48,6 +47,55 @@ export const getContests = async (queryParams?: Partial<Contest>) => {
     return response.data;
   } catch (error) {
     console.error('Error fetching contests:', error);
+    throw error;
+  }
+};
+
+export const deleteContest = async (id: string, queryParams?: Partial<Contest>) => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Token not exist!');
+    }
+    
+    const response = await axios.delete(`${API_BASE_URL}/contest/deleteContestById/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: queryParams,
+    });
+    console.log("deleteContest", response);
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error API delete contests:', error);
+    throw error;
+  }
+};
+
+export const updateContest = async (id: string, queryParams?: Partial<Contest>) => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Token not exist!');
+    }
+
+    const response = await axios.put(
+      `${API_BASE_URL}/contest/updateContestById/${id}`,
+      queryParams,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      }
+    );
+
+    console.log("updateContest", response);
+    return response.data;
+  } catch (error) {
+    console.error('Error API update contests:', error);
     throw error;
   }
 };

@@ -50,16 +50,31 @@ function LoginScreen() {
 
     try {
       const user = await loginUser(username, password);
+      
+      // Navigate based on the user's role
+      switch (user.role) {
+        case "admin":
+          router.push("/admin/dashboard");
+          break;
+        case "staff":
+          router.push("/staff/manageCompetition");
+          break;
+        // case "reference":
+        //   router.push("/reference/home");
+        //   break;
+        case "user":
+        default:
+          router.push("/(tabs)/home");
+          break;
+      }
 
       setLoginMessage("Login successful!");
       setModalVisible(true);
       setUsername("");
       setPassword("");
 
-      setTimeout(() => {
-        setModalVisible(false);
-        router.push("/(tabs)/home");
-      }, 1500);
+      // Remove modal delay if you navigate immediately
+      setModalVisible(false); // You can keep it for a short time if needed
     } catch (error: any) {
       Alert.alert("Login error:", error.message);
     } finally {

@@ -1,15 +1,14 @@
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React from "react";
 import {
-  Text,
-  View,
+  FlatList,
   Image,
   StyleSheet,
+  Text,
   TouchableOpacity,
-  FlatList,
+  View,
 } from "react-native";
-import React from "react";
-import { useRouter } from "expo-router";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import { useGlobalSearchParams, useLocalSearchParams } from "expo-router";
 const Contest = [
   {
     id: "1",
