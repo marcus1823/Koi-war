@@ -66,7 +66,7 @@ export function setupDependencies(): void {
     const contestService = new ContestService(contestRepository);
     AppContext.register('ContestService', contestService);
 
-    const contestInstanceService = new ContestInstanceServices(contestInstanceRepository);
+    const contestInstanceService = new ContestInstanceServices(contestInstanceRepository, contestService);
     AppContext.register('ContestInstanceService', contestInstanceService);
 
     const contestSubCategoryService = new ContestSubCategoryServices(contestSubCategoryRepository, contestInstanceService);

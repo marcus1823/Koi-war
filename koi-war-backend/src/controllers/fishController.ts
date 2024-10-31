@@ -1,7 +1,6 @@
 import {Request, Response} from "express";
 import {IFishService} from "../services/IFishService";
-import {CreateFishInput} from "../schema/fish.schema";
-import {GetUserInput} from "../schema/user.schema";
+import {CreateFishInput, UpdateFishInput} from "../schema/fish.schema";
 import {IFish} from "../models/fish.model";
 
 export class FishController {
@@ -12,35 +11,59 @@ export class FishController {
     }
 
     createFish = async (
-        req: Request<{}, {}, CreateFishInput>,
+        req: Request<{}, {}, CreateFishInput["body"]>,
         res: Response
     ) => {
         try {
-            console.log("Create Fish Request", req.body);
             const fish = await this.fishService.createFish(req.body);
-            res.status(201).json(fish);
+            res.status(201).json({
+                success: true,
+                message: "Fish created successfully",
+                data: fish
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(409).json({error: error.message});
+                res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
             } else {
-                res.status(409).json({error: "An unknown error occurred"});
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to create fish"
+                });
             }
         }
     }
 
-    getFishById = async (req: Request<GetUserInput["params"]>, res: Response) => {
+    getFishById = async (
+        req: Request<{ id: string }>,
+        res: Response
+    ) => {
         try {
             const fish = await this.fishService.getFishById(req.params.id);
-            if (fish) {
-                res.status(200).json(fish);
-            } else {
-                res.status(404).json({message: "Fish not found"});
-            }
+            res.status(200).json({
+                success: true,
+                data: fish
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(500).json({error: error.message});
+                if (error.message === "Fish not found") {
+                    res.status(404).json({
+                        success: false,
+                        message: error.message
+                    });
+                } else {
+                    res.status(400).json({
+                        success: false,
+                        message: error.message
+                    });
+                }
             } else {
-                res.status(500).json({error: "An unknown error occurred"});
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to fetch fish"
+                });
             }
         }
     }
@@ -48,31 +71,39 @@ export class FishController {
     getAllFishes = async (req: Request, res: Response) => {
         try {
             const fishes = await this.fishService.getAllFishes();
-            res.status(200).json(fishes);
+            res.status(200).json({
+                success: true,
+                data: fishes
+            });
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(500).json({error: error.message});
-            } else {
-                res.status(500).json({error: "An unknown error occurred"});
-            }
+            res.status(500).json({
+                success: false,
+                message: "Failed to fetch fishes"
+            });
         }
     }
 
-    getFishByUserId = async (req: Request, res: Response) => {
+    getFishByUserId = async (
+        req: Request<{ userId: string }>,
+        res: Response
+    ) => {
         try {
-            const userId = req.params.userId;
-            const fishes = await this.fishService.getFishByUserId(userId);
-
-            if (fishes.length > 0) {
-                res.status(200).json(fishes);
-            } else {
-                res.status(404).json({message: "Fish not found"});
-            }
+            const fishes = await this.fishService.getFishByUserId(req.params.userId);
+            res.status(200).json({
+                success: true,
+                data: fishes
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(500).json({error: error.message});
+                res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
             } else {
-                res.status(500).json({error: "An unknown error occurred"});
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to fetch user's fishes"
+                });
             }
         }
     }
@@ -83,15 +114,23 @@ export class FishController {
     ) => {
         try {
             const fishes = await this.fishService.getFishByVarietyId(req.params.varietyId);
-            res.status(200).json(fishes);
+            res.status(200).json({
+                success: true,
+                data: fishes
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(500).json({error: error.message});
+                res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
             } else {
-                res.status(500).json({error: "An unknown error occurred"});
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to fetch fishes by variety"
+                });
             }
         }
-
     }
 
     getFishByVarietyName = async (
@@ -100,12 +139,57 @@ export class FishController {
     ) => {
         try {
             const fishes = await this.fishService.getFishByVarietyName(req.params.varietyName);
-            res.status(200).json(fishes);
+            res.status(200).json({
+                success: true,
+                data: fishes
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(500).json({error: error.message});
+                res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
             } else {
-                res.status(500).json({error: "An unknown error occurred"});
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to fetch fishes by variety name"
+                });
+            }
+        }
+    }
+
+    updateFishById = async (
+        req: Request<{ id: string }, {}, UpdateFishInput["body"]>,
+        res: Response
+    ) => {
+        try {
+            const updatedFish = await this.fishService.updateFishById(
+                req.params.id,
+                req.body as Partial<IFish>
+            );
+            res.status(200).json({
+                success: true,
+                message: "Fish updated successfully",
+                data: updatedFish
+            });
+        } catch (error) {
+            if (error instanceof Error) {
+                if (error.message === "Fish not found") {
+                    res.status(404).json({
+                        success: false,
+                        message: error.message
+                    });
+                } else {
+                    res.status(400).json({
+                        success: false,
+                        message: error.message
+                    });
+                }
+            } else {
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to update fish"
+                });
             }
         }
     }
@@ -115,58 +199,51 @@ export class FishController {
         res: Response
     ) => {
         try {
-            const deleteFish = await this.fishService.deleteFishById(req.params.id);
-
-            if (!deleteFish) {
-                res.status(404).json({message: "Fish not found"});
-            }
+            await this.fishService.deleteFishById(req.params.id);
             res.status(200).json({
-                message: "Fish deleted successfully",
-                fish: deleteFish
+                success: true,
+                message: "Fish deleted successfully"
             });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(500).json({error: error.message});
+                if (error.message === "Fish not found") {
+                    res.status(404).json({
+                        success: false,
+                        message: error.message
+                    });
+                } else {
+                    res.status(400).json({
+                        success: false,
+                        message: error.message
+                    });
+                }
             } else {
-                res.status(500).json({error: "An unknown error occurred"});
-            }
-        }
-    }
-
-    updateFishById = async (
-        req: Request<{ id: string, updateData: Partial<IFish> }>,
-        res: Response
-    ) => {
-        try {
-            const updateFish = await this.fishService.updateFishById(req.params.id, req.body);
-
-            if (!updateFish) {
-                res.status(404).json({message: "Fish not found"});
-            } else {
-                res.status(200).json({
-                    message: "Fish updated successfully",
-                    fish: updateFish
-                })
-            }
-        } catch (error) {
-            if (error instanceof Error) {
-                res.status(500).json({error: error.message});
-            } else {
-                res.status(500).json({error: "An unknown error occurred"});
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to delete fish"
+                });
             }
         }
     }
 
     getAllMyFishes = async (req: Request, res: Response) => {
-        const requestUser = req.body.user;
         try {
-            const fishes = await this.fishService.getFishByUserId(requestUser.id);
-            res.status(200).json(fishes);
+            const fishes = await this.fishService.getFishByUserId(req.body.user.id);
+            res.status(200).json({
+                success: true,
+                data: fishes
+            });
         } catch (error) {
             if (error instanceof Error) {
-                res.status(500).json({error: error.message});
+                res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
             } else {
-                res.status(500).json({error: "An unknown error occurred"});
+                res.status(500).json({
+                    success: false,
+                    message: "Failed to fetch your fishes"
+                });
             }
         }
     }

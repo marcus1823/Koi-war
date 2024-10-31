@@ -3,12 +3,15 @@ import {IContestInstanceRepository} from "../../repositories/IContestInstanceRep
 import {IContestInstance} from "../../models/contestInstance.model";
 import {IContestInstanceResponse, mapContestInstanceResponse,} from "../../types/contestInstance";
 import {parseDateFromString} from "../../utils/format.utils";
+import { IContestServices } from "../IContestServices";
 
 export class ContestInstanceServices implements IContestInstanceServices {
     private contestInstanceRepository: IContestInstanceRepository;
+    private contestServices: IContestServices;
 
-    constructor(contestInstanceRepository: IContestInstanceRepository) {
+    constructor(contestInstanceRepository: IContestInstanceRepository, contestServices: IContestServices) {
         this.contestInstanceRepository = contestInstanceRepository;
+        this.contestServices = contestServices;
     }
 
     async createContestInstance(data: any): Promise<IContestInstanceResponse> {
@@ -40,6 +43,12 @@ export class ContestInstanceServices implements IContestInstanceServices {
                 if (endDate < startDate) {
                     throw new Error("End date must be after start date");
                 }
+            }
+
+            const contest = await this.contestServices.getContestById(data.contest);
+
+            if (!contest) {
+                throw new Error("Contest not found");
             }
 
             const contestInstance = await this.contestInstanceRepository.createContestInstance(processedData);
@@ -181,6 +190,20 @@ export class ContestInstanceServices implements IContestInstanceServices {
 
     async updateContestInstanceRankedStatus(id: string): Promise<IContestInstanceResponse | null> {
         const contestInstance = await this.contestInstanceRepository.updateContestInstanceRankedStatus(id);
+        if (!contestInstance) {
+            throw new Error("Contest instance not found");
+        }
+        return mapContestInstanceResponse(
+            contestInstance as IContestInstance & {
+                _id: string;
+                createdAt: Date;
+                updatedAt: Date;
+            }
+        );
+    }
+
+    async deleteContestInstanceById(id: string): Promise<IContestInstanceResponse | null> {
+        const contestInstance = await this.contestInstanceRepository.deleteContestInstanceById(id);
         if (!contestInstance) {
             throw new Error("Contest instance not found");
         }

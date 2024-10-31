@@ -2,6 +2,7 @@ import {IContestInstanceRepository} from "../IContestInstanceRepository";
 import ContestInstance, {IContestInstance} from "../../models/contestInstance.model";
 import Contest from "../../models/contest.model";
 import ContestSubCategory from "../../models/contestSubCategory.model";
+import { isValidObjectId } from "mongoose";
 
 
 export class ContestInstanceRepository implements IContestInstanceRepository {
@@ -129,5 +130,12 @@ export class ContestInstanceRepository implements IContestInstanceRepository {
             .populate("contest")
 
         return contestInstance;
+    }
+
+    async deleteContestInstanceById(id: string): Promise<IContestInstance | null> {
+        if (!isValidObjectId(id)) {
+            return null;
+        }
+        return ContestInstance.findByIdAndDelete(id);
     }
 }

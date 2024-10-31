@@ -14,4 +14,6 @@ export interface IContestInstanceRepository {
     getEndedContestInstances(): Promise<IContestInstance[]>;
 
     updateContestInstanceRankedStatus(id: string): Promise<IContestInstance | null>;
+
+    deleteContestInstanceById(id: string): Promise<IContestInstance | null>;
 }

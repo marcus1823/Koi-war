@@ -159,4 +159,24 @@ export class ContestInstanceController {
             }
         }
     }
+
+    deleteContestInstanceById = async (
+        req: Request<{ id: string }>,
+        res: Response
+    ): Promise<void> => {
+        try {
+            const deletedInstance = await this.contestInstanceService.deleteContestInstanceById(req.params.id);
+            res.status(200).json({
+                success: true,
+                message: "Contest instance deleted successfully",
+                data: deletedInstance
+            });
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(400).json({success: false, message: error.message});
+            } else {
+                res.status(500).json({success: false, message: "Internal server error"});
+            }
+        }
+    }   
 }

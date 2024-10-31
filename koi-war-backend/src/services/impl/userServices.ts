@@ -1,6 +1,6 @@
 // import bcrypt from "bcrypt";
 
-import {IUser, UserDocument} from "../../models/user.model";
+import {IUser, UserDocument, UserRole} from "../../models/user.model";
 import {IUserRepository} from "../../repositories/IUserRepository";
 import {IUserResponse, mapUserResponse} from "../../types/user";
 import {generateAccessToken} from "../../utils/jwt.utils";
@@ -63,5 +63,23 @@ export class UserService implements IUserService {
     async getUserByUsername(username: string) {
         const user = await this.userRepository.findUserByUsername(username);
         return mapUserResponse(user as IUser & { _id: string; createdAt: Date; updatedAt: Date });
+    }
+
+    async updateRole(id: string, role: string) {
+        const user = await this.userRepository.findUserById(id);
+        if (!user) {
+            throw new Error("User not found");
+        }
+        if (user.role === role) {
+            throw new Error("User already has this role");
+        }
+        if (user.role === UserRole.ADMIN) {
+            throw new Error("Admin role cannot be changed");
+        }
+        if (role === UserRole.ADMIN) {
+            throw new Error("Admin role cannot be assigned to a user");
+        }
+        const updatedUser = await this.userRepository.updateRole(id, role);
+        return mapUserResponse(updatedUser as IUser & { _id: string; createdAt: Date; updatedAt: Date });
     }
 }

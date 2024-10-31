@@ -330,5 +330,45 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
         contestInstanceController.disableContestInstance
     );
 
+    /**
+     * @openapi
+     * /api/contestInstance/deleteContestInstanceById/{id}:
+     *   delete:
+     *     tags:
+     *       - Contest Instances
+     *     summary: Delete a contest instance
+     *     description: Delete a contest instance by ID
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: Contest instance deleted successfully
+     *         content: 
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 message: 
+     *                   type: string
+     *                   example: "Contest instance deleted successfully"
+     *                 data:
+     *                   $ref: '#/components/schemas/ContestInstanceResponse'
+     *       404:   
+     *         description: Contest instance not found
+     */              
+    router.delete(
+        "/deleteContestInstanceById/:id",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
+        contestInstanceController.deleteContestInstanceById
+    );
+
     return router;
 }

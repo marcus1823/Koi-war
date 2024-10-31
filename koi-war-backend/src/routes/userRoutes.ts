@@ -105,5 +105,47 @@ export function userRoutes(userController: UserController): Router {
      */
     router.get("/me", verifyToken, userController.getUserProfile);
 
+ /**
+     * @openapi
+     * /api/users/updateRole/{id}:
+     *   patch:
+     *     tags:
+     *       - Users
+     *     security:
+     *       - bearerAuth: []
+     *     description: Update a user's role (Admin only)
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         schema:
+     *           type: string
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               role:
+     *                 type: string
+     *                 enum: [STAFF, REFEREE, USER ]
+     *                 description: The new role to assign to the user
+     *     responses:
+     *       '200':
+     *         description: Role updated successfully
+     *       '400':
+     *         description: Invalid role provided
+     *       '403':
+     *         description: Not authorized to perform this action
+     *       '404':
+     *         description: User not found
+     */
+    router.patch("/updateRole/:id",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
+        userController.updateRole
+    );
+
     return router;
 }

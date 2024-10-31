@@ -8,4 +8,6 @@ export interface IUserRepository {
     findUserByEmail(email: string): Promise<IUser | null>;
 
     findUserByUsername(username: string): Promise<IUser | null>;
+
+    updateRole(id: string, role: string): Promise<IUser | null>;
 }

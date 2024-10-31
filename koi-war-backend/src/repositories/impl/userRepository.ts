@@ -18,4 +18,8 @@ export class UserRepository implements IUserRepository {
     async findUserByUsername(username: string): Promise<IUser | null> {
         return User.findOne({username});
     }
+
+    async updateRole(id: string, role: string): Promise<IUser | null> {
+        return User.findByIdAndUpdate(id, {role}, {new: true});
+    }
 }

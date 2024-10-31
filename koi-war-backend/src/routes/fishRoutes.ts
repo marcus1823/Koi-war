@@ -1,7 +1,7 @@
 import {Router} from "express";
 import {FishController} from "../controllers/fishController";
 import {validate} from "../middleware/validateResource";
-import {createFishSchema} from "../schema/fish.schema";
+import {createFishSchema, updateFishSchema} from "../schema/fish.schema";
 import {verifyToken} from "../middleware/authMiddleware";
 import {authorizeRole} from "../middleware/authorizeMiddleware";
 import {UserRole} from "../models/user.model";
@@ -154,7 +154,7 @@ export function fishRoutes(fishController: FishController): Router {
      *               items:
      *                 $ref: '#/components/schemas/FishResponse'
      */
-    router.get("/getAllFishes", fishController.getAllFishes);
+    router.get("/getAllFishes",  fishController.getAllFishes);
 
     /**
      * @openapi
@@ -266,6 +266,185 @@ export function fishRoutes(fishController: FishController): Router {
      */
     router.get("/:id", fishController.getFishById);
 
+/**
+     * @openapi
+     * /api/fishes/updateFishById/{id}:
+     *   put:
+     *     tags: [Fishes]
+     *     summary: Update a fish by ID
+     *     description: Update fish information. Only authenticated users can update their own fish.
+     *     security:
+     *       - bearerAuth: []
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         description: ID of the fish to update
+     *         required: true
+     *         schema:
+     *           type: string
+     *           example: "6721f38553d22c42e4c1d991"
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               name:
+     *                 type: string
+     *                 example: "Updated Kohaku A1"
+     *               weight:
+     *                 type: number
+     *                 example: 3.5
+     *               length:
+     *                 type: number
+     *                 example: 40
+     *               variety:
+     *                 type: string
+     *                 example: "6721f38553d22c42e4c1d990"
+     *               images:
+     *                 type: array
+     *                 items:
+     *                   type: string
+     *                 example: ["https://example.com/updated-fish1.jpg"]
+     *               description:
+     *                 type: string
+     *                 example: "Updated description for Kohaku"
+     *     responses:
+     *       200:
+     *         description: Fish updated successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 message:
+     *                   type: string
+     *                   example: "Fish updated successfully"
+     *                 data:
+     *                   $ref: '#/components/schemas/FishResponse'
+     *       400:
+     *         description: Invalid input data
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: false
+     *                 message:
+     *                   type: string
+     *                   example: "Invalid input data"
+     *       401:
+     *         description: Unauthorized - Token missing or invalid
+     *       403:
+     *         description: Forbidden - User doesn't have permission to update this fish
+     *       404:
+     *         description: Fish not found
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: false
+     *                 message:
+     *                   type: string
+     *                   example: "Fish not found"
+     *       500:
+     *         description: Internal server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: false
+     *                 message:
+     *                   type: string
+     *                   example: "Failed to update fish"
+     */ 
+    router.put('/updateFishById/:id', 
+        (req, res, next) => authorizeRole([UserRole.USER], req, res, next),
+        validate(updateFishSchema),
+        fishController.updateFishById
+    );
+
+   /**
+     * @openapi
+     * /api/fishes/deleteFishById/{id}:
+     *   delete:
+     *     tags: [Fishes]
+     *     summary: Delete a fish by ID
+     *     description: Delete a fish. Only authenticated users can delete their own fish.
+     *     security:
+     *       - bearerAuth: []
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         description: ID of the fish to delete
+     *         required: true
+     *         schema:
+     *           type: string
+     *           example: "6721f38553d22c42e4c1d991"
+     *     responses:
+     *       200:
+     *         description: Fish deleted successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: true
+     *                 message:
+     *                   type: string
+     *                   example: "Fish deleted successfully"
+     *                 data:
+     *                   $ref: '#/components/schemas/FishResponse'
+     *       401:
+     *         description: Unauthorized - Token missing or invalid
+     *       403:
+     *         description: Forbidden - User doesn't have permission to delete this fish
+     *       404:
+     *         description: Fish not found
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: false
+     *                 message:
+     *                   type: string
+     *                   example: "Fish not found"
+     *       500:
+     *         description: Internal server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                   example: false
+     *                 message:
+     *                   type: string
+     *                   example: "Failed to delete fish"
+     */
+    router.delete('/deleteFishById/:id', 
+        (req, res, next) => authorizeRole([UserRole.USER], req, res, next),
+        fishController.deleteFishById
+    );
+
     /**
      * @openapi
      * /api/fishes/myFishes:
@@ -291,6 +470,7 @@ export function fishRoutes(fishController: FishController): Router {
         (req, res, next) => authorizeRole([UserRole.USER], req, res, next), 
         fishController.getAllMyFishes
     );
+
 
     return router;
 }

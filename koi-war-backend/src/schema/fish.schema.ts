@@ -1,4 +1,5 @@
 import {array, number, object, string, TypeOf} from "zod";
+import {updateContestSubCategorySchema} from "./contestSubCategory.schema";
 
 /**
  * @openapi
@@ -106,4 +107,58 @@ export const createFishSchema = object({
     })
 })
 
+export const updateFishSchema = object({
+    body: object({
+        name: string({
+            required_error: "Name is required",
+        })
+            .trim()
+            .min(2, "Name must be at least 2 characters long")
+            .max(150, "Name must be less than 150 characters long")
+            .regex(
+                /^[a-zA-Z0-9\sÀ-ỹ\-_.,!?()'"]+$/u,
+                "Name can only contain letters, numbers, Vietnamese characters, spaces, and basic punctuation"
+            )
+            .transform(val => val.replace(/\s+/g, ' '))
+            .optional(),
+
+        weight: number({
+            required_error: "Weight is required",
+        })
+            .min(0.1, "Weight must be at least 0.1 kg")
+            .optional(),
+
+
+        length: number({
+            required_error: "Length is required",
+        })
+            .min(1, "Length must be at least 1 cm")
+            .optional(),
+
+        images: array(string({
+            required_error: "Image URL is required",
+        })
+            .trim()
+            .url("Invalid image URL format"))
+            .min(1, "At least one image is required")
+            .optional(),
+
+        variety: string({
+            required_error: "Variety is required",
+        })
+            .trim()
+            .regex(/^[0-9a-fA-F]{24}$/, "Invalid Variety ID format")
+            .optional(),
+
+        description: string({
+            required_error: "Description is required",
+        })
+            .trim()
+            .min(8, "Description must be at least 8 characters long")
+            .max(1000, "Description must be less than 1000 characters")
+            .optional(),
+    })
+})
+
 export type CreateFishInput = TypeOf<typeof createFishSchema>;
+export type UpdateFishInput = TypeOf<typeof updateFishSchema>;

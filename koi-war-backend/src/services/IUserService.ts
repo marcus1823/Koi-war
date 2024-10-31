@@ -10,4 +10,6 @@ export interface IUserService {
     getUserByEmail(email: string): Promise<IUserResponse | null>;
 
     getUserByUsername(username: string): Promise<IUserResponse | null>;
+
+    updateRole(id: string, role: string): Promise<IUserResponse | null>;
 }
