@@ -1,3 +1,5 @@
+import { IScore } from "../models/score.model";
+
 export interface IScoreRepository {
     createScore(data: {
         registration: string;
@@ -7,5 +9,5 @@ export interface IScoreRepository {
         referee: string;
     }): Promise<any>;
 
-    getScoreByRegistrationId(registrationId: string): Promise<any>;
+    getScoreByRegistrationId(registrationId: string): Promise<(IScore & {_id: string})[]>;
 }

@@ -65,7 +65,19 @@ export class CompetitionManagementServices
             throw new Error("Registration not found");
         }
 
+        if (registration.status !== RegistrationStatus.CHECKED) {
+            throw new Error("Registration is not checked");
+        }
+
+        if (await this.checkRefereeIsScored(registration._id, data.referee)) {
+            throw new Error("This referee already scored this registration")
+        }
+
         return this.scoreServices.createScore(data);
+    }
+
+    private async checkRefereeIsScored(registrationId: string, refereeId: string): Promise<boolean> {
+        return await this.scoreServices.checkRefereeIsScored(registrationId, refereeId);
     }
 
     async rankingContestRegistration(contestSubCategoryId: string): Promise<any> {
