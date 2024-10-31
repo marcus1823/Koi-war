@@ -19,10 +19,9 @@ import {contestRegistrationRoutes} from "./routes/contestRegistrationRoutes";
 import {ContestRegistrationController} from "./controllers/contestRegistrationController";
 import {scoreRoutes} from "./routes/scoreRoutes";
 import {ScoreController} from "./controllers/scoreController";
-import {CompetitionManagementServices} from "./services/impl/competitionManagementServices";
-import cron from "node-cron";
 import {AppContext} from "./context/appContext";
 import {setupDependencies} from "./context/setupDependencies";
+import { initializeCronScheduleJobs } from "./jobs/cronSchedule.job";
 
 const app = express();
 connectDB().then(() => console.log("Connected to DB"));
@@ -33,17 +32,8 @@ app.use(express.json());
 // Registering the dependencies
 setupDependencies();
 
-cron.schedule("0 0 * * *", async () => {
-    const competitionManagementServices =
-        AppContext.get<CompetitionManagementServices>("CompetitionManagementServices");
-
-    try {
-        await competitionManagementServices.updateRankingEndedContestInstances();
-        console.log("Ranking updated successfully");
-    } catch (error) {
-        console.error("Error updating ranking:", error);
-    }
-});
+// Initialize cron jobs
+initializeCronScheduleJobs();
 
 const userController = AppContext.get<UserController>("UserController");
 app.use(
