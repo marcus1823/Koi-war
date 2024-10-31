@@ -9,7 +9,7 @@ type Variety = {
   _id: string;
   name: string;
   description: string;
-  images: string[];
+  images?: string[];
 };
 
 export default function VarietyPage() {
@@ -37,7 +37,7 @@ export default function VarietyPage() {
     <TouchableOpacity style={styles.varietyCard}>
       <View style={styles.imageContainer}>
         <Image 
-          source={{ uri: item.images[0] }} 
+          source={{ uri: item.images?.[0] || 'https://placeholder-url.com/default-image.jpg' }} 
           style={styles.varietyImage}
         />
         <LinearGradient
