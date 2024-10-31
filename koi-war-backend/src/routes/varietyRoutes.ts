@@ -42,7 +42,7 @@ export function varietyRoutes(varietyController: VarietyController): Router {
 
     /**
      * @openapi
-     * /api/varieties/getVarietyById/{id}:
+     * /api/variety/getVarietyById/{id}:
      *   get:
      *     tags:
      *       - Varieties
@@ -68,7 +68,7 @@ export function varietyRoutes(varietyController: VarietyController): Router {
 
     /**
      * @openapi
-     * /api/varieties/getAllVarieties:
+     * /api/variety/getAllVarieties:
      *   get:
      *     tags:
      *       - Varieties
@@ -88,7 +88,7 @@ export function varietyRoutes(varietyController: VarietyController): Router {
 
     /**
      * @openapi
-     * /api/varieties/updateVarietyById/{id}:
+     * /api/variety/updateVarietyById/{id}:
      *   put:
      *     tags:
      *       - Varieties
@@ -126,7 +126,7 @@ export function varietyRoutes(varietyController: VarietyController): Router {
 
     /**
      * @openapi
-     * /api/varieties/deleteVarietyById/{id}:
+     * /api/variety/deleteVarietyById/{id}:
      *   delete:
      *     tags:
      *       - Varieties
