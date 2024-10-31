@@ -272,6 +272,8 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
      */
     router.put(
         "/updateContestInstanceById/:id",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
         validate(updateContestInstanceSchema),
         contestInstanceController.updateContestInstanceById
     );
@@ -323,6 +325,8 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
      */
     router.put(
         "/disableContestInstanceById/:id",
+        (req, res, next) =>
+            authorizeRole([UserRole.ADMIN], req, res, next),
         contestInstanceController.disableContestInstance
     );
 
