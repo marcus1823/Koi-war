@@ -60,7 +60,7 @@ export class ContestRegistrationServices
         return this.contestRegistrationRepository.createContestRegistration(data);
     }
 
-    async getContestRegistrationById(id: string): Promise<any> {
+    async getContestRegistrationById(id: string): Promise<IRegistration & { _id: string }> {
         return this.contestRegistrationRepository.getContestRegistrationById(id);
     }
 

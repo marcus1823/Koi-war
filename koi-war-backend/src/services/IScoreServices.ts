@@ -8,4 +8,6 @@ export interface IScoreServices {
     }): Promise<any>;
 
     getScoreByRegistrationId(registrationId: string): Promise<any>;
+
+    checkRefereeIsScored(registrationId: string, refereeId: string): Promise<boolean>;
 }
