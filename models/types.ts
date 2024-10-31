@@ -21,3 +21,44 @@ export interface Profile {
   username: string;
   role: string;
 }
+
+// Interface cho contest instance trong contest và contest subcategory
+export interface ContestInstance {
+  id: string;
+  contest: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  description: string;
+  rules: string;
+  images: string[];
+  isDisabled: boolean;
+  contestSubCategories: string[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+export interface ContestSubCategory {
+  id: string;
+  name: string;
+  description: string;
+  contestInstance: ContestInstance;
+}
+
+export interface Contest {
+  id: string;
+  name: string;
+  description: string;
+  contestInstances: ContestInstance[];
+}
+
+export interface ContestResponse {
+  success: boolean;
+  data: Contest[];
+}
+
+export interface ContestSubCategoryResponse {
+  success: boolean;
+  data: ContestSubCategory[];
+}
