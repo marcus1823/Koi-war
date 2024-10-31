@@ -1,21 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { competitionProfiles } from '../competition'
+import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { getAllContestInstances } from '../../../api/competitionApi';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
 
 export default function CompetitionDetailPage() {
   const { id } = useLocalSearchParams();
   const [competition, setCompetition] = useState<any | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
-    if (id) {
-      const selectedCompetition = competitionProfiles.find(comp => comp.id === parseInt(id as string, 10));
-      setCompetition(selectedCompetition);
-    }
+    const fetchCompetitionDetail = async () => {
+      try {
+        const data = await getAllContestInstances();
+        const selectedCompetition = data.find((comp: any) => comp.id === id);
+        setCompetition(selectedCompetition);
+      } catch (error) {
+        console.error('Error fetching competition details:', error);
+      }
+    };
+
+    fetchCompetitionDetail();
   }, [id]);
 
   if (!competition) {
@@ -26,60 +39,44 @@ export default function CompetitionDetailPage() {
     );
   }
 
-  const statusColor = competition.Status.toLowerCase() === 'open' ? '#4CAF50' : '#F44336';
+  const statusColor = competition.isActive ? '#4CAF50' : '#F44336';
 
   return (
     <>
-      <Stack.Screen 
-        options={{ 
-          title: competition.Name,
-          headerShown: true,
-          headerTintColor: '#fff',
-          headerStyle: { backgroundColor: 'rgb(245, 177, 109)' },
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={24} color="#fff" />
-            </TouchableOpacity>
-          ),
-        }} 
+      <LinearGradient
+        colors={["#eb7452", "#5C98BB"]}
+        style={styles.gradientOverlay}
       />
       <ScrollView style={styles.container}>
-        <Image source={{ uri: competition.image }} style={styles.image} />
-        <LinearGradient
-          colors={['rgba(245, 177, 109, 0.8)', 'rgba(204, 0, 0, 0.8)']}
-          style={styles.gradientOverlay}
-        />
+        <Image source={{ uri: competition.images }} style={styles.image} />
         <View style={styles.contentContainer}>
           <View style={styles.statusBadge}>
-            <Text style={[styles.statusText, { color: statusColor }]}>{competition.Status}</Text>
+            <Text style={[styles.statusText, { color: statusColor }]}>{competition.isActive ? 'Open' : 'Closed'}</Text>
           </View>
-          <Text style={styles.competitionName}>{competition.Name}</Text>
-          <Text style={styles.description}>{competition.Description}</Text>
+          <Text style={styles.competitionName}>{competition.contest.name}</Text>
+          <Text style={styles.description}>{competition.description}</Text>
           <View style={styles.infoSection}>
             <Ionicons name="calendar-outline" size={20} color="#666" />
             <Text style={styles.infoText}>
-              {`${competition.StartDate} - ${competition.EndDate}`}
+              {`${formatDate(competition.startDate)} - ${formatDate(competition.endDate)}`}
             </Text>
           </View>
           <View style={styles.infoSection}>
             <Ionicons name="information-circle-outline" size={20} color="#666" />
             <Text style={styles.infoText}>
-              Rule: <Text style={styles.highlight}>{competition.Rule}</Text>
+              Rules: <Text style={styles.highlight}>{competition.rules}</Text>
             </Text>
           </View>
           
-          {competition.SubContests && competition.SubContests.length > 0 && (
+          {competition.contestSubCategories && competition.contestSubCategories.length > 0 && (
             <View style={styles.subContestsContainer}>
-              <Text style={styles.subContestsTitle}>Sub-Contests</Text>
-              {competition.SubContests.map((subContest: any, index: number) => (
-                <View key={subContest.id} style={styles.subContestItem}>
+              <Text style={styles.subContestsTitle}>Sub-Categories</Text>
+              {competition.contestSubCategories.map((subCategory: any, index: number) => (
+                <View key={subCategory.id} style={styles.subContestItem}>
                   <View style={styles.subContestHeader}>
-                    <View style={styles.subContestIcon}>
-                      <Text style={styles.subContestIconText}>{index + 1}</Text>
-                    </View>
-                    <Text style={styles.subContestName}>{subContest.Name}</Text>
+                    <Text style={styles.subContestName}>{subCategory.name}</Text>
                   </View>
-                  <Text style={styles.subContestDescription}>{subContest.Description}</Text>
+                  <Text style={styles.subContestDescription}>{subCategory.description}</Text>
                 </View>
               ))}
             </View>
@@ -103,9 +100,6 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 18,
     color: '#666',
-  },
-  backButton: {
-    marginLeft: 10,
   },
   image: {
     width: '100%',
@@ -170,18 +164,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#e67e22',
   },
-  registerButton: {
-    backgroundColor: '#e67e22',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  registerButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   subContestsContainer: {
     marginTop: 20,
     borderTopWidth: 1,
@@ -209,20 +191,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
-  },
-  subContestIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: 'rgb(245, 177, 109)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  subContestIconText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
   subContestName: {
     fontSize: 18,

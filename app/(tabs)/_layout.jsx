@@ -19,7 +19,7 @@ export default function TabLayout() {
       />
       <Tabs.Screen name='competition'
         options={{
-          tabBarLabel: 'Competitions',
+          tabBarLabel: 'Cuộc Thi',
           tabBarIcon: ({color}) => <Ionicons name="trophy-outline" size={24} color={color} />
         }}
       />
