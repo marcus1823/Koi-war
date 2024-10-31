@@ -38,7 +38,7 @@ const MenuHome = () => {
         </TouchableOpacity>
         <TouchableOpacity 
           style={styles.itemMenu}
-          onPress={() => router.push('/competition')}
+          onPress={() => router.push('/variety')}
         >
           <View style={styles.icon}>
             <FontAwesome6 name="fish-fins" size={25} color="#f45124" />
@@ -73,7 +73,10 @@ const MenuHome = () => {
             Cuộc thi của bạn
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.itemMenu}>
+        <TouchableOpacity 
+        style={styles.itemMenu}
+        onPress={() => router.push('/myKoi')}
+        >
           <View style={styles.icon}>
             <MaterialCommunityIcons
               name="fishbowl"

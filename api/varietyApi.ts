@@ -1,8 +1,8 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_BASE_URL } from '../api';
+import { API_BASE_URL } from './api';
 
-export const getAllContestInstances = async () => {
+export const getAllVariety = async () => {
   try {
     const token = await AsyncStorage.getItem('token');
 
@@ -10,7 +10,7 @@ export const getAllContestInstances = async () => {
       throw new Error('Token not found');
     }
 
-    const response = await axios.get(`${API_BASE_URL}/contestInstance/getAllContestInstances`, {
+    const response = await axios.get(`${API_BASE_URL}/variety/getAllVarieties`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

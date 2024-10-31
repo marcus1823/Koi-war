@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { getAllContestInstances } from '../../../api/competition/competitionApi';
+import { getAllContestInstances } from '../../../api/competitionApi';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
 
 export default function CompetitionDetailPage() {
   const { id } = useLocalSearchParams();
@@ -50,7 +58,7 @@ export default function CompetitionDetailPage() {
           <View style={styles.infoSection}>
             <Ionicons name="calendar-outline" size={20} color="#666" />
             <Text style={styles.infoText}>
-              {`${competition.startDate} - ${competition.endDate}`}
+              {`${formatDate(competition.startDate)} - ${formatDate(competition.endDate)}`}
             </Text>
           </View>
           <View style={styles.infoSection}>

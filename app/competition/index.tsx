@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { getAllContestInstances } from '../../api/competition/competitionApi';
+import { getAllContestInstances } from '../../api/competitionApi';
 import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -129,7 +129,7 @@ export default function CompetitionHomePage() {
       >
         <View style={styles.headerContainer}>
           <Text style={styles.headerTitle}>KHÁM PHÁ</Text>
-          <Text style={styles.headerSubtitle}>Cuộc Thi Sắp Diễn Ra</Text>
+          <Text style={styles.headerSubtitle}>Các Cuộc Thi Của Koi War</Text>
         </View>
 
         <View style={styles.tabContainer}>
