@@ -1,102 +1,99 @@
-import { IContestInstanceServices } from "../IContestInstanceServices";
-import { IContestInstanceRepository } from "../../repositories/IContestInstanceRepository";
-import { IContestInstance } from "../../models/contestInstance.model";
-import {
-  IContestInstanceResponse,
-  mapContestInstanceResponse,
-} from "../../types/contestInstance";
-import { parseDateFromString } from "../../utils/format.utils";
+import {IContestInstanceServices} from "../IContestInstanceServices";
+import {IContestInstanceRepository} from "../../repositories/IContestInstanceRepository";
+import {IContestInstance} from "../../models/contestInstance.model";
+import {IContestInstanceResponse, mapContestInstanceResponse,} from "../../types/contestInstance";
+import {parseDateFromString} from "../../utils/format.utils";
 
 export class ContestInstanceServices implements IContestInstanceServices {
-  private contestInstanceRepository: IContestInstanceRepository;
+    private contestInstanceRepository: IContestInstanceRepository;
 
-  constructor(contestInstanceRepository: IContestInstanceRepository) {
-    this.contestInstanceRepository = contestInstanceRepository;
-  }
-
-  async createContestInstance(data: any): Promise<IContestInstanceResponse> {
-    try {
-      // Xử lý chuyển đổi ngày tháng
-      const processedData = { ...data };
-
-      if (typeof data.startDate === 'string') {
-        const parsedStartDate = parseDateFromString(data.startDate);
-        if (!parsedStartDate) {
-          throw new Error("Invalid start date format. Use dd-MM-yyyy");
-        }
-        processedData.startDate = parsedStartDate;
-      }
-
-      if (typeof data.endDate === 'string') {
-        const parsedEndDate = parseDateFromString(data.endDate);
-        if (!parsedEndDate) {
-          throw new Error("Invalid end date format. Use dd-MM-yyyy");
-        }
-        processedData.endDate = parsedEndDate;
-      }
-
-      // Validate dates
-      if (processedData.startDate && processedData.endDate) {
-        const startDate = processedData.startDate as Date;
-        const endDate = processedData.endDate as Date;
-        
-        if (endDate < startDate) {
-          throw new Error("End date must be after start date");
-        }
-      }
-
-      const contestInstance = await this.contestInstanceRepository.createContestInstance(processedData);
-      return mapContestInstanceResponse(
-        contestInstance as IContestInstance & {
-          _id: string;
-          createdAt: Date;
-          updatedAt: Date;
-        }
-      );
-    } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error("Failed to create contest instance");
+    constructor(contestInstanceRepository: IContestInstanceRepository) {
+        this.contestInstanceRepository = contestInstanceRepository;
     }
-  }
 
-  async getAllContestInstances(): Promise<IContestInstanceResponse[]> {
-    try {
-        const contestInstances = await this.contestInstanceRepository.getAllContestInstances();
-        return contestInstances.map((contestInstance) =>
-            mapContestInstanceResponse(
+    async createContestInstance(data: any): Promise<IContestInstanceResponse> {
+        try {
+            // Xử lý chuyển đổi ngày tháng
+            const processedData = {...data};
+
+            if (typeof data.startDate === 'string') {
+                const parsedStartDate = parseDateFromString(data.startDate);
+                if (!parsedStartDate) {
+                    throw new Error("Invalid start date format. Use dd-MM-yyyy");
+                }
+                processedData.startDate = parsedStartDate;
+            }
+
+            if (typeof data.endDate === 'string') {
+                const parsedEndDate = parseDateFromString(data.endDate);
+                if (!parsedEndDate) {
+                    throw new Error("Invalid end date format. Use dd-MM-yyyy");
+                }
+                processedData.endDate = parsedEndDate;
+            }
+
+            // Validate dates
+            if (processedData.startDate && processedData.endDate) {
+                const startDate = processedData.startDate as Date;
+                const endDate = processedData.endDate as Date;
+
+                if (endDate < startDate) {
+                    throw new Error("End date must be after start date");
+                }
+            }
+
+            const contestInstance = await this.contestInstanceRepository.createContestInstance(processedData);
+            return mapContestInstanceResponse(
                 contestInstance as IContestInstance & {
                     _id: string;
                     createdAt: Date;
                     updatedAt: Date;
                 }
-            )
-        );
-    } catch (error) {
-        throw error;
+            );
+        } catch (error) {
+            if (error instanceof Error) {
+                throw error;
+            }
+            throw new Error("Failed to create contest instance");
+        }
     }
-  }
 
-  async getContestInstanceById(
-    id: string
-  ): Promise<IContestInstanceResponse | null> {
-    const contestInstance =
-      await this.contestInstanceRepository.getContestInstanceById(id);
-    if (!contestInstance) {
-      throw new Error("Contest instance not found");
+    async getAllContestInstances(): Promise<IContestInstanceResponse[]> {
+        try {
+            const contestInstances = await this.contestInstanceRepository.getAllContestInstances();
+            return contestInstances.map((contestInstance) =>
+                mapContestInstanceResponse(
+                    contestInstance as IContestInstance & {
+                        _id: string;
+                        createdAt: Date;
+                        updatedAt: Date;
+                    }
+                )
+            );
+        } catch (error) {
+            throw error;
+        }
     }
-    return mapContestInstanceResponse(
-      contestInstance as IContestInstance & {
-        _id: string;
-        createdAt: Date;
-        updatedAt: Date;
-      }
-    );
-  }
+
+    async getContestInstanceById(
+        id: string
+    ): Promise<IContestInstanceResponse | null> {
+        const contestInstance =
+            await this.contestInstanceRepository.getContestInstanceById(id);
+        if (!contestInstance) {
+            throw new Error("Contest instance not found");
+        }
+        return mapContestInstanceResponse(
+            contestInstance as IContestInstance & {
+                _id: string;
+                createdAt: Date;
+                updatedAt: Date;
+            }
+        );
+    }
 
     async updateContestInstanceById(
-        id: string, 
+        id: string,
         updateData: Partial<IContestInstance>
     ): Promise<IContestInstanceResponse | null> {
         try {
@@ -125,7 +122,7 @@ export class ContestInstanceServices implements IContestInstanceServices {
             if (processedData.startDate && processedData.endDate) {
                 const startDate = processedData.startDate as Date;
                 const endDate = processedData.endDate as Date;
-                
+
                 if (endDate < startDate) {
                     throw new Error("End date must be after start date");
                 }
@@ -141,10 +138,10 @@ export class ContestInstanceServices implements IContestInstanceServices {
             }
 
             return mapContestInstanceResponse(
-                contestInstance as IContestInstance & { 
-                    _id: string; 
-                    createdAt: Date; 
-                    updatedAt: Date 
+                contestInstance as IContestInstance & {
+                    _id: string;
+                    createdAt: Date;
+                    updatedAt: Date
                 }
             );
         } catch (error) {
@@ -162,6 +159,37 @@ export class ContestInstanceServices implements IContestInstanceServices {
         }
         return mapContestInstanceResponse(
             contestInstance as IContestInstance & { _id: string; createdAt: Date; updatedAt: Date }
-        );  
+        );
+    }
+
+    async getEndedContestInstances(): Promise<IContestInstanceResponse[]> {
+        try {
+            const contestInstances = await this.contestInstanceRepository.getEndedContestInstances();
+            return contestInstances.map((contestInstance) =>
+                mapContestInstanceResponse(
+                    contestInstance as IContestInstance & {
+                        _id: string;
+                        createdAt: Date;
+                        updatedAt: Date;
+                    }
+                )
+            );
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updateContestInstanceRankedStatus(id: string): Promise<IContestInstanceResponse | null> {
+        const contestInstance = await this.contestInstanceRepository.updateContestInstanceRankedStatus(id);
+        if (!contestInstance) {
+            throw new Error("Contest instance not found");
+        }
+        return mapContestInstanceResponse(
+            contestInstance as IContestInstance & {
+                _id: string;
+                createdAt: Date;
+                updatedAt: Date;
+            }
+        );
     }
 }

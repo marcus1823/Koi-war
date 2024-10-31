@@ -1,4 +1,5 @@
 import {object, string, TypeOf} from "zod";
+
 /**
  * @openapi
  * components:
@@ -48,9 +49,9 @@ export const createContestSubCategorySchema = object({
             .regex(
                 /^[a-zA-Z0-9\sÀ-ỹ\-_.,!?()'"]+$/u,
                 "Name can only contain letters, numbers, Vietnamese characters, spaces, and basic punctuation"
-              )
-              .transform(val => val.replace(/\s+/g, ' ')), // Thay thế nhiều khoảng trắng liên tiếp bằng một khoảng trắng
-            
+            )
+            .transform(val => val.replace(/\s+/g, ' ')), // Thay thế nhiều khoảng trắng liên tiếp bằng một khoảng trắng
+
         description: string({
             required_error: "Description is required",
         })
@@ -75,8 +76,8 @@ export const updateContestSubCategorySchema = object({
             .regex(
                 /^[a-zA-Z0-9\sÀ-ỹ\-_.,!?()'"]+$/u,
                 "Name can only contain letters, numbers, Vietnamese characters, spaces, and basic punctuation"
-              )
-              .transform(val => val.replace(/\s+/g, ' ')) // Thay thế nhiều khoảng trắng liên tiếp bằng một khoảng trắng
+            )
+            .transform(val => val.replace(/\s+/g, ' ')) // Thay thế nhiều khoảng trắng liên tiếp bằng một khoảng trắng
             .optional(),
 
         description: string()

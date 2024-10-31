@@ -1,4 +1,4 @@
-import { object, string, TypeOf } from "zod";
+import {object, string, TypeOf} from "zod";
 
 /**
  * @openapi
@@ -42,69 +42,69 @@ import { object, string, TypeOf } from "zod";
  */
 
 const userPayload = {
-  body: object({
-    name: string({
-      required_error: "Name is required",
+    body: object({
+        name: string({
+            required_error: "Name is required",
+        }),
+        email: string({
+            required_error: "Email is required",
+        }).email("Email is invalid"),
     }),
-    email: string({
-      required_error: "Email is required",
-    }).email("Email is invalid"),
-  }),
 };
 
 const params = {
-  params: object({
-    id: string({
-      required_error: "User Id is required",
+    params: object({
+        id: string({
+            required_error: "User Id is required",
+        }),
     }),
-  }),
 };
 
 const passwordField = object({
-  password: string({
-    required_error: "Password is required",
-  }).min(6, "Password must be at least 6 characters"),
+    password: string({
+        required_error: "Password is required",
+    }).min(6, "Password must be at least 6 characters"),
 });
 
 export const createUserSchema = object({
-  body: object({
-    name: string({
-      required_error: "Name is required",
+    body: object({
+        name: string({
+            required_error: "Name is required",
+        }),
+        username: string({
+            required_error: "Username is required",
+        }),
+        email: string({
+            required_error: "Email is required",
+        }).email("Email is invalid"),
+        password: string({
+            required_error: "Password is required",
+        }).min(6, "Password must be at least 6 characters"),
     }),
-    username: string({
-      required_error: "Username is required",
-    }),
-    email: string({
-      required_error: "Email is required",
-    }).email("Email is invalid"),
-    password: string({
-      required_error: "Password is required",
-    }).min(6, "Password must be at least 6 characters"),
-  }),
 });
 
 export const loginUserSchema = object({
-  body: object({
-    username: string({
-      required_error: "Username is required",
+    body: object({
+        username: string({
+            required_error: "Username is required",
+        }),
+        password: string({
+            required_error: "Password is required",
+        }).min(6, "Password must be at least 6 characters"),
     }),
-    password: string({
-      required_error: "Password is required",
-    }).min(6, "Password must be at least 6 characters"),
-  }),
 });
 
 export const updateUserSchema = object({
-  ...userPayload,
-  ...params,
+    ...userPayload,
+    ...params,
 });
 
 export const getUserSchema = object({
-  ...params,
+    ...params,
 });
 
 export const deleteUserSchema = object({
-  ...params,
+    ...params,
 });
 
 export type CreateUserInput = TypeOf<typeof createUserSchema>;

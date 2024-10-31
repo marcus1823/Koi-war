@@ -9,8 +9,7 @@ export interface IContestSubCategoryResponse {
 }
 
 export function mapContestSubCategoryResponse(
-    contestSubCategory : IContestSubCategory & {_id: string; createdAt: Date; updatedAt: Date },
-
+    contestSubCategory: IContestSubCategory & { _id: string; createdAt: Date; updatedAt: Date },
 ): IContestSubCategoryResponse {
     return {
         id: contestSubCategory._id,

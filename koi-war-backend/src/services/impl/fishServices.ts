@@ -5,7 +5,7 @@ import {IFishRepository} from "../../repositories/IFishRepository";
 import {IUserService} from "../IUserService";
 import {IVarietyRepository} from "../../repositories/IVarietyRepository";
 import * as console from "node:console";
-import { IVarietyDocument } from "../../models/variety.model";
+import {IVarietyDocument} from "../../models/variety.model";
 
 export class FishServices implements IFishService {
     private fishRepository: IFishRepository;

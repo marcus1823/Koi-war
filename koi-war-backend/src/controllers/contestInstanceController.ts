@@ -1,7 +1,7 @@
 import {IContestInstanceServices} from "../services/IContestInstanceServices";
-import { Request, Response } from "express";
-import { CreateContestInstanceInput} from "../schema/contestInstance.schema";
-import { IContestInstance } from "../models/contestInstance.model";
+import {Request, Response} from "express";
+import {CreateContestInstanceInput} from "../schema/contestInstance.schema";
+import {IContestInstance} from "../models/contestInstance.model";
 
 export class ContestInstanceController {
     private contestInstanceService: IContestInstanceServices;
@@ -62,7 +62,7 @@ export class ContestInstanceController {
     }
 
     getContestInstanceById = async (
-        req: Request<{id: string}>,
+        req: Request<{ id: string }>,
         res: Response
     ): Promise<void> => {
         try {
@@ -87,7 +87,7 @@ export class ContestInstanceController {
     }
 
     updateContestInstanceById = async (
-        req: Request<{id: string}, {}, Partial<IContestInstance>>,
+        req: Request<{ id: string }, {}, Partial<IContestInstance>>,
         res: Response
     ): Promise<void> => {
         try {
@@ -123,7 +123,7 @@ export class ContestInstanceController {
     }
 
     disableContestInstance = async (
-        req: Request<{id: string}>,
+        req: Request<{ id: string }>,
         res: Response
     ): Promise<void> => {
         try {

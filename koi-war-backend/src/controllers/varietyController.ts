@@ -1,7 +1,6 @@
-import { Request, Response } from "express";
+import {Request, Response} from "express";
 import {IVarietyService} from "../services/IVarietyService";
 import {CreateVarietyInput, UpdateVarietyInput} from "../schema/variety.schema";
-import {GetUserInput} from "../schema/user.schema";
 import {IVariety} from "../models/variety.model";
 
 export class VarietyController {
@@ -38,7 +37,7 @@ export class VarietyController {
     }
 
     getVarietyById = async (
-        req: Request<{id: string}>,
+        req: Request<{ id: string }>,
         res: Response
     ) => {
         try {
@@ -85,7 +84,7 @@ export class VarietyController {
     }
 
     updateVarietyById = async (
-        req: Request<{id: string}, {}, UpdateVarietyInput["body"]>,
+        req: Request<{ id: string }, {}, UpdateVarietyInput["body"]>,
         res: Response
     ) => {
         try {
@@ -121,7 +120,7 @@ export class VarietyController {
     }
 
     deleteVarietyById = async (
-        req: Request<{id: string}>,
+        req: Request<{ id: string }>,
         res: Response
     ) => {
         try {

@@ -56,7 +56,7 @@ import { UserRole } from "../models/user.model";
  *         isDisabled:
  *           type: boolean
  *           default: false
- *     
+ *
  *     ContestInstanceResponse:
  *       type: object
  *       properties:
@@ -151,7 +151,7 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
         validate(createContestInstanceSchema),
         contestInstanceController.createContestInstance
     );
-    
+
     /**
      * @openapi
      * /api/contestInstance/getAllContestInstances:

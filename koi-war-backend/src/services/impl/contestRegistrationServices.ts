@@ -60,6 +60,57 @@ export class ContestRegistrationServices
         return this.contestRegistrationRepository.createContestRegistration(data);
     }
 
+    async getContestRegistrationById(id: string): Promise<any> {
+        return this.contestRegistrationRepository.getContestRegistrationById(id);
+    }
+
+    async getContestRegistrationByFishId(
+        fishId: string
+    ): Promise<IRegistration & { _id: string }> {
+        const contestRegistration =
+            await this.contestRegistrationRepository.getContestRegistrationByFishId(
+                fishId
+            );
+        if (!contestRegistration) {
+            throw new Error("Contest registration not found");
+        }
+
+        return contestRegistration;
+    }
+
+    getContestRegistrationsBySubCategoryId(contestSubCategoryId: string): Promise<(IRegistration & { _id: string })[]> {
+        return this.contestRegistrationRepository.getContestRegistrationsBySubCategoryId(contestSubCategoryId);
+    }
+
+    async updateContestRegistrationRank(
+        registrationId: string,
+        rank: number
+    ): Promise<any> {
+        const contestRegistration = this.contestRegistrationRepository.updateContestRegistrationRank(
+            registrationId,
+            rank
+        );
+        return contestRegistration;
+    }
+
+    async updateContestRegistrationStatus(id: string, status: RegistrationStatus): Promise<IRegistration & {
+        _id: string
+    }> {
+        const registration = await this.contestRegistrationRepository.getContestRegistrationById(id);
+        if (!registration) {
+            throw new Error("Contest registration not found");
+        }
+        const currentStatus = registration.status;
+        if (currentStatus === RegistrationStatus.REJECTED) {
+            throw new Error("Registration already rejected, cannot update status");
+        }
+        const updatedRegistration = await this.contestRegistrationRepository.updateContestRegistrationStatus(id, status);
+        if (!updatedRegistration) {
+            throw new Error("Failed to update registration status");
+        }
+        return updatedRegistration;
+    }
+
     private async checkFishClassification(
         fishId: string,
         contestSubCategoryId: string
@@ -82,43 +133,5 @@ export class ContestRegistrationServices
             );
         }
         return true;
-    }
-
-    async getContestRegistrationById(id: string): Promise<any> {
-        return this.contestRegistrationRepository.getContestRegistrationById(id);
-    }
-
-    async getContestRegistrationByFishId(
-        fishId: string
-    ): Promise<IRegistration & {_id: string}> {
-        const contestRegistration =
-            await this.contestRegistrationRepository.getContestRegistrationByFishId(
-                fishId
-            );
-        if (!contestRegistration) {
-            throw new Error("Contest registration not found");
-        }
-
-        return contestRegistration;
-    }
-
-    getContestRegistrationsBySubCategoryId(contestSubCategoryId: string): Promise<(IRegistration & { _id: string })[]> {
-        return this.contestRegistrationRepository.getContestRegistrationsBySubCategoryId(contestSubCategoryId);
-    }
-
-    async updateContestRegistrationStatus(id: string, status: RegistrationStatus): Promise<IRegistration & { _id: string }> {
-        const registration = await this.contestRegistrationRepository.getContestRegistrationById(id);
-        if (!registration) {
-            throw new Error("Contest registration not found");
-        }
-        const currentStatus = registration.status;
-        if (currentStatus === RegistrationStatus.REJECTED) {
-            throw new Error("Registration already rejected, cannot update status");
-        }
-        const updatedRegistration = await this.contestRegistrationRepository.updateContestRegistrationStatus(id, status);
-        if (!updatedRegistration) {
-            throw new Error("Failed to update registration status");
-        }
-        return updatedRegistration;
     }
 }
