@@ -5,10 +5,11 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  BackHandler,
   Dimensions,
   Image,
   Modal,
@@ -30,8 +31,12 @@ function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [loginMessage, setLoginMessage] = useState("");
+  
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState("");
 
   const router = useRouter();
+  let backPressCount = 0; // Đếm số lần nhấn nút back
 
   const handleLogin = async () => {
     setShowUsernameError(false);
@@ -50,18 +55,15 @@ function LoginScreen() {
 
     try {
       const user = await loginUser(username, password);
-      
-      // Navigate based on the user's role
-      switch (user.role) {
+      setIsLoggedIn(true);
+      setUserRole(user.role);
+        switch (user.role) {
         case "admin":
           router.push("/admin/dashboard");
           break;
         case "staff":
           router.push("/staff/manageCompetition");
           break;
-        // case "reference":
-        //   router.push("/reference/home");
-        //   break;
         case "user":
         default:
           router.push("/(tabs)/home");
@@ -72,9 +74,7 @@ function LoginScreen() {
       setModalVisible(true);
       setUsername("");
       setPassword("");
-
-      // Remove modal delay if you navigate immediately
-      setModalVisible(false); // You can keep it for a short time if needed
+      setModalVisible(false);
     } catch (error: any) {
       Alert.alert("Login error:", error.message);
     } finally {
@@ -85,6 +85,42 @@ function LoginScreen() {
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
   };
+
+  useEffect(() => {
+    const backAction = () => {
+      backPressCount++;
+
+      // Điều hướng về trang phù hợp dựa trên vai trò
+      if (isLoggedIn) {
+        switch (userRole) {
+          case "admin":
+            router.push("/admin/dashboard");
+            break;
+          case "staff":
+            router.push("/staff/manageCompetition");
+            break;
+          case "user":
+          default:
+            router.push("/(tabs)/home");
+            break;
+        }
+        return true;
+      } else {
+        // Nếu chưa đăng nhập, kiểm tra số lần nhấn nút back
+        if (backPressCount === 2) {
+          BackHandler.exitApp(); // Thoát ứng dụng nếu nhấn back 2 lần
+        }
+        return false; // Cho phép hành vi mặc định (quay lại trang trước đó)
+      }
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove(); // Dọn dẹp listener khi component unmount
+  }, [isLoggedIn, userRole]);
 
   return (
     <LinearGradient
@@ -253,7 +289,6 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-
     color: "#fff",
   },
   logo: {
@@ -282,16 +317,14 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
+    width: 250,
     backgroundColor: "white",
-    padding: 20,
     borderRadius: 10,
+    padding: 20,
     alignItems: "center",
-    elevation: 5,
   },
   modalText: {
     marginTop: 10,
-    fontSize: 16,
-    color: "#333",
-    fontWeight: "bold",
+    textAlign: "center",
   },
 });
