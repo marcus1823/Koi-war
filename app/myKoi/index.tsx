@@ -40,8 +40,8 @@ export default function MyKoiPage() {
 
   const navigateToDetail = (fish: KoiFish) => {
     router.push({
-      pathname: "/fishdetail",
-      params: { fishId: fish._id }
+      pathname: "/myKoi/detail/[id]",
+      params: { id: fish._id }
     });
   };
 

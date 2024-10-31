@@ -34,7 +34,6 @@ export const getMyKoiFishes = async (): Promise<KoiFish[]> => {
     if (!userData) {
       throw new Error('User data not found');
     }
-    
     const user = JSON.parse(userData);
     
     const response = await axios.get(
@@ -56,3 +55,31 @@ export const getMyKoiFishes = async (): Promise<KoiFish[]> => {
     throw error;
   }
 };
+
+export const getFishDetail = async (fishId: string): Promise<KoiFish> => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+  
+      const response = await axios.get(
+        `${API_BASE_URL}/fishes/${fishId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (response.data) {
+        return response.data;
+      } else {
+        throw new Error('Failed to fetch fish details');
+      }
+    } catch (error: any) {
+      console.error('Error fetching fish details:', error);
+      throw error;
+    }
+  };
