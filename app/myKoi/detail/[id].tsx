@@ -13,7 +13,7 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { KoiFish, getFishDetail } from '../../../api/koi/myKoiApi';
-import RegisterContestModal from './components/RegisterContestModal';
+import RegisterContestModal from '../components/RegisterContestModal';
 
 const { width } = Dimensions.get('window');
 

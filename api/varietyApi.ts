@@ -2,7 +2,13 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_BASE_URL } from './api';
 
-export const getAllVariety = async () => {
+export interface Variety {
+  _id: string;
+  name: string;
+  description: string;
+}
+
+export const getAllVariety = async (): Promise<Variety[]> => {
   try {
     const token = await AsyncStorage.getItem('token');
 

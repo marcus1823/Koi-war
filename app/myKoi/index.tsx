@@ -13,6 +13,7 @@ import { Stack, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { getMyKoiFishes, KoiFish } from '../../api/koi/myKoiApi';
+import CreateFishModal from './components/CreateFishModal';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.9;
@@ -22,6 +23,7 @@ export default function MyKoiPage() {
   const [myFish, setMyFish] = useState<KoiFish[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
 
   useEffect(() => {
     fetchMyFish();
@@ -142,10 +144,18 @@ export default function MyKoiPage() {
           showsVerticalScrollIndicator={false}
         />
 
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity 
+          style={styles.addButton}
+          onPress={() => setCreateModalVisible(true)}
+        >
           <Ionicons name="add" size={30} color="#fff" />
         </TouchableOpacity>
       </LinearGradient>
+      <CreateFishModal
+        visible={createModalVisible}
+        onClose={() => setCreateModalVisible(false)}
+        onSuccess={fetchMyFish}
+      />
     </>
   );
 }

@@ -9,8 +9,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { assignToContest } from '../../../../api/registrationAPI';
-import { getAllContestInstances } from '../../../../api/competitionApi';
+import { assignToContest } from '../../../api/registrationAPI';
+import { getAllContestInstances } from '../../../api/competitionApi';
 
 interface RegisterContestModalProps {
   visible: boolean;
@@ -87,7 +87,7 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
                 <View style={styles.subCategories}>
                   {contest.contestSubCategories.map((subCategory: any) => (
                     <TouchableOpacity
-                      key={subCategory._id}
+                      key={`${contest._id}-${subCategory._id}`}
                       style={[
                         styles.subCategoryButton,
                         selectedSubCategory === subCategory._id && styles.selectedSubCategory,
@@ -106,6 +106,7 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
                   ))}
                 </View>
                 <TouchableOpacity
+                  key={`register-${contest._id}`}
                   style={[
                     styles.registerButton,
                     (!selectedSubCategory || registering) && styles.disabledButton,
