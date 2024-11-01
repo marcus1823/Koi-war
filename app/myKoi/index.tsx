@@ -40,9 +40,8 @@ export default function MyKoiPage() {
 
   const fetchMyFish = async () => {
     try {
-      const data = await getMyKoiFishes();
-      setMyFish(data);
-      console.log(data)
+      const response = await getMyKoiFishes() as { success: boolean; data: KoiFish[] };
+      setMyFish(response.data);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -52,9 +51,14 @@ export default function MyKoiPage() {
 
   const fetchContestCount = async () => {
     try {
-      const data = await getMyKoiFishes();
-      const inContestCount = data.filter(fish => fish.contests && fish.contests.length > 0).length;
-      setContestCount(inContestCount);
+      const response = await getMyKoiFishes() as { success: boolean; data: KoiFish[] };
+      const data = response.data;
+      if (Array.isArray(data)) {
+        const inContestCount = data.filter(fish => fish.contests && fish.contests.length > 0).length;
+        setContestCount(inContestCount);
+      } else {
+        console.error('Expected data to be an array, but got:', data);
+      }
     } catch (err) {
       console.error('Error fetching contest count:', err);
     }
@@ -63,7 +67,7 @@ export default function MyKoiPage() {
   const navigateToDetail = (fish: KoiFish) => {
     router.push({
       pathname: "/myKoi/detail/[id]",
-      params: { id: fish._id }
+      params: { id: fish._id }   
     });
   };
 

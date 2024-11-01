@@ -7,10 +7,11 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
-import { assignToContest } from '../../../api/registrationAPI';
+import { assignToContest, getContestsByFishId } from '../../../api/registrationAPI';
 import { getAllContestInstances } from '../../../api/competitionApi';
 
 interface RegisterContestModalProps {
@@ -22,6 +23,7 @@ interface RegisterContestModalProps {
 interface ContestInstance {
   id: string;
   name: string;
+  rules: string;
   contestSubCategories: {
     id: string;
     name: string;
@@ -34,10 +36,17 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
   const [contests, setContests] = useState<ContestInstance[]>([]);
   const [selectedContest, setSelectedContest] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [currentRegistration, setCurrentRegistration] = useState<{ contestId: string, categoryId: string } | null>(null);
+  const [isQualified, setIsQualified] = useState(false);
 
   useEffect(() => {
     fetchContests();
+    fetchCurrentRegistration();
   }, []);
+
+  useEffect(() => {
+    checkQualification();
+  }, [selectedContest, selectedCategory]);
 
   const fetchContests = async () => {
     try {
@@ -50,25 +59,98 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
     }
   };
 
+  const fetchCurrentRegistration = async () => {
+    try {
+      const registrationData = await getContestsByFishId(fishId);
+      if (registrationData && registrationData.contestSubCategory) {
+        setCurrentRegistration({
+          contestId: registrationData.contestSubCategory.contestInstance,
+          categoryId: registrationData.contestSubCategory.id,
+        });
+      }
+    } catch (err: any) {
+      console.error('Error fetching current registration:', err);
+    }
+  };
+
+  const checkQualification = () => {
+    if (selectedContest && selectedCategory) {
+      setIsQualified(true);
+    } else {
+      setIsQualified(false);
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       if (!selectedContest || !selectedCategory) {
-        throw new Error('Please select both contest and category');
+        throw new Error('Vui lòng chọn cuộc thi và hạng mục');
       }
 
       setLoading(true);
       setError(null);
 
       await assignToContest(fishId, selectedContest, selectedCategory);
-      onClose();
+      
+      Alert.alert(
+        "Đăng Ký Thành Công",
+        "Cá của bạn đã được đăng ký tham gia cuộc thi thành công!",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              onClose();
+              fetchCurrentRegistration();
+            }
+          }
+        ]
+      );
     } catch (err: any) {
-      setError(err.message || 'Failed to register for contest');
+      Alert.alert(
+        "Đăng Ký Thất Bại",
+        err.message || "Có lỗi xảy ra khi đăng ký cuộc thi. Vui lòng thử lại sau.",
+        [
+          {
+            text: "OK",
+            style: "cancel"
+          }
+        ]
+      );
+      setError(err.message || 'Đăng ký cuộc thi thất bại');
     } finally {
       setLoading(false);
     }
   };
 
+  const validateSubmission = () => {
+    if (!selectedContest) {
+      Alert.alert(
+        "Thông Báo",
+        "Vui lòng chọn cuộc thi",
+        [{ text: "OK", style: "cancel" }]
+      );
+      return false;
+    }
+    if (!selectedCategory) {
+      Alert.alert(
+        "Thông Báo",
+        "Vui lòng chọn hạng mục",
+        [{ text: "OK", style: "cancel" }]
+      );
+      return false;
+    }
+    return true;
+  };
+
+  const onSubmitPress = () => {
+    if (validateSubmission()) {
+      handleSubmit();
+    }
+  };
+
   const selectedContestData = contests.find(c => c.id === selectedContest);
+  const isAlreadyRegistered = currentRegistration && selectedContest === currentRegistration.contestId && selectedCategory === currentRegistration.categoryId;
+  const isButtonDisabled = loading || !isQualified || isAlreadyRegistered;
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -109,36 +191,45 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
             </View>
 
             {selectedContestData && (
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Hạng Mục</Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={selectedCategory}
-                    onValueChange={setSelectedCategory}
-                    style={styles.picker}
-                  >
-                    <Picker.Item label="Chọn hạng mục..." value="" />
-                    {selectedContestData.contestSubCategories.map((category) => (
-                      <Picker.Item 
-                        key={category.id} 
-                        label={category.name} 
-                        value={category.id} 
-                      />
-                    ))}
-                  </Picker>
+              <>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Hạng Mục</Text>
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      selectedValue={selectedCategory}
+                      onValueChange={setSelectedCategory}
+                      style={styles.picker}
+                    >
+                      <Picker.Item label="Chọn hạng mục..." value="" />
+                      {selectedContestData.contestSubCategories.map((category) => (
+                        <Picker.Item 
+                          key={category.id} 
+                          label={category.name} 
+                          value={category.id} 
+                        />
+                      ))}
+                    </Picker>
+                  </View>
                 </View>
-              </View>
+
+                <View style={styles.rulesContainer}>
+                  <Text style={styles.rulesLabel}>Quy Tắc Cuộc Thi</Text>
+                  <Text style={styles.rulesText}>{selectedContestData.rules}</Text>
+                </View>
+              </>
             )}
 
             <TouchableOpacity
-              style={[styles.submitButton, loading && styles.disabledButton]}
-              onPress={handleSubmit}
-              disabled={loading}
+              style={[styles.submitButton, isButtonDisabled && styles.disabledButton]}
+              onPress={onSubmitPress}
+              disabled={!!isButtonDisabled}
             >
               {loading ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
-                <Text style={styles.submitButtonText}>Đăng Ký</Text>
+                <Text style={styles.submitButtonText}>
+                  {isAlreadyRegistered ? 'Đã Đăng Ký' : 'Đăng Ký'}
+                </Text>
               )}
             </TouchableOpacity>
           </ScrollView>
@@ -197,6 +288,21 @@ const styles = StyleSheet.create({
   picker: {
     height: 50,
     width: '100%',
+  },
+  rulesContainer: {
+    marginTop: 15,
+    padding: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+  },
+  rulesLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  rulesText: {
+    fontSize: 14,
+    color: '#333',
   },
   submitButton: {
     backgroundColor: '#eb7452',

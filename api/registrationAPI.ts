@@ -38,3 +38,32 @@ export const assignToContest = async (
     throw error;
   }
 };
+
+export const getContestsByFishId = async (fishId: string) => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    const response = await axios.get(`${API_BASE_URL}/contestRegistration/getByFishId/${fishId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response) {
+      return response.data;
+    } else {
+      throw new Error('Failed to fetch contests for the fish');
+    }
+  } catch (error: any) {
+    console.error('Error details:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    throw error;
+  }
+};

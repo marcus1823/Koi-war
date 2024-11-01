@@ -6,18 +6,19 @@ import { getMyKoiFishes, KoiFish } from '../../api/koi/myKoiApi';
 
 export default function BodyProfile() {
   const router = useRouter();
-  const [fishData, setFishData] = useState<KoiFish[]>([]);
+  const [myFish, setMyFish] = useState<KoiFish[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchFishData();
+    fetchMyFish();
   }, []);
 
-  const fetchFishData = async () => {
+  const fetchMyFish = async () => {
     try {
-      const data = await getMyKoiFishes();
-      setFishData(data);
+      const response = await getMyKoiFishes() as { success: boolean; data: KoiFish[] };
+      setMyFish(response.data);
+      console.log(response.data);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -106,13 +107,13 @@ export default function BodyProfile() {
 
         <View style={styles.statsOverview}>
           <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{fishData.length}</Text>
+            <Text style={styles.statNumber}>{myFish.length}</Text>
             <Text style={styles.statLabel}>Tổng Cá Koi</Text>
           </View>
         </View>
 
         <FlatList
-          data={fishData}
+          data={myFish}
           renderItem={renderFishItem}
           keyExtractor={(item) => item._id}
           showsVerticalScrollIndicator={false}
