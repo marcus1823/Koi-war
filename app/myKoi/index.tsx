@@ -24,9 +24,11 @@ export default function MyKoiPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [contestCount, setContestCount] = useState(0);
 
   useEffect(() => {
     fetchMyFish();
+    fetchContestCount();
   }, []);
 
   const fetchMyFish = async () => {
@@ -37,6 +39,16 @@ export default function MyKoiPage() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchContestCount = async () => {
+    try {
+      const data = await getMyKoiFishes();
+      const inContestCount = data.filter(fish => fish.contests && fish.contests.length > 0).length;
+      setContestCount(inContestCount);
+    } catch (err) {
+      console.error('Error fetching contest count:', err);
     }
   };
 
@@ -127,7 +139,7 @@ export default function MyKoiPage() {
             <Text style={styles.statLabel}>Tổng Cá Koi</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={styles.statNumber}>3</Text>
+            <Text style={styles.statNumber}>{contestCount}</Text>
             <Text style={styles.statLabel}>Đang Tham Gia</Text>
           </View>
           <View style={styles.statBox}>

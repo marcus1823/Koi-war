@@ -24,6 +24,9 @@ export interface KoiFish {
     };
     createdAt: string;
     updatedAt: string;
+    contests?: {
+        _id: string;
+    }[];
 }
 
 export const getMyKoiFishes = async (): Promise<KoiFish[]> => {

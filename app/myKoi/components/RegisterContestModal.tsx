@@ -23,7 +23,8 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [registering, setRegistering] = useState(false);
-  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
+  const [selectedContestId, setSelectedContestId] = useState<string | null>(null);
+  const [selectedSubCategoryId, setSelectedSubCategoryId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchContests();
@@ -41,10 +42,22 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
     }
   };
 
-  const handleRegister = async (contestId: string, subCategoryId: string) => {
+  const handleSubCategorySelect = (contestId: string, subCategoryId: string) => {
+    if (selectedContestId === contestId && selectedSubCategoryId === subCategoryId) {
+      setSelectedContestId(null);
+      setSelectedSubCategoryId(null);
+    } else {
+      setSelectedContestId(contestId);
+      setSelectedSubCategoryId(subCategoryId);
+    }
+  };
+
+  const handleRegister = async () => {
+    if (!selectedContestId || !selectedSubCategoryId) return;
+
     try {
       setRegistering(true);
-      await assignToContest(fishId, contestId, subCategoryId);
+      await assignToContest(fishId, selectedContestId, selectedSubCategoryId);
       onClose();
     } catch (err: any) {
       setError(err.message);
@@ -62,6 +75,8 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
       </Modal>
     );
   }
+
+  console.log(selectedContestId, selectedSubCategoryId);
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -85,41 +100,48 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
               <View key={contest._id} style={styles.contestItem}>
                 <Text style={styles.contestName}>{contest.contest.name}</Text>
                 <View style={styles.subCategories}>
-                  {contest.contestSubCategories.map((subCategory: any) => (
-                    <TouchableOpacity
-                      key={`${contest._id}-${subCategory._id}`}
-                      style={[
-                        styles.subCategoryButton,
-                        selectedSubCategory === subCategory._id && styles.selectedSubCategory,
-                      ]}
-                      onPress={() => setSelectedSubCategory(subCategory._id)}
-                    >
-                      <Text 
+                  {contest.contestSubCategories.map((subCategory: any) => {
+                    const isSelected = 
+                      selectedContestId === contest._id && 
+                      selectedSubCategoryId === subCategory._id;
+
+                    return (
+                      <TouchableOpacity
+                        key={`${contest._id}-${subCategory._id}`}
                         style={[
-                          styles.subCategoryText,
-                          selectedSubCategory === subCategory._id && styles.selectedSubCategoryText,
+                          styles.subCategoryButton,
+                          isSelected && styles.selectedSubCategory,
                         ]}
+                        onPress={() => handleSubCategorySelect(contest._id, subCategory._id)}
                       >
-                        {subCategory.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                        <Text 
+                          style={[
+                            styles.subCategoryText,
+                            isSelected && styles.selectedSubCategoryText,
+                          ]}
+                        >
+                          {subCategory.name}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
-                <TouchableOpacity
-                  key={`register-${contest._id}`}
-                  style={[
-                    styles.registerButton,
-                    (!selectedSubCategory || registering) && styles.disabledButton,
-                  ]}
-                  onPress={() => handleRegister(contest._id, selectedSubCategory!)}
-                  disabled={!selectedSubCategory || registering}
-                >
-                  {registering ? (
-                    <ActivityIndicator size="small" color="#fff" />
-                  ) : (
-                    <Text style={styles.registerButtonText}>Đăng Ký</Text>
-                  )}
-                </TouchableOpacity>
+                {selectedContestId === contest._id && (
+                  <TouchableOpacity
+                    style={[
+                      styles.registerButton,
+                      (!selectedSubCategoryId || registering) && styles.disabledButton,
+                    ]}
+                    onPress={handleRegister}
+                    disabled={!selectedSubCategoryId || registering}
+                  >
+                    {registering ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <Text style={styles.registerButtonText}>Đăng Ký</Text>
+                    )}
+                  </TouchableOpacity>
+                )}
               </View>
             ))}
           </ScrollView>
@@ -221,4 +243,4 @@ const styles = StyleSheet.create({
     color: '#c62828',
     fontSize: 14,
   },
-}); 
+});
