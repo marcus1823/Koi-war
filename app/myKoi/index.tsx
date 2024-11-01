@@ -18,6 +18,13 @@ import CreateFishModal from './components/CreateFishModal';
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.9;
 
+const EmptyState = () => (
+  <View style={styles.emptyStateContainer}>
+    <MaterialCommunityIcons name="fish-off" size={64} color="rgba(255,255,255,0.8)" />
+    <Text style={styles.emptyStateText}>Bạn chưa có cá, hãy đăng ký cá của bạn</Text>
+  </View>
+);
+
 export default function MyKoiPage() {
   const router = useRouter();
   const [myFish, setMyFish] = useState<KoiFish[]>([]);
@@ -35,6 +42,7 @@ export default function MyKoiPage() {
     try {
       const data = await getMyKoiFishes();
       setMyFish(data);
+      console.log(data)
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -135,7 +143,7 @@ export default function MyKoiPage() {
 
         <View style={styles.statsOverview}>
           <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{myFish.length}</Text>
+            <Text style={styles.statNumber}>{myFish?.length || 0}</Text>
             <Text style={styles.statLabel}>Tổng Cá Koi</Text>
           </View>
           <View style={styles.statBox}>
@@ -148,13 +156,17 @@ export default function MyKoiPage() {
           </View>
         </View>
 
-        <FlatList
-          data={myFish}
-          renderItem={renderKoiCard}
-          keyExtractor={(item) => item._id}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-        />
+        {myFish.length > 0 ? (
+          <FlatList
+            data={myFish}
+            renderItem={renderKoiCard}
+            keyExtractor={(item) => item._id}
+            contentContainerStyle={styles.listContainer}
+            showsVerticalScrollIndicator={false}
+          />
+        ) : (
+          <EmptyState />
+        )}
 
         <TouchableOpacity 
           style={styles.addButton}
@@ -328,5 +340,18 @@ const styles = StyleSheet.create({
     color: '#ff4444',
     fontSize: 16,
     textAlign: 'center',
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  emptyStateText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 16,
+    opacity: 0.8,
   },
 });

@@ -25,7 +25,6 @@ export default function VarietyPage() {
     try {
       const data = await getAllVariety();
       setVarieties(data);
-      console.log(data);
     } catch (err: any) {
       setError(err.message);
     } finally {

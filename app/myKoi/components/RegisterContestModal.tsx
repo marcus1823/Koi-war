@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
 import { assignToContest } from '../../../api/registrationAPI';
 import { getAllContestInstances } from '../../../api/competitionApi';
 
@@ -18,13 +19,21 @@ interface RegisterContestModalProps {
   fishId: string;
 }
 
+interface ContestInstance {
+  id: string;
+  name: string;
+  contestSubCategories: {
+    id: string;
+    name: string;
+  }[];
+}
+
 export default function RegisterContestModal({ visible, onClose, fishId }: RegisterContestModalProps) {
-  const [contests, setContests] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [registering, setRegistering] = useState(false);
-  const [selectedContestId, setSelectedContestId] = useState<string | null>(null);
-  const [selectedSubCategoryId, setSelectedSubCategoryId] = useState<string | null>(null);
+  const [contests, setContests] = useState<ContestInstance[]>([]);
+  const [selectedContest, setSelectedContest] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   useEffect(() => {
     fetchContests();
@@ -36,47 +45,30 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
       const activeContests = data.filter((contest: any) => contest.isActive);
       setContests(activeContests);
     } catch (err: any) {
-      setError(err.message);
+      setError('Failed to load contests');
+      console.error('Error fetching contests:', err);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (!selectedContest || !selectedCategory) {
+        throw new Error('Please select both contest and category');
+      }
+
+      setLoading(true);
+      setError(null);
+
+      await assignToContest(fishId, selectedContest, selectedCategory);
+      onClose();
+    } catch (err: any) {
+      setError(err.message || 'Failed to register for contest');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubCategorySelect = (contestId: string, subCategoryId: string) => {
-    if (selectedContestId === contestId && selectedSubCategoryId === subCategoryId) {
-      setSelectedContestId(null);
-      setSelectedSubCategoryId(null);
-    } else {
-      setSelectedContestId(contestId);
-      setSelectedSubCategoryId(subCategoryId);
-    }
-  };
-
-  const handleRegister = async () => {
-    if (!selectedContestId || !selectedSubCategoryId) return;
-
-    try {
-      setRegistering(true);
-      await assignToContest(fishId, selectedContestId, selectedSubCategoryId);
-      onClose();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setRegistering(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <Modal visible={visible} transparent animationType="slide">
-        <View style={styles.modalContainer}>
-          <ActivityIndicator size="large" color="#eb7452" />
-        </View>
-      </Modal>
-    );
-  }
-
-  console.log(selectedContestId, selectedSubCategoryId);
+  const selectedContestData = contests.find(c => c.id === selectedContest);
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -89,61 +81,66 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
             </TouchableOpacity>
           </View>
 
-          {error && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>Lỗi: {error}</Text>
-            </View>
-          )}
-
-          <ScrollView style={styles.contestList}>
-            {contests.map((contest) => (
-              <View key={contest._id} style={styles.contestItem}>
-                <Text style={styles.contestName}>{contest.contest.name}</Text>
-                <View style={styles.subCategories}>
-                  {contest.contestSubCategories.map((subCategory: any) => {
-                    const isSelected = 
-                      selectedContestId === contest._id && 
-                      selectedSubCategoryId === subCategory._id;
-
-                    return (
-                      <TouchableOpacity
-                        key={`${contest._id}-${subCategory._id}`}
-                        style={[
-                          styles.subCategoryButton,
-                          isSelected && styles.selectedSubCategory,
-                        ]}
-                        onPress={() => handleSubCategorySelect(contest._id, subCategory._id)}
-                      >
-                        <Text 
-                          style={[
-                            styles.subCategoryText,
-                            isSelected && styles.selectedSubCategoryText,
-                          ]}
-                        >
-                          {subCategory.name}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-                {selectedContestId === contest._id && (
-                  <TouchableOpacity
-                    style={[
-                      styles.registerButton,
-                      (!selectedSubCategoryId || registering) && styles.disabledButton,
-                    ]}
-                    onPress={handleRegister}
-                    disabled={!selectedSubCategoryId || registering}
-                  >
-                    {registering ? (
-                      <ActivityIndicator size="small" color="#fff" />
-                    ) : (
-                      <Text style={styles.registerButtonText}>Đăng Ký</Text>
-                    )}
-                  </TouchableOpacity>
-                )}
+          <ScrollView style={styles.form}>
+            {error && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{error}</Text>
               </View>
-            ))}
+            )}
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Cuộc Thi</Text>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={selectedContest}
+                  onValueChange={setSelectedContest}
+                  style={styles.picker}
+                >
+                  <Picker.Item label="Chọn cuộc thi..." value="" />
+                  {contests.map((contest) => (
+                    <Picker.Item 
+                      key={contest.id} 
+                      label={contest.name} 
+                      value={contest.id} 
+                    />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+
+            {selectedContestData && (
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Hạng Mục</Text>
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={selectedCategory}
+                    onValueChange={setSelectedCategory}
+                    style={styles.picker}
+                  >
+                    <Picker.Item label="Chọn hạng mục..." value="" />
+                    {selectedContestData.contestSubCategories.map((category) => (
+                      <Picker.Item 
+                        key={category.id} 
+                        label={category.name} 
+                        value={category.id} 
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+            )}
+
+            <TouchableOpacity
+              style={[styles.submitButton, loading && styles.disabledButton]}
+              onPress={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.submitButtonText}>Đăng Ký</Text>
+              )}
+            </TouchableOpacity>
           </ScrollView>
         </View>
       </View>
@@ -163,8 +160,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     paddingHorizontal: 20,
     paddingBottom: 34,
-    maxHeight: '80%',
-    minHeight: '50%',
+    maxHeight: '90%',
   },
   header: {
     flexDirection: 'row',
@@ -182,53 +178,37 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 5,
   },
-  contestList: {
+  form: {
     marginTop: 15,
   },
-  contestItem: {
-    backgroundColor: '#f8f8f8',
-    borderRadius: 10,
-    padding: 15,
+  inputGroup: {
     marginBottom: 15,
   },
-  contestName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
-  },
-  subCategories: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 15,
-  },
-  subCategoryButton: {
-    backgroundColor: '#eee',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
-  },
-  selectedSubCategory: {
-    backgroundColor: '#eb7452',
-  },
-  subCategoryText: {
-    color: '#666',
+  label: {
     fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
   },
-  selectedSubCategoryText: {
-    color: '#fff',
+  pickerContainer: {
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
+    overflow: 'hidden',
   },
-  registerButton: {
+  picker: {
+    height: 50,
+    width: '100%',
+  },
+  submitButton: {
     backgroundColor: '#eb7452',
-    padding: 12,
+    padding: 15,
     borderRadius: 8,
     alignItems: 'center',
+    marginTop: 20,
   },
   disabledButton: {
     backgroundColor: '#ccc',
   },
-  registerButtonText: {
+  submitButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
@@ -237,7 +217,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffebee',
     padding: 10,
     borderRadius: 5,
-    marginTop: 10,
+    marginBottom: 15,
   },
   errorText: {
     color: '#c62828',
