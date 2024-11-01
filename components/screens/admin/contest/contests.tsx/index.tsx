@@ -40,7 +40,7 @@ const ContestsScreen = () => {
   const handleCreateOrUpdate = async (contestData: {
     name: string;
     description: string;
-  }) => {
+  }): Promise<boolean> => {
     try {
       if (selectedContest) {
         // Update existing contest
@@ -64,6 +64,8 @@ const ContestsScreen = () => {
         const createdContest = response.data || response;
         setContests((prev) => [createdContest, ...prev]);
       }
+      await loadContests(); // Reload the contests after successful creation/update
+      return true;
     } catch (error) {
       console.error(
         selectedContest
@@ -71,6 +73,7 @@ const ContestsScreen = () => {
           : "Failed to create contest:",
         error
       );
+      return false;
     } finally {
       setSelectedContest(null);
       setShowModal(false);

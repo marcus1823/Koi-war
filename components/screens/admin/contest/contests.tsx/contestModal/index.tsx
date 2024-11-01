@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   Modal,
   StyleSheet,
   Text,
@@ -11,7 +12,7 @@ import {
 interface CreateContestModalProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (contestData: { name: string; description: string }) => void;
+  onSubmit: (contestData: { name: string; description: string }) => Promise<boolean>;
   initialData?: { name: string; description: string };
   isUpdate?: boolean;
 }
@@ -24,6 +25,7 @@ export const CreateContestModal: React.FC<CreateContestModalProps> = ({
   isUpdate = false
 }) => {
   const [contestData, setContestData] = useState({ name: '', description: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -31,10 +33,31 @@ export const CreateContestModal: React.FC<CreateContestModalProps> = ({
     }
   }, [initialData]);
 
-  const handleSubmit = () => {
-    onSubmit(contestData);
-    setContestData({ name: '', description: '' });
-    onClose();
+  const handleSubmit = async () => {
+    if (!contestData.name.trim()) {
+      Alert.alert('Lỗi', 'Vui lòng nhập tên cuộc thi');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const success = await onSubmit(contestData);
+      if (success) {
+        Alert.alert(
+          'Thành công',
+          isUpdate ? 'Cập nhật cuộc thi thành công' : 'Tạo mới cuộc thi thành công'
+        );
+        setContestData({ name: '', description: '' });
+        onClose();
+      }
+    } catch (error) {
+      Alert.alert(
+        'Lỗi',
+        isUpdate ? 'Không thể cập nhật cuộc thi' : 'Không thể tạo cuộc thi mới'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -61,14 +84,28 @@ export const CreateContestModal: React.FC<CreateContestModalProps> = ({
           />
 
           <View style={styles.modalButtons}>
-            <TouchableOpacity style={styles.button} onPress={onClose}>
+            <TouchableOpacity 
+              style={styles.button} 
+              onPress={onClose}
+              disabled={isSubmitting}
+            >
               <Text>Huỷ</Text>
             </TouchableOpacity>
             <TouchableOpacity 
-              style={[styles.button, styles.primaryButton]} 
+              style={[
+                styles.button, 
+                styles.primaryButton,
+                isSubmitting && styles.disabledButton
+              ]} 
               onPress={handleSubmit}
+              disabled={isSubmitting}
             >
-              <Text style={styles.buttonText}>{isUpdate ? 'Cập nhật' : 'Tạo mới'}</Text>
+              <Text style={styles.buttonText}>
+                {isSubmitting 
+                  ? 'Đang xử lý...' 
+                  : isUpdate ? 'Cập nhật' : 'Tạo mới'
+                }
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -117,6 +154,9 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     backgroundColor: '#007AFF'
+  },
+  disabledButton: {
+    backgroundColor: '#99c4ea',
   },
   buttonText: {
     color: '#fff'
