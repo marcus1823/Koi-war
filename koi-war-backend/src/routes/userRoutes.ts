@@ -76,7 +76,7 @@ export function userRoutes(userController: UserController): Router {
      *           schema:
      *             type: object
      *             properties:
-     *               email:
+     *               username:
      *                 type: string
      *               password:
      *                 type: string

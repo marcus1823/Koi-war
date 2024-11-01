@@ -242,7 +242,7 @@ export function fishRoutes(fishController: FishController): Router {
 
     /**
      * @openapi
-     * /api/fishes/{id}:
+     * /api/fishes/getFishById/{id}:
      *   get:
      *     tags: [Fishes]
      *     summary: Get fish by ID
@@ -264,7 +264,7 @@ export function fishRoutes(fishController: FishController): Router {
      *       404:
      *         description: Fish not found
      */
-    router.get("/:id", fishController.getFishById);
+    router.get("/getFishById/:id", fishController.getFishById);
 
 /**
      * @openapi
