@@ -5,21 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e9817380-6844-461a-93ed-1951972ea524" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/app/(tabs)/profile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/profile.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/_layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/fishprofile.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/predictresults.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/progress.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/screens/LoginScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/screens/LoginScreen.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/screens/home/HeaderHome.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/screens/home/HeaderHome.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/screens/profile/BodyProfile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/screens/profile/BodyProfile.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/screens/profile/FishProfile.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/screens/profile/FooterProfile.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/screens/profile/HeaderProfile.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/screens/profile/HeaderProfile.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/screens/profile/PredictResults.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/screens/profile/Progress.jsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
