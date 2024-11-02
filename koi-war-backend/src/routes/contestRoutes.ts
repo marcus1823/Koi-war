@@ -349,61 +349,6 @@ export function contestRoutes(contestController: ContestController): Router {
      *                 message:
      *                   type: string
      *                   example: "Contest not found"
-     *
-     *   delete:
-     *     tags:
-     *       - Contests
-     *     summary: Delete contest by ID
-     *     description: Delete a contest if it has no contest instances
-     *     parameters:
-     *       - name: id
-     *         in: path
-     *         required: true
-     *         schema:
-     *           type: string
-     *         example: "672100e85eaba638c1ff4e0b"
-     *     responses:
-     *       200:
-     *         description: Contest deleted successfully
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 success:
-     *                   type: boolean
-     *                   example: true
-     *                 message:
-     *                   type: string
-     *                   example: "Contest deleted successfully"
-     *                 data:
-     *                   $ref: '#/components/schemas/ContestResponse'
-     *       400:
-     *         description: Bad request
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 success:
-     *                   type: boolean
-     *                   example: false
-     *                 message:
-     *                   type: string
-     *                   example: "Cannot delete contest with existing instances"
-     *       404:
-     *         description: Contest not found
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 success:
-     *                   type: boolean
-     *                   example: false
-     *                 message:
-     *                   type: string
-     *                   example: "Contest not found"
      */
     router.put(
         "/updateContestById/:id",

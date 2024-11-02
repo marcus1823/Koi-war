@@ -5,6 +5,8 @@ import {IContestRegistrationServices} from "../IContestRegistrationServices";
 import {IContestSubCategoryService} from "../IContestSubCategoryService";
 import {IFishService} from "../IFishService";
 import {IRegistration, RegistrationStatus} from "../../models/registration.model";
+import {IContestResponse} from "../../types/contest";
+import {mapContestRegistrationResponse} from "../../types/contestRegistration";
 
 export class ContestRegistrationServices
     implements IContestRegistrationServices {
@@ -62,6 +64,21 @@ export class ContestRegistrationServices
 
     async getContestRegistrationById(id: string): Promise<IRegistration & { _id: string }> {
         return this.contestRegistrationRepository.getContestRegistrationById(id);
+    }
+
+    // async getAllContestRegistrations(): Promise<IRegistration[]> {
+    //    const registrations = await this.contestRegistrationRepository.getAllContestRegistration();
+    //    return registrations.map((registration) => mapContestRegistrationResponse(
+    //        registration as IRegistration & {
+    //            _id: string;
+    //            createdAt: Date;
+    //            updatedAt: Date;
+    //        }
+    //    ))
+    // }
+
+    async getAllContestRegistrations(): Promise<(IRegistration & { _id: string })[]> {
+        return this.contestRegistrationRepository.getAllContestRegistration();
     }
 
     async getContestRegistrationByFishId(

@@ -28,6 +28,15 @@ export class ContestRepository implements IContestRepository {
         return contest;
     }
 
+    async getContestByName(name: string): Promise<IContest | null> {
+        const contest = await Contest.findOne({name})
+            .populate({
+                path: 'contestInstances',
+                model: 'ContestInstance'
+            });
+        return contest;
+    }
+
     async updateContest(id: string, updateData: Partial<IContest>): Promise<IContest | null> {
         return Contest.findByIdAndUpdate(id, updateData, {new: true}).populate("contestInstances");
     }

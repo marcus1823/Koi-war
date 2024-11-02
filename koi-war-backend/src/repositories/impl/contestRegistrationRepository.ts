@@ -1,4 +1,4 @@
-import Registration, {RegistrationStatus} from "../../models/registration.model";
+import Registration, {IRegistration, RegistrationStatus} from "../../models/registration.model";
 import {IContestRegistrationRepository} from "../IContestRegistrationRepository";
 
 export class ContestRegistrationRepository
@@ -15,6 +15,10 @@ export class ContestRegistrationRepository
 
     async getContestRegistrationById(id: string): Promise<any> {
         return Registration.findById(id);
+    }
+
+    async getAllContestRegistration(): Promise<(IRegistration & { _id: string })[]> {
+        return Registration.find();
     }
 
     getContestRegistrationByFishId(fishId: string): Promise<any> {

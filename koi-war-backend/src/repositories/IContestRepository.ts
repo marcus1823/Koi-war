@@ -5,6 +5,8 @@ export interface IContestRepository {
 
     getAllContests(): Promise<IContest[]>;
 
+    getContestByName(name: string): Promise<IContest | null>;
+
     getContestById(id: string): Promise<IContest | null>;
 
     updateContest(id: string, updateData: Partial<IContest>): Promise<IContest | null>;

@@ -2,6 +2,8 @@ import {IRegistration, RegistrationStatus} from "../models/registration.model";
 import {IContestRegistrationResponse} from "../types/contestRegistration";
 
 export interface ICompetitionManagementServices {
+    getAllContestRegistrations(): Promise<any>;
+
     createContestRegistration(data: any): Promise<any>;
 
     getContestRegistrationById(id: string): Promise<any>;

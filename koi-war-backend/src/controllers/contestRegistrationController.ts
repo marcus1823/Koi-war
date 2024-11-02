@@ -84,4 +84,17 @@ export class ContestRegistrationController {
         }
     }
 
+    getAllContestRegistrations = async (req: Request, res: Response) => {
+        try {
+            const registrations = await this.competitionManagementServices.getAllContestRegistrations();
+            res.status(200).json(registrations);
+        } catch (error) {
+            if (error instanceof Error) {
+                res.status(500).send(error.message);
+            } else {
+                res.status(500).send("An unknown error occurred");
+            }
+        }
+    }
+
 }

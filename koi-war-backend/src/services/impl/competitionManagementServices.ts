@@ -26,6 +26,10 @@ export class CompetitionManagementServices
         this.contestSubCategoryServices = contestSubCategoryServices;
     }
 
+    getAllContestRegistrations(): Promise<any> {
+        return this.registrationServices.getAllContestRegistrations();
+    }
+
     createContestRegistration(data: any): Promise<any> {
         return this.registrationServices.createContestRegistration(data);
     }

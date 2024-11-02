@@ -5,6 +5,8 @@ export interface IContestRegistrationServices {
 
     getContestRegistrationById(id: string): Promise<IRegistration & { _id: string }>;
 
+    getAllContestRegistrations(): Promise<(IRegistration & { _id: string })[]>;
+
     getContestRegistrationByFishId(
         fishId: string
     ): Promise<IRegistration & { _id: string }>;

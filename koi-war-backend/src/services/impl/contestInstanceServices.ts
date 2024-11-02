@@ -50,6 +50,9 @@ export class ContestInstanceServices implements IContestInstanceServices {
             if (!contest) {
                 throw new Error("Contest not found");
             }
+            
+            
+
 
             const contestInstance = await this.contestInstanceRepository.createContestInstance(processedData);
             return mapContestInstanceResponse(

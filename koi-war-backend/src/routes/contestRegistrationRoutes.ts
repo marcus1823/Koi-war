@@ -173,5 +173,28 @@ export function contestRegistrationRoutes(
         validate(UpdateRegistrationStatusInput),
         contestRegistrationController.updateContestRegistrationStatus
     );
+
+    /**
+     * @openapi
+     * /api/contestRegistration/getAll:
+     *   get:
+     *     tags:
+     *       - Contest Registration
+     *     summary: Get all contest registrations
+     *     description: Retrieve a list of all contest registrations
+     *     responses:
+     *       '200':
+     *         description: List of contest registrations retrieved successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 $ref: '#/components/schemas/ContestRegistrationResponse'
+     *       '500':
+     *         description: Internal server error
+     */
+    router.get("/getAll", contestRegistrationController.getAllContestRegistrations);
+
     return router;
 }

@@ -13,6 +13,9 @@ export class ContestService implements IContestServices {
 
     async getAllContests(): Promise<IContestResponse[]> {
         const contests = await this.contestRepository.getAllContests();
+        if (!contests) {
+            throw new Error("No contests found");
+        }
         return contests.map((contest) =>
             mapContestResponse(
                 contest as IContest & { _id: string; createdAt: Date; updatedAt: Date }
@@ -21,6 +24,11 @@ export class ContestService implements IContestServices {
     }
 
     async createContest(data: any): Promise<IContestResponse> {
+        const existingContest = await this.contestRepository.getContestByName(data.name);
+        if (existingContest) {
+            throw new Error("Contest with this name already exists");
+        }
+
         const contest = await this.contestRepository.createContest(data);
         return mapContestResponse(
             contest as IContest & { _id: string; createdAt: Date; updatedAt: Date }
@@ -37,11 +45,28 @@ export class ContestService implements IContestServices {
         );
     }
 
+    async getContestByName(name: string): Promise<IContestResponse | null> {
+        const contest = await this.contestRepository.getContestByName(name);
+        if (!contest) {
+            throw new Error("Contest not found");
+        }
+        return mapContestResponse(
+            contest as IContest & { _id: string; createdAt: Date; updatedAt: Date }
+        );
+    }
+
     async updateContestById(id: string, updateData: Partial<IContest>): Promise<IContestResponse | null> {
         const contest = await this.contestRepository.updateContest(id, updateData);
         if (!contest) {
             throw new Error("Contest not found");
         }
+        if (updateData.name) {
+            const existingContest = await this.contestRepository.getContestByName(updateData.name);
+            if (existingContest) {
+                throw new Error("Contest with this name already exists");
+            }
+        }
+        
         return mapContestResponse(
             contest as IContest & { _id: string; createdAt: Date; updatedAt: Date }
         );

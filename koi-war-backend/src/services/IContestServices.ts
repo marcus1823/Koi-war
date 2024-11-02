@@ -8,6 +8,8 @@ export interface IContestServices {
 
     getContestById(id: string): Promise<IContestResponse | null>;
 
+    getContestByName(name: string): Promise<IContestResponse | null>;
+
     updateContestById(id: string, updateData: Partial<IContest>): Promise<IContestResponse | null>;
 
     deleteContestById(id: string): Promise<IContestResponse | null>;
