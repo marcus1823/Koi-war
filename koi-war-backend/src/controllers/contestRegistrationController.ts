@@ -24,6 +24,15 @@ export class ContestRegistrationController {
         }
     };
 
+    getContestRegistrationById = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const contestRegistration = await this.competitionManagementServices.getContestRegistrationById(req.params.id);
+            res.status(200).json(contestRegistration);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     getContestRegistrationByFishId = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const contestRegistration = await this.competitionManagementServices.getContestRegistrationByFishId(

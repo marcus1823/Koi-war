@@ -46,6 +46,36 @@ export function contestRegistrationRoutes(
 
     /**
      * @openapi
+     * /api/contestRegistration/getById/{id}:
+     *   get:
+     *     tags:
+     *       - Contest Registration
+     *     summary: Get contest registration by ID
+     *     description: Retrieve a specific contest registration by its ID
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *           type: string
+     *         description: The contest registration ID
+     *         example: "6721f38553d22c42e4c1d991"
+     *     responses:
+     *       '200':
+     *         description: Contest registration retrieved successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/ContestRegistrationResponse'
+     *       '404':
+     *         description: Contest registration not found
+     *       '500':
+     *         description: Internal server error
+     */
+    router.get("/getById/:id", contestRegistrationController.getContestRegistrationById);
+
+    /**
+     * @openapi
      * /api/contestRegistration/getByFishId/{fishId}:
      *   get:
      *     tags:
@@ -72,6 +102,7 @@ export function contestRegistrationRoutes(
      *         description: Internal server error
      */
     router.get("/getByFishId/:fishId", contestRegistrationController.getContestRegistrationByFishId);
+
 
     /**
      * @openapi
