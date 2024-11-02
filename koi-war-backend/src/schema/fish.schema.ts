@@ -1,5 +1,4 @@
 import {array, number, object, string, TypeOf} from "zod";
-import {updateContestSubCategorySchema} from "./contestSubCategory.schema";
 
 /**
  * @openapi

@@ -1,4 +1,4 @@
-import { IScore } from "../../models/score.model";
+import {IScore} from "../../models/score.model";
 import {IScoreRepository} from "../../repositories/IScoreRepository";
 import {IScoreServices} from "../IScoreServices";
 
@@ -24,7 +24,7 @@ export class ScoreServices implements IScoreServices {
         });
     }
 
-    async getScoreByRegistrationId(registrationId: string): Promise<(IScore & {_id: string})[]> {
+    async getScoreByRegistrationId(registrationId: string): Promise<(IScore & { _id: string })[]> {
         return this.scoreRepository.getScoreByRegistrationId(registrationId);
     }
 

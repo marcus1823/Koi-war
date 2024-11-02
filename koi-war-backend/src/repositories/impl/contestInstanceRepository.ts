@@ -2,7 +2,7 @@ import {IContestInstanceRepository} from "../IContestInstanceRepository";
 import ContestInstance, {IContestInstance} from "../../models/contestInstance.model";
 import Contest from "../../models/contest.model";
 import ContestSubCategory from "../../models/contestSubCategory.model";
-import { isValidObjectId } from "mongoose";
+import {isValidObjectId} from "mongoose";
 
 
 export class ContestInstanceRepository implements IContestInstanceRepository {

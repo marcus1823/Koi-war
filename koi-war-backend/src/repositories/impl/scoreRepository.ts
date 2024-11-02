@@ -1,4 +1,4 @@
-import Score, { IScore } from "../../models/score.model";
+import Score, {IScore} from "../../models/score.model";
 import {IScoreRepository} from "../IScoreRepository";
 
 export class ScoreRepository implements IScoreRepository {
@@ -13,7 +13,9 @@ export class ScoreRepository implements IScoreRepository {
         return score.save();
     }
 
-    async getScoreByRegistrationId(registrationId: string): Promise<(IScore & {_id: string})[]> {
-        return Score.find({registration: registrationId}).populate("referee").exec() as Promise<(IScore & {_id: string})[]>;
+    async getScoreByRegistrationId(registrationId: string): Promise<(IScore & { _id: string })[]> {
+        return Score.find({registration: registrationId}).populate("referee").exec() as Promise<(IScore & {
+            _id: string
+        })[]>;
     }
 }

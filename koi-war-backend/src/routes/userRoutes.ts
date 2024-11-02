@@ -105,7 +105,7 @@ export function userRoutes(userController: UserController): Router {
      */
     router.get("/me", verifyToken, userController.getUserProfile);
 
- /**
+    /**
      * @openapi
      * /api/users/updateRole/{id}:
      *   patch:

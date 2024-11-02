@@ -1,9 +1,9 @@
-import { ContestInstanceController } from "../controllers/contestInstanceController";
-import { Router } from "express";
-import { validate } from "../middleware/validateResource";
-import { createContestInstanceSchema, updateContestInstanceSchema } from "../schema/contestInstance.schema";
-import { authorizeRole } from "../middleware/authorizeMiddleware";
-import { UserRole } from "../models/user.model";
+import {ContestInstanceController} from "../controllers/contestInstanceController";
+import {Router} from "express";
+import {validate} from "../middleware/validateResource";
+import {createContestInstanceSchema, updateContestInstanceSchema} from "../schema/contestInstance.schema";
+import {authorizeRole} from "../middleware/authorizeMiddleware";
+import {UserRole} from "../models/user.model";
 
 /**
  * @openapi
@@ -347,7 +347,7 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
      *     responses:
      *       200:
      *         description: Contest instance deleted successfully
-     *         content: 
+     *         content:
      *           application/json:
      *             schema:
      *               type: object
@@ -355,14 +355,14 @@ export function contestInstanceRoutes(contestInstanceController: ContestInstance
      *                 success:
      *                   type: boolean
      *                   example: true
-     *                 message: 
+     *                 message:
      *                   type: string
      *                   example: "Contest instance deleted successfully"
      *                 data:
      *                   $ref: '#/components/schemas/ContestInstanceResponse'
-     *       404:   
+     *       404:
      *         description: Contest instance not found
-     */              
+     */
     router.delete(
         "/deleteContestInstanceById/:id",
         (req, res, next) =>

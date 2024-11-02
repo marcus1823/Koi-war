@@ -76,10 +76,6 @@ export class CompetitionManagementServices
         return this.scoreServices.createScore(data);
     }
 
-    private async checkRefereeIsScored(registrationId: string, refereeId: string): Promise<boolean> {
-        return await this.scoreServices.checkRefereeIsScored(registrationId, refereeId);
-    }
-
     async rankingContestRegistration(contestSubCategoryId: string): Promise<any> {
         const registrationsWithScores = await this.getRegistrationsWithScores(contestSubCategoryId);
         return this.assignRanks(registrationsWithScores);
@@ -106,6 +102,10 @@ export class CompetitionManagementServices
     ): Promise<IRegistration & { _id: string }> {
         // Delegate to contestRegistrationServices
         return this.registrationServices.updateContestRegistrationStatus(id, status);
+    }
+
+    private async checkRefereeIsScored(registrationId: string, refereeId: string): Promise<boolean> {
+        return await this.scoreServices.checkRefereeIsScored(registrationId, refereeId);
     }
 
     private calculateTotalScore(scores: any[]): number {

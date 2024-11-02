@@ -154,7 +154,7 @@ export function fishRoutes(fishController: FishController): Router {
      *               items:
      *                 $ref: '#/components/schemas/FishResponse'
      */
-    router.get("/getAllFishes",  fishController.getAllFishes);
+    router.get("/getAllFishes", fishController.getAllFishes);
 
     /**
      * @openapi
@@ -266,7 +266,7 @@ export function fishRoutes(fishController: FishController): Router {
      */
     router.get("/getFishById/:id", fishController.getFishById);
 
-/**
+    /**
      * @openapi
      * /api/fishes/updateFishById/{id}:
      *   put:
@@ -369,14 +369,14 @@ export function fishRoutes(fishController: FishController): Router {
      *                 message:
      *                   type: string
      *                   example: "Failed to update fish"
-     */ 
-    router.put('/updateFishById/:id', 
+     */
+    router.put('/updateFishById/:id',
         (req, res, next) => authorizeRole([UserRole.USER], req, res, next),
         validate(updateFishSchema),
         fishController.updateFishById
     );
 
-   /**
+    /**
      * @openapi
      * /api/fishes/deleteFishById/{id}:
      *   delete:
@@ -440,7 +440,7 @@ export function fishRoutes(fishController: FishController): Router {
      *                   type: string
      *                   example: "Failed to delete fish"
      */
-    router.delete('/deleteFishById/:id', 
+    router.delete('/deleteFishById/:id',
         (req, res, next) => authorizeRole([UserRole.USER], req, res, next),
         fishController.deleteFishById
     );
@@ -466,8 +466,8 @@ export function fishRoutes(fishController: FishController): Router {
      *       401:
      *         description: Unauthorized - Token missing or invalid
      */
-    router.get("/myFishes", verifyToken, 
-        (req, res, next) => authorizeRole([UserRole.USER], req, res, next), 
+    router.get("/myFishes", verifyToken,
+        (req, res, next) => authorizeRole([UserRole.USER], req, res, next),
         fishController.getAllMyFishes
     );
 

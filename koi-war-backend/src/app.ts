@@ -1,4 +1,4 @@
-import express from "express";
+import express, {NextFunction, Request, Response} from "express";
 import {connectDB} from "./config/db";
 import {userRoutes} from "./routes/userRoutes";
 import {UserController} from "./controllers/userController";
@@ -21,7 +21,9 @@ import {scoreRoutes} from "./routes/scoreRoutes";
 import {ScoreController} from "./controllers/scoreController";
 import {AppContext} from "./context/appContext";
 import {setupDependencies} from "./context/setupDependencies";
-import { initializeCronScheduleJobs } from "./jobs/cronSchedule.job";
+import {initializeCronScheduleJobs} from "./jobs/cronSchedule.job";
+import {errorHandler} from "./middleware/errorHandlingMiddleware";
+import {CustomError} from "./errors/customError";
 
 const app = express();
 connectDB().then(() => console.log("Connected to DB"));
@@ -102,5 +104,9 @@ app.use(
         scoreController
     )
 );
+
+app.use((err: CustomError, req: Request, res: Response, next: NextFunction) => {
+    errorHandler(err, req, res, next);
+});
 
 module.exports = app;

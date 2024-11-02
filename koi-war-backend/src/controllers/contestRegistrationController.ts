@@ -1,4 +1,4 @@
-import {Request, Response} from "express";
+import {NextFunction, Request, Response} from "express";
 import {ICompetitionManagementServices} from "../services/ICompetitionManagementServices";
 
 export class ContestRegistrationController {
@@ -24,23 +24,15 @@ export class ContestRegistrationController {
         }
     };
 
-    getContestRegistrationByFishId = async (req: Request, res: Response) => {
+    getContestRegistrationByFishId = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const contestRegistration = await this.competitionManagementServices.getContestRegistrationByFishId(
                 req.params.fishId
             );
 
-            if (!contestRegistration) {
-                res.status(404).json({message: "Contest registration not found"});
-            } else {
-                res.status(200).json(contestRegistration);
-            }
+            res.status(200).json(contestRegistration);
         } catch (error) {
-            if (error instanceof Error) {
-                res.status(500).send(error.message);
-            } else {
-                res.status(500).send("An unknown error occurred");
-            }
+            next(error);
         }
     }
 

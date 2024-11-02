@@ -1,5 +1,5 @@
-import { AppContext } from "../context/appContext";
-import { ICompetitionManagementServices } from "../services/ICompetitionManagementServices";
+import {AppContext} from "../context/appContext";
+import {ICompetitionManagementServices} from "../services/ICompetitionManagementServices";
 import cron from "node-cron";
 
 export function initializeCronScheduleJobs() {

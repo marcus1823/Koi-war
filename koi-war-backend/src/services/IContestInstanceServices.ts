@@ -18,5 +18,5 @@ export interface IContestInstanceServices {
     updateContestInstanceRankedStatus(id: string): Promise<IContestInstanceResponse | null>;
 
     deleteContestInstanceById(id: string): Promise<IContestInstanceResponse | null>;
- 
+
 } 
