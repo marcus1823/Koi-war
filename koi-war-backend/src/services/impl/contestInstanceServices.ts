@@ -3,7 +3,7 @@ import {IContestInstanceRepository} from "../../repositories/IContestInstanceRep
 import {IContestInstance} from "../../models/contestInstance.model";
 import {IContestInstanceResponse, mapContestInstanceResponse,} from "../../types/contestInstance";
 import {parseDateFromString} from "../../utils/format.utils";
-import { IContestServices } from "../IContestServices";
+import {IContestServices} from "../IContestServices";
 
 export class ContestInstanceServices implements IContestInstanceServices {
     private contestInstanceRepository: IContestInstanceRepository;

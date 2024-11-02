@@ -1,5 +1,5 @@
-import { object, string, enum as zodEnum } from "zod";
-import { RegistrationStatus } from "../models/registration.model";
+import {enum as zodEnum, object, string} from "zod";
+import {RegistrationStatus} from "../models/registration.model";
 
 export const CreateContestRegistrationInput = object({
     body: object({
@@ -16,15 +16,15 @@ export const CreateContestRegistrationInput = object({
 });
 
 export const UpdateRegistrationStatusInput = object({
-  body: object({
-    status: zodEnum([
-      RegistrationStatus.PENDING,
-      RegistrationStatus.APPROVED,
-      RegistrationStatus.CHECKED,
-      RegistrationStatus.REJECTED
-    ], {
-      required_error: "Status is required",
-      invalid_type_error: "Invalid status value"
+    body: object({
+        status: zodEnum([
+            RegistrationStatus.PENDING,
+            RegistrationStatus.APPROVED,
+            RegistrationStatus.CHECKED,
+            RegistrationStatus.REJECTED
+        ], {
+            required_error: "Status is required",
+            invalid_type_error: "Invalid status value"
+        })
     })
-  })
 });

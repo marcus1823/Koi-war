@@ -2,8 +2,8 @@ import {VarietyController} from "../controllers/varietyController";
 import {Router} from "express";
 import {validate} from "../middleware/validateResource";
 import {createVarietySchema, updateVarietySchema} from "../schema/variety.schema";
-import { authorizeRole } from "../middleware/authorizeMiddleware";
-import { UserRole } from "../models/user.model";
+import {authorizeRole} from "../middleware/authorizeMiddleware";
+import {UserRole} from "../models/user.model";
 
 export function varietyRoutes(varietyController: VarietyController): Router {
     const router = Router();

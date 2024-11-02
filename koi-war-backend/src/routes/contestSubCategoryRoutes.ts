@@ -1,9 +1,9 @@
-import { ContestSubCategoryController } from "../controllers/contestSubCategoryController";
-import { Router } from "express";
-import { validate } from "../middleware/validateResource";
-import { createContestSubCategorySchema, updateContestSubCategorySchema } from "../schema/contestSubCategory.schema";
-import { UserRole } from "../models/user.model";
-import { authorizeRole } from "../middleware/authorizeMiddleware";
+import {ContestSubCategoryController} from "../controllers/contestSubCategoryController";
+import {Router} from "express";
+import {validate} from "../middleware/validateResource";
+import {createContestSubCategorySchema, updateContestSubCategorySchema} from "../schema/contestSubCategory.schema";
+import {UserRole} from "../models/user.model";
+import {authorizeRole} from "../middleware/authorizeMiddleware";
 
 /**
  * @openapi
