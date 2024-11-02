@@ -5,8 +5,12 @@ import {IContestRegistrationServices} from "../IContestRegistrationServices";
 import {IContestSubCategoryService} from "../IContestSubCategoryService";
 import {IFishService} from "../IFishService";
 import {IRegistration, RegistrationStatus} from "../../models/registration.model";
+
 import {IContestResponse} from "../../types/contest";
 import {mapContestRegistrationResponse} from "../../types/contestRegistration";
+
+import NotFoundError from "../../errors/notFoundError";
+
 
 export class ContestRegistrationServices
     implements IContestRegistrationServices {
@@ -89,7 +93,7 @@ export class ContestRegistrationServices
                 fishId
             );
         if (!contestRegistration) {
-            throw new Error("Contest registration not found");
+            throw new NotFoundError({message: "Contest registration not found"});
         }
 
         return contestRegistration;
