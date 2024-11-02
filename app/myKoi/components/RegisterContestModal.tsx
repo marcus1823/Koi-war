@@ -7,9 +7,11 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { assignToContest } from '../../../api/registrationAPI';
+import { Picker } from '@react-native-picker/picker';
+import { assignToContest, getContestsByFishId } from '../../../api/registrationAPI';
 import { getAllContestInstances } from '../../../api/competitionApi';
 
 interface RegisterContestModalProps {
@@ -18,16 +20,33 @@ interface RegisterContestModalProps {
   fishId: string;
 }
 
+interface ContestInstance {
+  id: string;
+  name: string;
+  rules: string;
+  contestSubCategories: {
+    id: string;
+    name: string;
+  }[];
+}
+
 export default function RegisterContestModal({ visible, onClose, fishId }: RegisterContestModalProps) {
-  const [contests, setContests] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [registering, setRegistering] = useState(false);
-  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
+  const [contests, setContests] = useState<ContestInstance[]>([]);
+  const [selectedContest, setSelectedContest] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [currentRegistration, setCurrentRegistration] = useState<{ contestId: string, categoryId: string } | null>(null);
+  const [isQualified, setIsQualified] = useState(false);
 
   useEffect(() => {
     fetchContests();
+    fetchCurrentRegistration();
   }, []);
+
+  useEffect(() => {
+    checkQualification();
+  }, [selectedContest, selectedCategory]);
 
   const fetchContests = async () => {
     try {
@@ -35,33 +54,103 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
       const activeContests = data.filter((contest: any) => contest.isActive);
       setContests(activeContests);
     } catch (err: any) {
-      setError(err.message);
+      setError('Failed to load contests');
+      console.error('Error fetching contests:', err);
+    }
+  };
+
+  const fetchCurrentRegistration = async () => {
+    try {
+      const registrationData = await getContestsByFishId(fishId);
+      if (registrationData && registrationData.contestSubCategory) {
+        setCurrentRegistration({
+          contestId: registrationData.contestSubCategory.contestInstance,
+          categoryId: registrationData.contestSubCategory.id,
+        });
+      }
+    } catch (err: any) {
+      console.error('Error fetching current registration:', err);
+    }
+  };
+
+  const checkQualification = () => {
+    if (selectedContest && selectedCategory) {
+      setIsQualified(true);
+    } else {
+      setIsQualified(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (!selectedContest || !selectedCategory) {
+        throw new Error('Vui lòng chọn cuộc thi và hạng mục');
+      }
+
+      setLoading(true);
+      setError(null);
+
+      await assignToContest(fishId, selectedContest, selectedCategory);
+      
+      Alert.alert(
+        "Đăng Ký Thành Công",
+        "Cá của bạn đã được đăng ký tham gia cuộc thi thành công!",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              onClose();
+              fetchCurrentRegistration();
+            }
+          }
+        ]
+      );
+    } catch (err: any) {
+      Alert.alert(
+        "Đăng Ký Thất Bại",
+        err.message || "Có lỗi xảy ra khi đăng ký cuộc thi. Vui lòng thử lại sau.",
+        [
+          {
+            text: "OK",
+            style: "cancel"
+          }
+        ]
+      );
+      setError(err.message || 'Đăng ký cuộc thi thất bại');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRegister = async (contestId: string, subCategoryId: string) => {
-    try {
-      setRegistering(true);
-      await assignToContest(fishId, contestId, subCategoryId);
-      onClose();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setRegistering(false);
+  const validateSubmission = () => {
+    if (!selectedContest) {
+      Alert.alert(
+        "Thông Báo",
+        "Vui lòng chọn cuộc thi",
+        [{ text: "OK", style: "cancel" }]
+      );
+      return false;
+    }
+    if (!selectedCategory) {
+      Alert.alert(
+        "Thông Báo",
+        "Vui lòng chọn hạng mục",
+        [{ text: "OK", style: "cancel" }]
+      );
+      return false;
+    }
+    return true;
+  };
+
+  const onSubmitPress = () => {
+    if (validateSubmission()) {
+      handleSubmit();
     }
   };
 
-  if (loading) {
-    return (
-      <Modal visible={visible} transparent animationType="slide">
-        <View style={styles.modalContainer}>
-          <ActivityIndicator size="large" color="#eb7452" />
-        </View>
-      </Modal>
-    );
-  }
+  const selectedContestData = contests.find(c => c.id === selectedContest);
+  const isAlreadyRegistered = currentRegistration && selectedContest === currentRegistration.contestId && selectedCategory === currentRegistration.categoryId;
+  const isButtonDisabled = loading || !isQualified || isAlreadyRegistered;
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -74,54 +163,75 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
             </TouchableOpacity>
           </View>
 
-          {error && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>Lỗi: {error}</Text>
-            </View>
-          )}
-
-          <ScrollView style={styles.contestList}>
-            {contests.map((contest) => (
-              <View key={contest._id} style={styles.contestItem}>
-                <Text style={styles.contestName}>{contest.contest.name}</Text>
-                <View style={styles.subCategories}>
-                  {contest.contestSubCategories.map((subCategory: any) => (
-                    <TouchableOpacity
-                      key={`${contest._id}-${subCategory._id}`}
-                      style={[
-                        styles.subCategoryButton,
-                        selectedSubCategory === subCategory._id && styles.selectedSubCategory,
-                      ]}
-                      onPress={() => setSelectedSubCategory(subCategory._id)}
-                    >
-                      <Text 
-                        style={[
-                          styles.subCategoryText,
-                          selectedSubCategory === subCategory._id && styles.selectedSubCategoryText,
-                        ]}
-                      >
-                        {subCategory.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-                <TouchableOpacity
-                  key={`register-${contest._id}`}
-                  style={[
-                    styles.registerButton,
-                    (!selectedSubCategory || registering) && styles.disabledButton,
-                  ]}
-                  onPress={() => handleRegister(contest._id, selectedSubCategory!)}
-                  disabled={!selectedSubCategory || registering}
-                >
-                  {registering ? (
-                    <ActivityIndicator size="small" color="#fff" />
-                  ) : (
-                    <Text style={styles.registerButtonText}>Đăng Ký</Text>
-                  )}
-                </TouchableOpacity>
+          <ScrollView style={styles.form}>
+            {error && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{error}</Text>
               </View>
-            ))}
+            )}
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Cuộc Thi</Text>
+              <View style={styles.pickerContainer}>
+                <Picker
+                  selectedValue={selectedContest}
+                  onValueChange={setSelectedContest}
+                  style={styles.picker}
+                >
+                  <Picker.Item label="Chọn cuộc thi..." value="" />
+                  {contests.map((contest) => (
+                    <Picker.Item 
+                      key={contest.id} 
+                      label={contest.name} 
+                      value={contest.id} 
+                    />
+                  ))}
+                </Picker>
+              </View>
+            </View>
+
+            {selectedContestData && (
+              <>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Hạng Mục</Text>
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      selectedValue={selectedCategory}
+                      onValueChange={setSelectedCategory}
+                      style={styles.picker}
+                    >
+                      <Picker.Item label="Chọn hạng mục..." value="" />
+                      {selectedContestData.contestSubCategories.map((category) => (
+                        <Picker.Item 
+                          key={category.id} 
+                          label={category.name} 
+                          value={category.id} 
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+
+                <View style={styles.rulesContainer}>
+                  <Text style={styles.rulesLabel}>Quy Tắc Cuộc Thi</Text>
+                  <Text style={styles.rulesText}>{selectedContestData.rules}</Text>
+                </View>
+              </>
+            )}
+
+            <TouchableOpacity
+              style={[styles.submitButton, isButtonDisabled && styles.disabledButton]}
+              onPress={onSubmitPress}
+              disabled={!!isButtonDisabled}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.submitButtonText}>
+                  {isAlreadyRegistered ? 'Đã Đăng Ký' : 'Đăng Ký'}
+                </Text>
+              )}
+            </TouchableOpacity>
           </ScrollView>
         </View>
       </View>
@@ -141,8 +251,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     paddingHorizontal: 20,
     paddingBottom: 34,
-    maxHeight: '80%',
-    minHeight: '50%',
+    maxHeight: '90%',
   },
   header: {
     flexDirection: 'row',
@@ -160,53 +269,52 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 5,
   },
-  contestList: {
+  form: {
     marginTop: 15,
   },
-  contestItem: {
-    backgroundColor: '#f8f8f8',
-    borderRadius: 10,
-    padding: 15,
+  inputGroup: {
     marginBottom: 15,
   },
-  contestName: {
+  label: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
+  },
+  pickerContainer: {
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+  },
+  rulesContainer: {
+    marginTop: 15,
+    padding: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+  },
+  rulesLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
+    marginBottom: 5,
   },
-  subCategories: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 15,
-  },
-  subCategoryButton: {
-    backgroundColor: '#eee',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
-  },
-  selectedSubCategory: {
-    backgroundColor: '#eb7452',
-  },
-  subCategoryText: {
-    color: '#666',
+  rulesText: {
     fontSize: 14,
+    color: '#333',
   },
-  selectedSubCategoryText: {
-    color: '#fff',
-  },
-  registerButton: {
+  submitButton: {
     backgroundColor: '#eb7452',
-    padding: 12,
+    padding: 15,
     borderRadius: 8,
     alignItems: 'center',
+    marginTop: 20,
   },
   disabledButton: {
     backgroundColor: '#ccc',
   },
-  registerButtonText: {
+  submitButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
@@ -215,10 +323,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffebee',
     padding: 10,
     borderRadius: 5,
-    marginTop: 10,
+    marginBottom: 15,
   },
   errorText: {
     color: '#c62828',
     fontSize: 14,
   },
-}); 
+});

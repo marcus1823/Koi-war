@@ -34,6 +34,7 @@ export default function CreateFishModal({ visible, onClose, onSuccess }: CreateF
   const [varieties, setVarieties] = useState<Variety[]>([]);
   const [weightError, setWeightError] = useState<string | null>(null);
   const [lengthError, setLengthError] = useState<string | null>(null);
+  const [descriptionError, setDescriptionError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchVarieties();
@@ -67,6 +68,12 @@ export default function CreateFishModal({ visible, onClose, onSuccess }: CreateF
 
       if (!name || !variety || images.length === 0) {
         throw new Error('Vui lòng điền đầy đủ thông tin');
+      }
+
+      const wordCount = description.trim().split(/\s+/).length;
+      if (wordCount <= 6) {
+        setDescriptionError('Mô tả phải có nhiều hơn 6 từ');
+        return;
       }
 
       const weightNum = parseFloat(weight);
@@ -149,6 +156,11 @@ export default function CreateFishModal({ visible, onClose, onSuccess }: CreateF
     setLengthError(isNaN(num) || num <= 1 ? 'Chiều dài phải lớn hơn 1' : null);
   };
 
+  const validateDescription = (text: string) => {
+    const wordCount = text.trim().split(/\s+/).length;
+    setDescriptionError(wordCount <= 6 ? 'Mô tả phải có nhiều hơn 6 từ' : null);
+  };
+
   return (
     <Modal visible={visible} transparent animationType="slide">
       <View style={styles.modalContainer}>
@@ -227,13 +239,17 @@ export default function CreateFishModal({ visible, onClose, onSuccess }: CreateF
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Mô Tả</Text>
               <TextInput
-                style={[styles.input, styles.textArea]}
+                style={[styles.input, styles.textArea, descriptionError ? styles.inputError : null]}
                 value={description}
-                onChangeText={setDescription}
+                onChangeText={(text) => {
+                  setDescription(text);
+                  validateDescription(text);
+                }}
                 placeholder="Nhập mô tả..."
                 multiline
                 numberOfLines={4}
               />
+              {descriptionError && <Text style={styles.errorText}>{descriptionError}</Text>}
             </View>
 
             <View style={styles.imageSection}>

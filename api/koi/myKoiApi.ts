@@ -24,34 +24,34 @@ export interface KoiFish {
     };
     createdAt: string;
     updatedAt: string;
+    contests?: {
+        _id: string;
+    }[];
 }
 
-export const getMyKoiFishes = async (): Promise<KoiFish[]> => {
+export const getMyKoiFishes = async (): Promise<{ success: boolean; data: KoiFish[] }> => {
     try {
         const token = await AsyncStorage.getItem('token');
         const userData = await AsyncStorage.getItem('user');
+
+        if (!token) {
+            throw new Error('Authentication required');
+        }
 
         if (!userData) {
             throw new Error('User data not found');
         }
         const user = JSON.parse(userData);
 
-        const response = await axios.get(
-            `${API_BASE_URL}/fishes/getFishByUserId/${user._id}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
+        const response = await axios.get(`${API_BASE_URL}/fishes/getFishByUserId/${user._id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
 
-        if (response.data) {
-            return response.data;
-        } else {
-            throw new Error('Failed to fetch koi fish data');
-        }
+        return response.data;
     } catch (error: any) {
-        console.error('Error fetching koi fish:', error);
+        console.error('Error fetching my koi fishes:', error);
         throw error;
     }
 };
@@ -73,7 +73,9 @@ export const getFishDetail = async (fishId: string): Promise<KoiFish> => {
             }
         );
 
-        if (response.data) {
+        if (response.data.data) {
+            return response.data.data;
+        } else if (response.data) {
             return response.data;
         } else {
             throw new Error('Failed to fetch fish details');
@@ -94,7 +96,7 @@ export const createFish = async (fishData: {
 }): Promise<any> => {
     try {
         const token = await AsyncStorage.getItem('token');
-        
+
         if (!token) {
             throw new Error('Authentication required');
         }
