@@ -11,8 +11,9 @@ export const loginUser = async (username: string, password: string): Promise<Log
     });
 
     const { token, user } = response.data;
-
+    
     await AsyncStorage.setItem('token', token);
+    await AsyncStorage.setItem('user', JSON.stringify(user));
 
     return user;
   } catch (error) {

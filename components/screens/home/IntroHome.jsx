@@ -8,49 +8,6 @@ import {
 } from "react-native";
 import React from "react";
 
-const koiData = [
-  {
-    id: "v1128n004",
-    name: "Hi Bekko",
-    beforeImage: require("../../../assets/images/koiBefore1.png"),
-    afterImage: require("../../../assets/images/koiAfter1.png"),
-    beforeSize: 22.0,
-    afterSize: 32.0,
-  },
-  {
-    id: "v1128n005",
-    name: "Golden Corn",
-    beforeImage: require("../../../assets/images/koiBefore2.png"),
-    afterImage: require("../../../assets/images/koiAfter2.png"),
-    beforeSize: 15.0,
-    afterSize: 24.0,
-  },
-  {
-    id: "v1128n007",
-    name: "Hi Bekko",
-    beforeImage: require("../../../assets/images/koiBefore1.png"),
-    afterImage: require("../../../assets/images/koiAfter1.png"),
-    beforeSize: 22.0,
-    afterSize: 32.0,
-  },
-  {
-    id: "v1128n008",
-    name: "Hi Bekko",
-    beforeImage: require("../../../assets/images/koiBefore1.png"),
-    afterImage: require("../../../assets/images/koiAfter1.png"),
-    beforeSize: 22.0,
-    afterSize: 32.0,
-  },
-  {
-    id: "v1128n009",
-    name: "Hi Bekko",
-    beforeImage: require("../../../assets/images/koiBefore1.png"),
-    afterImage: require("../../../assets/images/koiAfter1.png"),
-    beforeSize: 22.0,
-    afterSize: 32.0,
-  },
-];
-
 export default function IntroHome() {
   return (
     <View style={styles.imageContainer}>

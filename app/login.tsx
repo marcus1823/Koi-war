@@ -4,9 +4,7 @@ import LoginScreen from "../components/screens/LoginScreen";
 
 function login() {
   return (
-    <ScrollView>
       <LoginScreen />
-    </ScrollView>
   );
 }
 
