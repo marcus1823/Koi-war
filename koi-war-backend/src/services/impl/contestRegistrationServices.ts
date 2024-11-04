@@ -54,6 +54,13 @@ export class ContestRegistrationServices
             throw new Error("Contest sub category not found");
         }
 
+        const existingRegistration = await this.contestRegistrationRepository
+            .getRegistrationByFishAndSubCategory(data.fish, data.contestSubCategory);
+        
+        if (existingRegistration) {
+            throw new Error("This fish is already registered in this contest subcategory");
+        }
+
         const fishClassification = await this.checkFishClassification(
             data.fish,
             data.contestSubCategory

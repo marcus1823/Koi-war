@@ -26,5 +26,5 @@ export interface IContestRegistrationRepository {
 
     updateContestRegistrationStatus(id: string, status: RegistrationStatus): Promise<any>;
 
-
+    getRegistrationByFishAndSubCategory(fishId: string, subCategoryId: string): Promise<any>;
 }

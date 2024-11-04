@@ -64,4 +64,11 @@ export class ContestRegistrationRepository
             .populate("contestSubCategory")
             .populate("fish");
     }
+
+    async getRegistrationByFishAndSubCategory(fishId: string, subCategoryId: string): Promise<any> {
+        return Registration.findOne({
+            fish: fishId,
+            contestSubCategory: subCategoryId
+        });
+    }
 }
