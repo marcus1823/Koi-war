@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { assignToContest, getContestsByFishId } from '../../../api/registrationAPI';
 import { getAllContestInstances } from '../../../api/competitionApi';
+import Toast from 'react-native-toast-message';
 
 interface RegisterContestModalProps {
   visible: boolean;
@@ -30,13 +31,20 @@ interface ContestInstance {
   }[];
 }
 
+interface Registration {
+  contestSubCategory: {
+    contestInstance: string;
+    id: string;
+  };
+}
+
 export default function RegisterContestModal({ visible, onClose, fishId }: RegisterContestModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [contests, setContests] = useState<ContestInstance[]>([]);
   const [selectedContest, setSelectedContest] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [currentRegistration, setCurrentRegistration] = useState<{ contestId: string, categoryId: string } | null>(null);
+  const [currentRegistrations, setCurrentRegistrations] = useState<Array<{ contestId: string, categoryId: string }>>([]);
   const [isQualified, setIsQualified] = useState(false);
 
   useEffect(() => {
@@ -62,11 +70,17 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
   const fetchCurrentRegistration = async () => {
     try {
       const registrationData = await getContestsByFishId(fishId);
-      if (registrationData && registrationData.contestSubCategory) {
-        setCurrentRegistration({
-          contestId: registrationData.contestSubCategory.contestInstance,
-          categoryId: registrationData.contestSubCategory.id,
-        });
+      if (registrationData && Array.isArray(registrationData)) {
+        const registrations = (registrationData as Registration[]).map(reg => ({
+          contestId: reg.contestSubCategory.contestInstance,
+          categoryId: reg.contestSubCategory.id,
+        }));
+        setCurrentRegistrations(registrations);
+      } else if (registrationData && 'contestSubCategory' in registrationData) {
+        setCurrentRegistrations([{
+          contestId: (registrationData as Registration).contestSubCategory.contestInstance,
+          categoryId: (registrationData as Registration).contestSubCategory.id,
+        }]);
       }
     } catch (err: any) {
       console.error('Error fetching current registration:', err);
@@ -82,41 +96,45 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
   };
 
   const handleSubmit = async () => {
+    if (!selectedContest || !selectedCategory) {
+      setError('Vui lòng chọn đầy đủ thông tin');
+      return;
+    }
+
     try {
-      if (!selectedContest || !selectedCategory) {
-        throw new Error('Vui lòng chọn cuộc thi và hạng mục');
-      }
-
       setLoading(true);
-      setError(null);
+      await assignToContest(
+        fishId,
+        selectedContest,
+        selectedCategory
+      );
 
-      await assignToContest(fishId, selectedContest, selectedCategory);
-      
-      Alert.alert(
-        "Đăng Ký Thành Công",
-        "Cá của bạn đã được đăng ký tham gia cuộc thi thành công!",
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              onClose();
-              fetchCurrentRegistration();
-            }
-          }
-        ]
-      );
+      Toast.show({
+        type: 'success',
+        text1: 'Đăng ký thành công',
+        text2: 'Đơn đăng ký của bạn đang chờ được xét duyệt',
+        position: 'top',
+        visibilityTime: 3000,
+        autoHide: true,
+        topOffset: 60
+      });
+
+      setSelectedContest('');
+      setSelectedCategory('');
+      setError('');
+      onClose();
     } catch (err: any) {
-      Alert.alert(
-        "Đăng Ký Thất Bại",
-        err.message || "Có lỗi xảy ra khi đăng ký cuộc thi. Vui lòng thử lại sau.",
-        [
-          {
-            text: "OK",
-            style: "cancel"
-          }
-        ]
-      );
-      setError(err.message || 'Đăng ký cuộc thi thất bại');
+      setError(err.message || 'Có lỗi xảy ra khi đăng ký');
+      
+      Toast.show({
+        type: 'error',
+        text1: 'Đăng ký thất bại',
+        text2: err.message || 'Vui lòng thử lại sau',
+        position: 'top',
+        visibilityTime: 3000,
+        autoHide: true,
+        topOffset: 60
+      });
     } finally {
       setLoading(false);
     }
@@ -149,8 +167,32 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
   };
 
   const selectedContestData = contests.find(c => c.id === selectedContest);
-  const isAlreadyRegistered = currentRegistration && selectedContest === currentRegistration.contestId && selectedCategory === currentRegistration.categoryId;
-  const isButtonDisabled = loading || !isQualified || isAlreadyRegistered;
+  const isAlreadyRegisteredInContest = currentRegistrations.some(registration => 
+    registration.contestId === selectedContest
+  );
+  const isButtonDisabled = loading || !isQualified || isAlreadyRegisteredInContest;
+
+  const handleContestSelect = (contestId: string) => {
+    setSelectedContest(contestId);
+    setSelectedCategory(''); // Reset category when changing contest
+    
+    // Check if already registered in this contest
+    const isContestRegistered = currentRegistrations.some(
+      registration => registration.contestId === contestId
+    );
+    
+    if (isContestRegistered) {
+      Toast.show({
+        type: 'info',
+        text1: 'Thông báo',
+        text2: 'Bạn đã đăng ký cuộc thi này',
+        position: 'top',
+        visibilityTime: 2000,
+        autoHide: true,
+        topOffset: 60
+      });
+    }
+  };
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -175,17 +217,24 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
               <View style={styles.pickerContainer}>
                 <Picker
                   selectedValue={selectedContest}
-                  onValueChange={setSelectedContest}
+                  onValueChange={handleContestSelect}
                   style={styles.picker}
+                  enabled={!loading}
                 >
                   <Picker.Item label="Chọn cuộc thi..." value="" />
-                  {contests.map((contest) => (
-                    <Picker.Item 
-                      key={contest.id} 
-                      label={contest.name} 
-                      value={contest.id} 
-                    />
-                  ))}
+                  {contests.map((contest) => {
+                    const isRegistered = currentRegistrations.some(
+                      reg => reg.contestId === contest.id
+                    );
+                    return (
+                      <Picker.Item 
+                        key={contest.id} 
+                        label={`${contest.name}${isRegistered ? ' (Đã đăng ký)' : ''}`}
+                        value={contest.id}
+                        color={isRegistered ? '#999' : '#000'}
+                      />
+                    );
+                  })}
                 </Picker>
               </View>
             </View>
@@ -199,13 +248,16 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
                       selectedValue={selectedCategory}
                       onValueChange={setSelectedCategory}
                       style={styles.picker}
+                      enabled={!loading && !currentRegistrations.some(
+                        reg => reg.contestId === selectedContest
+                      )}
                     >
                       <Picker.Item label="Chọn hạng mục..." value="" />
                       {selectedContestData.contestSubCategories.map((category) => (
                         <Picker.Item 
                           key={category.id} 
                           label={category.name} 
-                          value={category.id} 
+                          value={category.id}
                         />
                       ))}
                     </Picker>
@@ -220,15 +272,22 @@ export default function RegisterContestModal({ visible, onClose, fishId }: Regis
             )}
 
             <TouchableOpacity
-              style={[styles.submitButton, isButtonDisabled && styles.disabledButton]}
+              style={[
+                styles.submitButton, 
+                (isButtonDisabled || currentRegistrations.some(reg => reg.contestId === selectedContest)) && 
+                styles.disabledButton
+              ]}
               onPress={onSubmitPress}
-              disabled={!!isButtonDisabled}
+              disabled={isButtonDisabled || currentRegistrations.some(reg => reg.contestId === selectedContest)}
             >
               {loading ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
                 <Text style={styles.submitButtonText}>
-                  {isAlreadyRegistered ? 'Đã Đăng Ký' : 'Đăng Ký'}
+                  {currentRegistrations.some(reg => reg.contestId === selectedContest) 
+                    ? 'Đã Đăng Ký' 
+                    : 'Đăng Ký'
+                  }
                 </Text>
               )}
             </TouchableOpacity>
@@ -329,4 +388,13 @@ const styles = StyleSheet.create({
     color: '#c62828',
     fontSize: 14,
   },
+  registeredText: {
+    color: '#999',
+    fontStyle: 'italic',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  disabledPicker: {
+    opacity: 0.5,
+  }
 });
