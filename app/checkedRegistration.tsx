@@ -1,8 +1,8 @@
 import React from 'react';
 import { Stack } from 'expo-router';
-import WaittingApproval from '../components/screens/profile/WaittingApproval';
+import Checked from '../components/screens/profile/Checked';
 
-export default function WaitingApprovalPage() {
+export default function CheckedRegistrationPage() {
   return (
     <>
       <Stack.Screen 
@@ -10,7 +10,7 @@ export default function WaitingApprovalPage() {
           headerShown: false,
         }} 
       />
-      <WaittingApproval />
+      <Checked />
     </>
   );
 }

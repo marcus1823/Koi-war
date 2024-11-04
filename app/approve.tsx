@@ -1,17 +1,16 @@
-import { View, Text, FlatList } from 'react-native'
-import React from 'react'
-import Approve from '../components/screens/profile/Approve'
+import React from 'react';
+import { Stack } from 'expo-router';
+import Approve from '../components/screens/profile/Approve';
 
-export default function editprofile() {
+export default function ApprovePage() {
   return (
-    <FlatList
-      data={[]}
-      renderItem={null}
-      ListFooterComponent={() => (
-        <>
-          <Approve />
-        </>
-      )}
-    />
-  )
+    <>
+      <Stack.Screen 
+        options={{ 
+          headerShown: false,
+        }} 
+      />
+      <Approve />
+    </>
+  );
 }

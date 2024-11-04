@@ -3,15 +3,21 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList, ScrollView, Activit
 import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { getMyKoiFishes, KoiFish } from '../../api/koi/myKoiApi';
+import { getAllRegistrations } from '@/api/registrationAPI';
 
 export default function BodyProfile() {
   const router = useRouter();
   const [myFish, setMyFish] = useState<KoiFish[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [approvedCount, setApprovedCount] = useState(0);
+  const [rejectedCount, setRejectedCount] = useState(0);
+  const [checkedCount, setCheckedCount] = useState(0);
 
   useEffect(() => {
     fetchMyFish();
+    fetchRegistrationCounts();
   }, []);
 
   const fetchMyFish = async () => {
@@ -23,6 +29,18 @@ export default function BodyProfile() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRegistrationCounts = async () => {
+    try {
+      const response = await getAllRegistrations();
+      setPendingCount(response.filter((reg: any) => reg.status === 'pending').length);
+      setApprovedCount(response.filter((reg: any) => reg.status === 'approved').length);
+      setRejectedCount(response.filter((reg: any) => reg.status === 'rejected').length);
+      setCheckedCount(response.filter((reg: any) => reg.status === 'checked').length);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -39,8 +57,11 @@ export default function BodyProfile() {
   const navigateToApprove = () => {
     router.push("/approve");
   };
-  const navigateToIsGoing = () => {
-    router.push("/isgoing");
+  const navigateToRejected = () => {
+    router.push("/rejected");
+  };
+  const navigateToChecked = () => {
+    router.push("/checkedRegistration");
   };
 
   const renderFishItem = ({ item }: { item: KoiFish }) => (
@@ -68,30 +89,102 @@ export default function BodyProfile() {
   return (
     <View style={styles.container}>
       <View style={styles.section}>
-        <Text style={styles.title}>Cuộc thi</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.statusContainer}>
-          <TouchableOpacity style={styles.statusItem} onPress={navigateToWaittingApproval}>
-            <View style={styles.card}>
-              <AntDesign name="filetext1" size={24} color="black" />
-              <Text style={styles.statusText}>Chờ duyệt đơn</Text>
+        <View style={styles.sectionHeader}>
+          <View>
+            <Text style={styles.title}>Đơn Đăng Ký</Text>
+            <Text style={styles.subtitle}>Quản lý các đơn đăng ký thi đấu</Text>
+          </View>
+          <View style={styles.totalRegistrations}>
+            <Text style={styles.totalNumber}>
+              {pendingCount + approvedCount + rejectedCount + checkedCount}
+            </Text>
+            <Text style={styles.totalLabel}>Tổng đơn</Text>
+          </View>
+        </View>
+
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false} 
+          style={styles.statusContainer}
+          contentContainerStyle={styles.statusContentContainer}
+        >
+          <TouchableOpacity 
+            style={styles.statusItem} 
+            onPress={navigateToWaittingApproval}
+          >
+            <View style={[styles.card, styles.pendingCard]}>
+              <View style={styles.cardHeader}>
+                <View style={[styles.iconContainer, styles.pendingIcon]}>
+                  <AntDesign name="filetext1" size={24} color="#F59E0B" />
+                </View>
+                {pendingCount > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{pendingCount}</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.cardTitle}>Chờ Duyệt</Text>
+              <Text style={styles.cardSubtitle}>Đơn đang chờ xét duyệt</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.statusItem} onPress={navigateToApprove}>
-            <View style={styles.card}>
-              <AntDesign name="inbox" size={24} color="black" />
-              <Text style={styles.statusText}>Đã duyệt</Text>
+
+          <TouchableOpacity 
+            style={styles.statusItem} 
+            onPress={navigateToApprove}
+          >
+            <View style={[styles.card, styles.approvedCard]}>
+              <View style={styles.cardHeader}>
+                <View style={[styles.iconContainer, styles.approvedIcon]}>
+                  <AntDesign name="checkcircleo" size={24} color="#10B981" />
+                </View>
+                {approvedCount > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{approvedCount}</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.cardTitle}>Đã Duyệt</Text>
+              <Text style={styles.cardSubtitle}>Đơn được chấp nhận</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.statusItem} onPress={navigateToIsGoing}>
-            <View style={styles.card}>
-              <AntDesign name="clockcircleo" size={24} color="black" />
-              <Text style={styles.statusText}>Đang diễn ra</Text>
+
+          <TouchableOpacity 
+            style={styles.statusItem} 
+            onPress={navigateToRejected}
+          >
+            <View style={[styles.card, styles.rejectedCard]}>
+              <View style={styles.cardHeader}>
+                <View style={[styles.iconContainer, styles.rejectedIcon]}>
+                  <AntDesign name="closecircleo" size={24} color="#EF4444" />
+                </View>
+                {rejectedCount > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{rejectedCount}</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.cardTitle}>Từ Chối</Text>
+              <Text style={styles.cardSubtitle}>Đơn bị từ chối</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.statusItem}>
-            <View style={styles.card}>
-              <AntDesign name="staro" size={24} color="black" />
-              <Text style={styles.statusText}>Kết thúc</Text>
+
+          <TouchableOpacity 
+            style={styles.statusItem} 
+            onPress={navigateToChecked}
+          >
+            <View style={[styles.card, styles.checkedCard]}>
+              <View style={styles.cardHeader}>
+                <View style={[styles.iconContainer, styles.checkedIcon]}>
+                  <AntDesign name="staro" size={24} color="#6366F1" />
+                </View>
+                {checkedCount > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{checkedCount}</Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.cardTitle}>Kiểm Tra</Text>
+              <Text style={styles.cardSubtitle}>Duyệt trước thi</Text>
             </View>
           </TouchableOpacity>
         </ScrollView>
@@ -148,27 +241,21 @@ const styles = StyleSheet.create({
     color: '#2d3436',
   },
   statusContainer: {
-    flexDirection: 'row',
-    marginBottom: 12,
+    marginHorizontal: -20,
   },
   statusItem: {
     marginRight: 16,
   },
   card: {
-    backgroundColor: '#fff',
+    width: 160,
+    height: 140,
+    borderRadius: 16,
     padding: 16,
-    borderRadius: 12,
+    justifyContent: 'space-between',
+  },
+  cardContent: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    width: 130,
-    height: 110,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   statusText: {
     marginTop: 10,
@@ -243,5 +330,96 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 16,
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    minWidth: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#EF4444',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#64748B',
+    marginTop: 4,
+  },
+  totalRegistrations: {
+    alignItems: 'center',
+  },
+  totalNumber: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#0F172A',
+  },
+  totalLabel: {
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 2,
+  },
+  statusContentContainer: {
+    paddingHorizontal: 20,
+  },
+  pendingCard: {
+    backgroundColor: '#FEF3C7',
+  },
+  pendingIcon: {
+    backgroundColor: '#FDE68A',
+  },
+  approvedCard: {
+    backgroundColor: '#D1FAE5',
+  },
+  approvedIcon: {
+    backgroundColor: '#A7F3D0',
+  },
+  rejectedCard: {
+    backgroundColor: '#FEE2E2',
+  },
+  rejectedIcon: {
+    backgroundColor: '#FECACA',
+  },
+  checkedCard: {
+    backgroundColor: '#E0E7FF',
+  },
+  checkedIcon: {
+    backgroundColor: '#C7D2FE',
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#0F172A',
+    marginTop: 12,
+  },
+  cardSubtitle: {
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 4,
   },
 });

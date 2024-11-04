@@ -67,3 +67,31 @@ export const getContestsByFishId = async (fishId: string) => {
     throw error;
   }
 };
+
+export const getAllRegistrations = async () => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    const response = await axios.get(
+      `${API_BASE_URL}/contestRegistration/getAll`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.data) {
+      return response.data;
+    } else {
+      throw new Error('Failed to fetch registrations');
+    }
+  } catch (error: any) {
+    console.error('Error fetching registrations:', error);
+    throw error;
+  }
+};
