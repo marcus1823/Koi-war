@@ -2,7 +2,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   FlatList,
   Image,
@@ -13,110 +13,62 @@ import {
   View
 } from "react-native";
 import { Colors } from "../../../constants/Colors";
-const Contest = [
-  {
-    id: "1",
-    contest: {
-      id: "1",
-      name: "Giải Đấu Cá Koi Miền Bắc 12 2024",
-      description: "Giải đấu cá Koi lớn nhất Miền Bắc năm 2024",
-      contestInstances: [],
-    },
-    name: "Mùa Đông 2024",
-    startDate: "2024-04-02T00:00:00.000Z",
-    endDate: "2024-05-07T00:00:00.000Z",
-    isActive: false,
-    description: "Giải đấu mùa Đông, tổ chức tại TP.HCM",
-    rules: "Di chuyển vào HCM để tham gia",
-    images:
-      "https://i.pinimg.com/564x/bf/69/5f/bf695f58110594bac0b2976b9e942691.jpg",
-    isDisabled: false,
-    contestSubCategories: ["Cá Koi", "Cuộc Thi"],
-  },
-  {
-    id: "2",
-    contest: {
-      id: "2",
-      name: "Giải Cá Koi Quốc Gia 2024",
-      description: "Cuộc thi cá Koi lớn nhất toàn quốc",
-      contestInstances: [],
-    },
-    name: "Mùa Hè 2024",
-    startDate: "2024-06-01T00:00:00.000Z",
-    endDate: "2024-07-15T00:00:00.000Z",
-    isActive: false,
-    description: "Giải đấu mùa Hè, tổ chức tại Hà Nội",
-    rules: "Tham gia với cá Koi đẹp nhất",
-    images:
-      "https://kodamakoishow.com/wp-content/uploads/2024/10/5th-Kodama-Virtual-Koi-Show.jpg",
-    isDisabled: false,
-    contestSubCategories: ["Cá Koi", "Cuộc Thi"],
-  },
-  {
-    id: "3",
-    contest: {
-      id: "3",
-      name: "Giải Cá Koi Đẹp Nhất 2024",
-      description: "Cuộc thi tìm kiếm cá Koi đẹp nhất",
-      contestInstances: [],
-    },
-    name: "Mùa Xuân 2024",
-    startDate: "2024-010-01T00:00:00.000Z",
-    endDate: "2024-11-15T00:00:00.000Z",
-    isActive: true,
-    description: "Giải đấu mùa Xuân, tổ chức tại Đà Nẵng",
-    rules: "Chọn cá Koi đẹp nhất để tham gia",
-    images:
-      "https://hikaripetfood.com/wp-content/uploads/2024/06/hikari-vietnam-koi-show-2024.jpg",
-    isDisabled: false,
-    contestSubCategories: ["Cá Koi", "Cuộc Thi"],
-  },
-  {
-    id: "4",
-    contest: {
-      id: "4",
-      name: "Giải Cá Koi Quốc Tế 2024",
-      description: "Cuộc thi cá Koi quốc tế",
-      contestInstances: [],
-    },
-    name: "Mùa Thu 2024",
-    startDate: "2024-11-05T00:00:00.000Z",
-    endDate: "2024-12-15T00:00:00.000Z",
-    isActive: true,
-    description: "Giải đấu mùa Thu, tổ chức tại TP.HCM",
-    rules: "Tham gia với cá Koi từ các quốc gia khác",
-    images:
-      "https://japan-avenue.com/cdn/shop/articles/koi-fish-meaning-min.webp?v=1693134758&width=1000",
-    isDisabled: false,
-    contestSubCategories: ["Cá Koi", "Cuộc Thi"],
-  },
-  {
-    id: "6721e27443d22c42e4c1d993",
-    contest: {
-      id: "672100e85eaba638c1ff4e0f",
-      name: "Giải Cá Koi Miền Nam 2024 ",
-      description: "Cuộc thi cá Koi lớn nhất Miền Nam",
-      contestInstances: [],
-    },
-    name: "Mùa Đông 2024",
-    startDate: "2024-11-02T00:00:00.000Z",
-    endDate: "2024-12-07T00:00:00.000Z",
-    isActive: false,
-    description: "Giải đấu mùa Đông, tổ chức tại Cần Thơ",
-    rules: "Di chuyển vào Cần Thơ để tham gia",
-    images:
-      "https://japan-avenue.com/cdn/shop/articles/koi-fish-meaning-min.webp?v=1693134758&width=1000",
-    isDisabled: true,
-    contestSubCategories: ["Cá Koi", "Cuộc Thi"],
-  },
-];
+import { getAllContestInstances } from "../../../api/competitionApi";
+
+type CompetitionProfile = {
+  id: string;
+  contest: {
+    id: string;
+    name: string;
+    description: string;
+    contestInstances: any[];
+  };
+  name: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  description: string;
+  rules: string;
+  images: string;
+  isDisabled: boolean;
+  contestSubCategories: {
+    id: string;
+    name: string;
+    description: string;
+    contestInstance: string;
+    classificationContestRule: string;
+    createdAt: string;
+    updatedAt: string;
+  }[];
+};
 
 const HeaderCompetition = () => {
   const router = useRouter();
+  const [contests, setContests] = useState<CompetitionProfile[]>([]);
   const currentDate = new Date();
-  const handlecontest = (contestId: string) => {
-    router.push(`/ManageContest/${contestId}`);
+
+  useEffect(() => {
+    const fetchContests = async () => {
+      try {
+        const data = await getAllContestInstances();
+        setContests(data);
+      } catch (error) {
+        console.error("Error fetching contests:", error);
+      }
+    };
+
+    fetchContests();
+  }, []);
+
+  const handleContest = (contestId: string) => {
+    if (contestId) {
+      router.push({
+        pathname: `/staff/manageCompetition/detail/[id]`,
+        params: { id: contestId }
+      });
+    }
   };
+
   return (
     <View style={{ flex: 1 }}>
       <LinearGradient
@@ -164,31 +116,28 @@ const HeaderCompetition = () => {
         </View>
       </View>
       <FlatList
-        data={Contest}
+        data={contests}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
         renderItem={({ item }) => {
           let statusColor;
 
-          // Xác định màu sắc dựa trên trạng thái
           if (item.isDisabled) {
-            statusColor = "black"; // Bị hủy
+            statusColor = "black";
           } else if (!item.isActive && currentDate > new Date(item.endDate)) {
-            statusColor = "#ff0000"; // Kết thúc
+            statusColor = "#ff0000";
           } else if (
             currentDate >= new Date(item.startDate) &&
             currentDate < new Date(item.endDate)
           ) {
-            statusColor = "#28a745"; // Đang diễn ra
+            statusColor = "#28a745";
           } else if (currentDate < new Date(item.startDate)) {
-            statusColor = "#f48516"; // Sắp diễn ra
+            statusColor = "#f48516";
           }
 
           return (
             <TouchableOpacity
-              onPress={() => {
-                handlecontest(item.contest.id);
-              }}
+              onPress={() => handleContest(item.id)}
               disabled={item.isDisabled}
             >
               <View style={styles.contestCard}>
@@ -200,35 +149,31 @@ const HeaderCompetition = () => {
                 />
                 <View style={styles.contentContest}>
                   <Image
-                    source={{ uri: item.images }}
+                    source={{ uri: Array.isArray(item.images) ? item.images[0] : item.images }}
                     style={styles.contestImage}
                   />
-                  <View style={{ flex: 1, marginHorizontal: 10 }}>
-                    <Text style={styles.contestTitle}>{item.contest.name}</Text>
-                    <Text style={styles.contestDate}>
-                      Ngày bắt đầu:{" "}
-                      {new Date(item.startDate).toLocaleDateString()}{" "}
+                  <View style={styles.contestInfo}>
+                    <Text style={styles.contestMainTitle}>
+                      {item.contest?.name || "Không có tên cuộc thi"}
+                    </Text>
+                    <Text style={styles.contestTitle}>
+                      {item.name || "Không có tên phiên bản"}
                     </Text>
                     <Text style={styles.contestDate}>
-                      Ngày kết thúc:{" "}
-                      {new Date(item.endDate).toLocaleDateString()}
+                      Ngày bắt đầu: {item.startDate ? new Date(item.startDate).toLocaleDateString() : "N/A"}
+                    </Text>
+                    <Text style={styles.contestDate}>
+                      Ngày kết thúc: {item.endDate ? new Date(item.endDate).toLocaleDateString() : "N/A"}
+                    </Text>
+                    <Text style={styles.contestStatus}>
+                      Trạng thái: {item.isActive ? "Đang hoạt động" : "Không hoạt động"}
+                    </Text>
+                    <Text style={styles.subCategoriesCount}>
+                      Số hạng mục: {item.contestSubCategories?.length || 0}
                     </Text>
                   </View>
                 </View>
-                {item.isDisabled && (
-                  <View
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      backgroundColor: "black",
-                      opacity: 0.3,
-                      borderRadius: 10,
-                    }}
-                  />
-                )}
+                {item.isDisabled && <View style={styles.disabledOverlay} />}
               </View>
             </TouchableOpacity>
           );
@@ -268,13 +213,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 20,
     marginTop: 5,
-    // backgroundColor: "#ffff",
   },
   contestCardNote: {
     backgroundColor: "#fff",
     paddingHorizontal: 20,
     paddingVertical: 10,
-
     elevation: 5,
   },
   contestCard: {
@@ -300,18 +243,48 @@ const styles = StyleSheet.create({
     width: 150,
     height: 100,
     borderRadius: 10,
-
-    objectFit: "fill",
+  },
+  contestInfo: {
+    flex: 1,
+    marginHorizontal: 10,
+  },
+  contestMainTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 3,
+    flexWrap: "wrap",
+    color: "#f45124",
   },
   contestTitle: {
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: "500",
     marginBottom: 5,
     flexWrap: "wrap",
+    color: "#666",
   },
   contestDate: {
     color: "#555",
-    marginBottom: 5,
+    marginBottom: 3,
     fontSize: 12,
+  },
+  contestStatus: {
+    fontSize: 12,
+    color: "#555",
+    marginBottom: 3,
+  },
+  subCategoriesCount: {
+    fontSize: 12,
+    color: "#555",
+    fontWeight: "500",
+  },
+  disabledOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "black",
+    opacity: 0.3,
+    borderRadius: 10,
   },
 });
