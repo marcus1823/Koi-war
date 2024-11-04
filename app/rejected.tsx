@@ -1,8 +1,8 @@
 import React from 'react';
 import { Stack } from 'expo-router';
-import WaittingApproval from '../components/screens/profile/WaittingApproval';
+import Rejected from '../components/screens/profile/Rejected';
 
-export default function WaitingApprovalPage() {
+export default function RejectedPage() {
   return (
     <>
       <Stack.Screen 
@@ -10,7 +10,7 @@ export default function WaitingApprovalPage() {
           headerShown: false,
         }} 
       />
-      <WaittingApproval />
+      <Rejected />
     </>
   );
 }

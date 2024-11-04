@@ -68,6 +68,7 @@ export const getContestsByFishId = async (fishId: string) => {
   }
 };
 
+
 export const getAllRegistrations = async (): Promise<any> => {
   try {
     const token = await AsyncStorage.getItem('token');
