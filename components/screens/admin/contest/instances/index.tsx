@@ -2,6 +2,7 @@ import { getContests, getContestsById } from "@/api/admin/contestApi";
 import {
   createContestInstance,
   deleteContestInstance,
+  updateContestInstance,
 } from "@/api/admin/contestInstancesApi";
 import { Contest } from "@/models/types";
 import { Ionicons } from "@expo/vector-icons";
@@ -97,7 +98,29 @@ const ContestInstancesScreen = () => {
   const handleCreateOrUpdate = async (formData: ContestInstanceFormData) => {
     try {
       if (selectedInstance) {
-        // Logic cập nhật nếu cần thêm phần cập nhật
+        // Xử lý cập nhật
+        const updatedInstance = await updateContestInstance(selectedInstance.id, {
+          name: formData.name,
+          description: formData.description,
+          startDate: formData.startDate,
+          endDate: formData.endDate,
+          rules: formData.rules,
+          images: formData.imageUrl ? [formData.imageUrl] : [],
+          isActive: selectedInstance.isActive,
+          isDisabled: selectedInstance.isDisabled,
+          contestSubCategories: selectedInstance.contestSubCategories,
+        });
+  
+        if (updatedInstance) {
+          // Cập nhật state với instance đã được update
+          setInstances((prev) =>
+            prev.map((instance) =>
+              instance.id === selectedInstance.id ? updatedInstance : instance
+            )
+          );
+          Alert.alert("Thành công", "Đã cập nhật đợt thi thành công!");
+          return true;
+        }
       } else {
         const newContestInstance = await createContestInstance(id, {
           name: formData.name,
@@ -109,22 +132,31 @@ const ContestInstancesScreen = () => {
           isActive: true,
           isDisabled: false,
           contestSubCategories: [],
-          // contest đâu í
         });
-        setInstances((prev) => [...prev, newContestInstance]);
-        Alert.alert("Thành công", "Đã tạo đợt thi mới thành công!");
+        
+        if (newContestInstance) {
+          setInstances((prev) => [...prev, newContestInstance]);
+          Alert.alert("Thành công", "Đã tạo đợt thi mới thành công!");
+          return true;
+        }
       }
-      setShowModal(false);
+      return false;
     } catch (error) {
       console.error("Lỗi khi tạo hoặc cập nhật đợt thi:", error);
-      Alert.alert("Lỗi", "Đã xảy ra lỗi khi tạo đợt thi.");
+      Alert.alert(
+        "Lỗi",
+        selectedInstance
+          ? "Đã xảy ra lỗi khi cập nhật đợt thi."
+          : "Đã xảy ra lỗi khi tạo đợt thi."
+      );
+      return false;
     }
   };
   
-  const handleDelete = async (instances: ContestInstance) => {
+  const handleDelete = async (instance: ContestInstance) => {
     Alert.alert(
       "Xóa Đợt thi",
-      `Bạn có chắc muốn xóa đợt thi "${instances.name}" không?`,
+      `Bạn có chắc muốn xóa đợt thi "${instance.name}" không?`,
       [
         { text: "Hủy", style: "cancel" },
         {
@@ -132,8 +164,8 @@ const ContestInstancesScreen = () => {
           style: "destructive",
           onPress: async () => {
             try {
-              await deleteContestInstance(instances.id);
-              setInstances((prev) => prev.filter((i) => i.id !== instances.id));
+              await deleteContestInstance(instance.id);
+              setInstances((prev) => prev.filter((i) => i.id !== instance.id));
               Alert.alert("Thành công", "Đã xóa đợt thi thành công");
             } catch (error) {
               console.error("Error deleting contest instance:", error);
@@ -147,7 +179,7 @@ const ContestInstancesScreen = () => {
       ]
     );
   };
-
+  
   const openCreateModal = () => {
     setSelectedInstance(null);
     setShowModal(true);
@@ -176,7 +208,7 @@ const ContestInstancesScreen = () => {
           <ContestInstanceCard
             instance={item}
             onUpdate={() => openUpdateModal(item)}
-            onDelete={handleDelete}
+            onDelete={() => handleDelete(item)}
           />
         )}
         extraData={instances}

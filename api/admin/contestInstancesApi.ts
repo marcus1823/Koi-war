@@ -20,25 +20,30 @@ export const createContestInstance = async (
 ) => {
   try {
     const token = await AsyncStorage.getItem('token');
-
     if (!token) {
       throw new Error('Token not exist!');
     }
 
+    // Format dates to dd-MM-yyyy
+    const formatDate = (date: Date) => {
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    };
+
     const payload = {
-      contestId,
+      contest: contestId,
       name: formData.name,
       description: formData.description,
-      startDate: formData.startDate.toISOString(),
-      endDate: formData.endDate.toISOString(),
+      startDate: formatDate(formData.startDate),
+      endDate: formatDate(formData.endDate),
       rules: formData.rules,
-      images: formData.images,
+      images: formData.images[0] || "",
       isActive: formData.isActive,
       isDisabled: formData.isDisabled,
       contestSubCategories: formData.contestSubCategories,
     };
-
-    console.log("Sending request payload:", payload.contestId);
 
     const response = await axios.post(
       `${API_BASE_URL}/contestInstance/createContestInstance`,
@@ -50,14 +55,12 @@ export const createContestInstance = async (
       }
     );
 
-    console.log("API Response ContestInstance:", response.data);
     return response.data;
   } catch (error) {
     console.error('Error creating API ContestInstance:', error);
     throw error;
   }
 };
-
 
 export const getContestInstances = async (contestId: string, queryParams?: Partial<ContestInstance>) => {
   try {
@@ -105,51 +108,83 @@ export const getContestInstancesById = async (contestId: string, queryParams?: P
   }
 };
 
-export const deleteContestInstance = async (id: string, queryParams?: Partial<ContestInstance>) => {
+export const deleteContestInstance = async (id: string) => {
   try {
     const token = await AsyncStorage.getItem('token');
-    
     if (!token) {
       throw new Error('Token not exist!');
     }
-    
-    const response = await axios.delete(`${API_BASE_URL}/contest/deleteContestById/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      params: queryParams,
-    });
-    console.log("deleteContest", response);
-    
+
+    const response = await axios.delete(
+      `${API_BASE_URL}/contestInstance/deleteContestInstanceById/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
     return response.data;
   } catch (error) {
-    console.error('Error API delete contests:', error);
+    console.error('Error deleting contest instance:', error);
     throw error;
   }
 };
 
-export const updateContestInstance = async (id: string, queryParams?: Partial<Contest>) => {
+export interface UpdateContestInstanceData {
+  name: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  rules: string;
+  images: string[];
+  isActive: boolean;
+  isDisabled: boolean;
+  contestSubCategories: string[];
+}
+
+export const updateContestInstance = async (
+  id: string,
+  formData: UpdateContestInstanceData
+) => {
   try {
     const token = await AsyncStorage.getItem('token');
-    
     if (!token) {
       throw new Error('Token not exist!');
     }
 
+    const formatDate = (date: Date) => {
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    };
+
+    const payload = {
+      name: formData.name,
+      description: formData.description,
+      startDate: formatDate(formData.startDate),
+      endDate: formatDate(formData.endDate),
+      rules: formData.rules,
+      images: formData.images[0] || "",
+      isActive: formData.isActive,
+      isDisabled: formData.isDisabled,
+      contestSubCategories: formData.contestSubCategories,
+    };
+
     const response = await axios.put(
-      `${API_BASE_URL}/contestInstance/updateContestInstance/${id}`,
-      queryParams,
+      `${API_BASE_URL}/contestInstance/updateContestInstanceById/${id}`,
+      payload,
       {
         headers: {
           Authorization: `Bearer ${token}`,
-        }
+        },
       }
     );
 
-    console.log("updateContest", response);
     return response.data;
   } catch (error) {
-    console.error('Error API update contests:', error);
+    console.error('Error updating contest instance:', error);
     throw error;
   }
 };
