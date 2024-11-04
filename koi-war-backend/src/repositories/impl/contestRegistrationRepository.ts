@@ -18,7 +18,14 @@ export class ContestRegistrationRepository
     }
 
     async getAllContestRegistration(): Promise<(IRegistration & { _id: string })[]> {
-        return Registration.find();
+        const result = await Registration.find()
+            .populate("scores")
+            .populate("contestInstance")
+            .populate("contestSubCategory")
+            .populate("fish")
+            .lean();
+            
+        return result as unknown as (IRegistration & { _id: string })[];
     }
 
     getContestRegistrationByFishId(fishId: string): Promise<any> {
