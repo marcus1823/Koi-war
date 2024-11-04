@@ -1,19 +1,18 @@
-import {
-  Text,
-  View,
-  FlatList,
-  StyleSheet,
-  TextInput,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
-import React, { Component } from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { Colors } from "../../../constants/Colors";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import React from "react";
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
+import { Colors } from "../../../constants/Colors";
 const Contest = [
   {
     id: "1",

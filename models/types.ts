@@ -27,8 +27,8 @@ export interface ContestInstance {
   id: string;
   contest: string;
   name: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
   isActive: boolean;
   description: string;
   rules: string;

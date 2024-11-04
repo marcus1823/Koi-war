@@ -18,6 +18,7 @@ export default function RootLayout() {
       <Stack.Screen name="waittingapproval" />
       <Stack.Screen name="approve" />
       <Stack.Screen name="isgoing" />
+      <Stack.Screen name="contestInstances" />
     </Stack>
   );
 }
