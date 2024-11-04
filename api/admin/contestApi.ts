@@ -51,6 +51,26 @@ export const getContests = async (queryParams?: Partial<Contest>) => {
   }
 };
 
+export const getContestsById = async (id: string) => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Token not exist!');
+    }
+    
+    const response = await axios.get(`${API_BASE_URL}/contest/getContestById/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching contests by ID:', error);
+    throw error;
+  }
+};
+
 export const deleteContest = async (id: string, queryParams?: Partial<Contest>) => {
   try {
     const token = await AsyncStorage.getItem('token');

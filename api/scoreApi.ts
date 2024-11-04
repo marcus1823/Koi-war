@@ -7,8 +7,6 @@ interface ScoreData {
   bodyScore: number;
   patternScore: number;
   colorScore: number;
-  rank: number;
-  referee: string;
 }
 
 export const createScore = async (scoreData: ScoreData) => {

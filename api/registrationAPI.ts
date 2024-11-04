@@ -68,7 +68,8 @@ export const getContestsByFishId = async (fishId: string) => {
   }
 };
 
-export const getAllRegistrations = async () => {
+
+export const getAllRegistrations = async (): Promise<any> => {
   try {
     const token = await AsyncStorage.getItem('token');
     
@@ -91,7 +92,47 @@ export const getAllRegistrations = async () => {
       throw new Error('Failed to fetch registrations');
     }
   } catch (error: any) {
-    console.error('Error fetching registrations:', error);
+    console.error('Error fetching registrations:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    throw error;
+  }
+};
+
+export const updateRegistrationStatus = async (
+  registrationId: string,
+  status: 'pending' | 'approved' | 'rejected'
+): Promise<any> => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    const response = await axios.patch(
+      `${API_BASE_URL}/contestRegistration/updateStatus/${registrationId}`,
+      { status },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.data) {
+      return response.data;
+    } else {
+      throw new Error('Failed to update registration status');
+    }
+  } catch (error: any) {
+    console.error('Error updating registration status:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
     throw error;
   }
 };

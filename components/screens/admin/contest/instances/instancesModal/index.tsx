@@ -1,267 +1,343 @@
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { format } from 'date-fns';
-import React, { useState } from 'react';
+import DateTimePicker from "@react-native-community/datetimepicker";
+import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    Modal,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
-interface ContestInstanceModal {
-    visible: boolean;
-    onClose: () => void;
-    onSubmit: (data: {
-        name: string;
-        startDate: string;
-        endDate: string;
-        description: string;
-        rules: string;
-        images: string;
-    }) => Promise<void>;
+interface ContestInstanceFormData {
+  name: string;
+  description: string;
+  imageUrl: string;
+  startDate: Date;
+  endDate: Date;
+  rules: string;
 }
 
-export const CreateContestInstanceModal: React.FC<ContestInstanceModal> = ({
-    visible,
-    onClose,
-    onSubmit,
-}) => {
-    const [formData, setFormData] = useState({
-        name: '',
-        startDate: new Date(),
-        endDate: new Date(),
-        description: '',
-        rules: '',
-        images: '',
+
+interface ContestInstanceModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onSubmit: (data: ContestInstanceFormData) => Promise<boolean>;
+  initialData?: ContestInstanceFormData;
+  isUpdate?: boolean;
+}
+
+export const ContestInstanceModal = ({
+  visible,
+  onClose,
+  onSubmit,
+  initialData,
+  isUpdate,
+}: ContestInstanceModalProps) => {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [rules, setRules] = useState("");
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+  const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    if (initialData) {
+      setName(initialData.name);
+      setDescription(initialData.description);
+      setImageUrl(initialData.imageUrl);
+      setStartDate(new Date(initialData.startDate));
+      setEndDate(new Date(initialData.endDate));
+      setRules(initialData.rules);
+    } else {
+      resetForm();
+    }
+  }, [initialData, visible]);
+
+  const resetForm = () => {
+    setName("");
+    setDescription("");
+    setImageUrl("");
+    setStartDate(new Date());
+    setEndDate(new Date());
+    setRules("");
+    setError("");
+  };
+
+  const validateForm = () => {
+    if (!name.trim()) {
+      setError("Vui lòng nhập tên đợt thi");
+      return false;
+    }
+    if (!description.trim()) {
+      setError("Vui lòng nhập mô tả");
+      return false;
+    }
+    if (!imageUrl.trim()) {
+      setError("Vui lòng nhập URL hình ảnh");
+      return false;
+    }
+    if (!rules.trim()) {
+      setError("Vui lòng nhập luật thi");
+      return false;
+    }
+    if (endDate <= startDate) {
+      setError("Ngày kết thúc phải sau ngày bắt đầu");
+      return false;
+    }
+    setError("");
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    const success = await onSubmit({
+      name,
+      description,
+      imageUrl,
+      startDate,
+      endDate,
+      rules,
     });
-    const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-    const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleStartDateChange = (event: any, selectedDate?: Date) => {
-        setShowStartDatePicker(false);
-        if (selectedDate) {
-            setFormData(prev => ({ ...prev, startDate: selectedDate }));
+    if (success) {
+      resetForm();
+      onClose();
+    }
+  };
+
+  const handleDateChange = (
+    event: any,
+    selectedDate: Date | undefined,
+    isStart: boolean
+  ) => {
+    if (Platform.OS === "android") {
+      setShowStartPicker(false);
+      setShowEndPicker(false);
+    }
+
+    if (selectedDate) {
+      if (isStart) {
+        setStartDate(selectedDate);
+        // Automatically set end date to start date + 1 day if end date is before start date
+        if (endDate <= selectedDate) {
+          const newEndDate = new Date(selectedDate);
+          newEndDate.setDate(newEndDate.getDate() + 1);
+          setEndDate(newEndDate);
         }
-    };
+      } else {
+        setEndDate(selectedDate);
+      }
+    }
+  };
 
-    const handleEndDateChange = (event: any, selectedDate?: Date) => {
-        setShowEndDatePicker(false);
-        if (selectedDate) {
-            setFormData(prev => ({ ...prev, endDate: selectedDate }));
-        }
-    };
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  };
 
-    const validateForm = () => {
-        if (!formData.name.trim()) {
-            Alert.alert('Lỗi', 'Vui lòng nhập tên đợt thi đấu');
-            return false;
-        }
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <Text style={styles.modalTitle}>
+              {isUpdate ? "Cập nhật Đợt thi" : "Tạo Đợt thi Mới"}
+            </Text>
 
-        if (formData.endDate < formData.startDate) {
-            Alert.alert('Lỗi', 'Ngày kết thúc phải sau ngày bắt đầu');
-            return false;
-        }
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        return true;
-    };
-
-    const handleSubmit = async () => {
-        if (!validateForm()) return;
-
-        setIsSubmitting(true);
-        try {
-            await onSubmit({
-                ...formData,
-                startDate: formData.startDate.toISOString(),
-                endDate: formData.endDate.toISOString(),
-            });
-            setFormData({
-                name: '',
-                startDate: new Date(),
-                endDate: new Date(),
-                description: '',
-                rules: '',
-                images: '',
-            });
-            onClose();
-        } catch (error) {
-            Alert.alert('Lỗi', 'Có lỗi xảy ra khi tạo đợt thi đấu');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const renderDatePicker = (
-        isStartDate: boolean,
-        show: boolean,
-        onChange: (event: any, date?: Date) => void
-    ) => {
-        if (!show) return null;
-
-        return (
-            <DateTimePicker
-                value={isStartDate ? formData.startDate : formData.endDate}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={onChange}
-                minimumDate={isStartDate ? new Date() : formData.startDate}
+            <Text style={styles.label}>Tên đợt thi <Text style={styles.required}>*</Text></Text>
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="Nhập tên đợt thi"
+              placeholderTextColor="#999"
             />
-        );
-    };
 
-    return (
-        <Modal visible={visible} animationType="slide" transparent>
-            <View style={styles.modalOverlay}>
-                <View style={styles.modalContent}>
-                    <ScrollView showsVerticalScrollIndicator={false}>
-                        <Text style={styles.modalTitle}>Tạo đợt thi đấu mới</Text>
-                        
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Tên đợt thi đấu"
-                            value={formData.name}
-                            onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
-                        />
+            <Text style={styles.label}>Mô tả <Text style={styles.required}>*</Text></Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={description}
+              onChangeText={setDescription}
+              placeholder="Nhập mô tả"
+              placeholderTextColor="#999"
+              multiline
+              numberOfLines={4}
+            />
 
-                        <TouchableOpacity
-                            style={styles.dateInput}
-                            onPress={() => setShowStartDatePicker(true)}
-                        >
-                            <Text>Ngày bắt đầu: {format(formData.startDate, 'dd/MM/yyyy')}</Text>
-                        </TouchableOpacity>
+            <Text style={styles.label}>URL Hình ảnh <Text style={styles.required}>*</Text></Text>
+            <TextInput
+              style={styles.input}
+              value={imageUrl}
+              onChangeText={setImageUrl}
+              placeholder="Nhập URL hình ảnh"
+              placeholderTextColor="#999"
+            />
 
-                        <TouchableOpacity
-                            style={styles.dateInput}
-                            onPress={() => setShowEndDatePicker(true)}
-                        >
-                            <Text>Ngày kết thúc: {format(formData.endDate, 'dd/MM/yyyy')}</Text>
-                        </TouchableOpacity>
+            <Text style={styles.label}>Ngày bắt đầu <Text style={styles.required}>*</Text></Text>
+            <TouchableOpacity
+              style={styles.dateButton}
+              onPress={() => setShowStartPicker(true)}
+            >
+              <Text style={styles.dateButtonText}>{formatDate(startDate)}</Text>
+            </TouchableOpacity>
 
-                        {renderDatePicker(true, showStartDatePicker, handleStartDateChange)}
-                        {renderDatePicker(false, showEndDatePicker, handleEndDateChange)}
+            <Text style={styles.label}>Ngày kết thúc <Text style={styles.required}>*</Text></Text>
+            <TouchableOpacity
+              style={styles.dateButton}
+              onPress={() => setShowEndPicker(true)}
+            >
+              <Text style={styles.dateButtonText}>{formatDate(endDate)}</Text>
+            </TouchableOpacity>
 
-                        <TextInput
-                            style={[styles.input, styles.textArea]}
-                            placeholder="Mô tả"
-                            multiline
-                            value={formData.description}
-                            onChangeText={(text) => setFormData(prev => ({ ...prev, description: text }))}
-                        />
+            <Text style={styles.label}>Luật thi <Text style={styles.required}>*</Text></Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={rules}
+              onChangeText={setRules}
+              placeholder="Nhập luật thi"
+              placeholderTextColor="#999"
+              multiline
+              numberOfLines={6}
+            />
 
-                        <TextInput
-                            style={[styles.input, styles.textArea]}
-                            placeholder="Luật thi đấu"
-                            multiline
-                            value={formData.rules}
-                            onChangeText={(text) => setFormData(prev => ({ ...prev, rules: text }))}
-                        />
+            {(showStartPicker || showEndPicker) && (
+              <DateTimePicker
+                value={showStartPicker ? startDate : endDate}
+                mode="date"
+                display="default"
+                onChange={(event, date) =>
+                  handleDateChange(event, date, showStartPicker)
+                }
+                minimumDate={showStartPicker ? new Date() : startDate}
+              />
+            )}
 
-                        <TextInput
-                            style={styles.input}
-                            placeholder="URL hình ảnh"
-                            value={formData.images}
-                            onChangeText={(text) => setFormData(prev => ({ ...prev, images: text }))}
-                        />
-
-                        <View style={styles.buttonContainer}>
-                            <TouchableOpacity
-                                style={styles.cancelButton}
-                                onPress={onClose}
-                                disabled={isSubmitting}
-                            >
-                                <Text style={styles.cancelButtonText}>Hủy</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={[styles.submitButton, isSubmitting && styles.disabledButton]}
-                                onPress={handleSubmit}
-                                disabled={isSubmitting}
-                            >
-                                <Text style={styles.submitButtonText}>
-                                    {isSubmitting ? 'Đang xử lý...' : 'Tạo mới'}
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                    </ScrollView>
-                </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.button, styles.cancelButton]}
+                onPress={onClose}
+              >
+                <Text style={styles.buttonText}>Hủy</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, styles.submitButton]}
+                onPress={handleSubmit}
+              >
+                <Text style={styles.buttonText}>
+                  {isUpdate ? "Cập nhật" : "Tạo mới"}
+                </Text>
+              </TouchableOpacity>
             </View>
-        </Modal>
-    );
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
 };
 
 const styles = StyleSheet.create({
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'center',
-        padding: 16,
-    },
-    modalContent: {
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        padding: 16,
-        maxHeight: '80%',
-    },
-    modalTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 16,
-        textAlign: 'center',
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
-        padding: 12,
-        marginBottom: 12,
-    },
-    textArea: {
-        height: 100,
-        textAlignVertical: 'top',
-    },
-    dateInput: {
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
-        padding: 12,
-        marginBottom: 12,
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 16,
-    },
-    cancelButton: {
-        flex: 1,
-        backgroundColor: '#f5f5f5',
-        padding: 12,
-        borderRadius: 8,
-        marginRight: 8,
-    },
-    submitButton: {
-        flex: 1,
-        backgroundColor: '#007AFF',
-        padding: 12,
-        borderRadius: 8,
-        marginLeft: 8,
-    },
-    disabledButton: {
-        opacity: 0.5,
-    },
-    cancelButtonText: {
-        color: '#666',
-        textAlign: 'center',
-        fontWeight: '600',
-    },
-    submitButtonText: {
-        color: '#fff',
-        textAlign: 'center',
-        fontWeight: '600',
-    },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    padding: 16,
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 20,
+    width: "100%",
+    maxHeight: "90%",
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+    color: "#333",
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "500",
+    marginBottom: 8,
+    color: "#333",
+  },
+  required: {
+    color: "#FF3B30",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    fontSize: 16,
+    color: "#333",
+    backgroundColor: "#fff",
+  },
+  textArea: {
+    height: 100,
+    textAlignVertical: "top",
+  },
+  dateButton: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    backgroundColor: "#fff",
+  },
+  dateButtonText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+  button: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 8,
+    alignItems: "center",
+    marginHorizontal: 8,
+  },
+  cancelButton: {
+    backgroundColor: "#FF3B30",
+  },
+  submitButton: {
+    backgroundColor: "#007AFF",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  errorText: {
+    color: "#FF3B30",
+    fontSize: 14,
+    marginBottom: 12,
+    textAlign: "center",
+  },
 });
+
+export default ContestInstanceModal;

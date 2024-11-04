@@ -36,7 +36,7 @@ function LoginScreen() {
   const [userRole, setUserRole] = useState("");
 
   const router = useRouter();
-  let backPressCount = 0; // Đếm số lần nhấn nút back
+  let backPressCount = 0;
 
   const handleLogin = async () => {
     setShowUsernameError(false);
