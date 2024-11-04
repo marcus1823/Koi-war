@@ -1,15 +1,34 @@
-import AntDesign from "@expo/vector-icons/AntDesign";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
 import {
-  FlatList,
+  Text,
+  View,
   Image,
   StyleSheet,
-  Text,
   TouchableOpacity,
-  View,
+  FlatList,
+  ScrollView,
+  Modal,
+  Button,
 } from "react-native";
+
+import { useRouter } from "expo-router";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { useLocalSearchParams } from "expo-router";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import React, { useState } from "react";
+interface Fish {
+  _id: string;
+  name: string;
+  weight: number;
+  length: number;
+  variety: string;
+  images: string[];
+  description: string;
+  user: string;
+  createdAt: string;
+  updatedAt: string;
+  registrationStatus: string;
+  contestId: string;
+}
 const Contest = [
   {
     id: "1",
@@ -162,10 +181,46 @@ const CompetitionDetailPage = () => {
   const router = useRouter();
   const { contestId } = useLocalSearchParams();
   const contest = Contest.find((item) => item.id === contestId);
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [selectedFish, setSelectedFish] = useState(null);
   // const registeredFish = fishRegistration.filter(
   //   (fish) => fish.contestId === contestId
   // );
+  // Cập nhật trạng thái cá
+  const updateFishStatus = (fishId: string, newStatus: string) => {
+    fishRegistration.forEach((fish) => {
+      if (fish._id === fishId) {
+        fish.registrationStatus = newStatus;
+      }
+    });
+  };
+  // đỏ do chưa có model
+  const handleAgreePress = (fish) => {
+    // Cập nhật trạng thái
+    updateFishStatus(fish._id, "agree");
+    console.log(`Đã đồng ý cá: ${fish.name}`);
 
+    setSelectedStatus("wait");
+  };
+
+  const handleRejectPress = (fish: any) => {
+    setSelectedFish(fish);
+    setModalVisible(true);
+  };
+  const handleConfirmReject = () => {
+    if (selectedFish) {
+      updateFishStatus(selectedFish._id, "reject");
+      console.log(`Đã từ chối cá: ${selectedFish.name}`);
+      setModalVisible(false);
+      setSelectedFish(null);
+    }
+  };
+
+  const handleCancelReject = () => {
+    setModalVisible(false);
+    setSelectedFish(null);
+  };
   const currentDate = new Date();
   let statusColor;
 
@@ -189,9 +244,13 @@ const CompetitionDetailPage = () => {
       </View>
     );
   }
-
+  // Lọc danh sách cá theo trạng thái đã chọn
+  const filteredFish = fishRegistration.filter((fish) => {
+    if (selectedStatus === "all") return true;
+    return fish.registrationStatus === selectedStatus;
+  });
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <TouchableOpacity onPress={() => router.push("/staff/manageCompetition")}>
         <View style={styles.backButton}>
           <AntDesign name="arrowleft" size={38} color="#333" />
@@ -258,29 +317,126 @@ const CompetitionDetailPage = () => {
         </Text>
       </View>
 
-      <Text style={styles.sectionTitle}>Danh sách cá tham gia</Text>
-      <FlatList
-        data={fishRegistration}
-        keyExtractor={(item) => item._id}
-        contentContainerStyle={styles.fishList}
-        renderItem={({ item }) => (
-          <View style={styles.fishCard}>
-            <Image source={{ uri: item.images[0] }} style={styles.fishImage} />
-            <View style={styles.fishInfo}>
-              <Text style={styles.fishName}>{item.name}</Text>
-              <Text style={styles.fishDetail}>Loài: {item.variety}</Text>
-              <Text style={styles.fishDetail}>
-                Trọng lượng: {item.weight} kg
-              </Text>
-              <Text style={styles.fishDetail}>Chiều dài: {item.length} cm</Text>
-              <Text style={styles.fishStatus}>
-                Tình trạng đăng ký: {item.registrationStatus}
-              </Text>
-            </View>
+      {currentDate <= new Date(contest.endDate) && (
+        <View>
+          <Text style={styles.sectionTitle}>Danh sách cá tham gia</Text>
+          <View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={[styles.filterButtons, ,]} // Căn giữa các nút
+              // Thêm khoảng cách giữa nút và danh sách
+            >
+              <TouchableOpacity
+                onPress={() => setSelectedStatus("all")}
+                style={[
+                  styles.filterButton,
+                  selectedStatus === "all" && styles.filterButtonActive,
+                ]}
+              >
+                <Text style={styles.filterButtonText}>Tất cả</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setSelectedStatus("wait")}
+                style={[
+                  styles.filterButton,
+                  selectedStatus === "wait" && styles.filterButtonActive,
+                ]}
+              >
+                <Text style={styles.filterButtonText}>Đang đợi xác nhận</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setSelectedStatus("agree")}
+                style={[
+                  styles.filterButton,
+                  selectedStatus === "agree" && styles.filterButtonActive,
+                ]}
+              >
+                <Text style={styles.filterButtonText}>Đã đồng ý</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setSelectedStatus("reject")}
+                style={[
+                  styles.filterButton,
+                  selectedStatus === "reject" && styles.filterButtonActive,
+                ]}
+              >
+                <Text style={styles.filterButtonText}>Đã từ chối</Text>
+              </TouchableOpacity>
+            </ScrollView>
+
+            <FlatList
+              data={filteredFish}
+              keyExtractor={(item) => item._id}
+              contentContainerStyle={styles.fishList}
+              renderItem={({ item }) => (
+                <View style={styles.fishCard}>
+                  <Image
+                    source={{ uri: item.images[0] }}
+                    style={styles.fishImage}
+                  />
+                  <View style={styles.fishInfo}>
+                    <Text style={styles.fishName}>{item.name}</Text>
+                    <Text style={styles.fishDetail}>Loài: {item.variety}</Text>
+                    <Text style={styles.fishDetail}>
+                      Trọng lượng: {item.weight} kg
+                    </Text>
+                    <Text style={styles.fishDetail}>
+                      Chiều dài: {item.length} cm
+                    </Text>
+                    <Text style={styles.fishStatus}>
+                      Tình trạng đăng ký: {item.registrationStatus}
+                    </Text>
+
+                    {/* Hiển thị nút dựa trên trạng thái đăng ký */}
+                    {item.registrationStatus === "wait" && (
+                      <View style={styles.buttonContainer}>
+                        <TouchableOpacity
+                          style={styles.actionButton}
+                          onPress={() => handleAgreePress(item)}
+                        >
+                          <Text style={styles.buttonText}>Đồng ý</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.actionButton}
+                          onPress={() => handleRejectPress(item)}
+                        >
+                          <Text style={styles.buttonText}>Từ chối</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                    {item.registrationStatus === "agree" && (
+                      <Text style={styles.buttonText}>Đồng ý</Text>
+                    )}
+                    {item.registrationStatus === "reject" && (
+                      <Text style={styles.buttonText}>Từ chối </Text>
+                    )}
+                  </View>
+                </View>
+              )}
+            />
+            <Modal
+              transparent={true}
+              animationType="slide"
+              visible={isModalVisible}
+              onRequestClose={handleCancelReject}
+            >
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalText}>
+                    Bạn có chắc chắn muốn từ chối cá {selectedFish?.name}?
+                  </Text>
+                  <View style={styles.modalButtons}>
+                    <Button title=" Từ chối" onPress={handleConfirmReject} />
+                    <Button title="Hủy" onPress={handleCancelReject} />
+                  </View>
+                </View>
+              </View>
+            </Modal>
           </View>
-        )}
-      />
-    </View>
+        </View>
+      )}
+    </ScrollView>
   );
 };
 
@@ -342,10 +498,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#444",
     marginBottom: 10,
+    marginHorizontal: 20,
   },
   fishList: {
+    flex: 1,
+    marginTop: 10,
     paddingVertical: 10,
     paddingHorizontal: 15,
+    marginBottom: 40,
   },
   fishCard: {
     flexDirection: "row",
@@ -396,6 +556,65 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
     marginRight: 10,
+  },
+  filterButtons: {
+    marginHorizontal: 10,
+    height: 40,
+    justifyContent: "center", // Căn giữa theo chiều dọc
+    alignItems: "center", // Căn giữa theo chiều ngang
+    paddingBottom: 0,
+  },
+  filterButton: {
+    backgroundColor: "black",
+    padding: 10,
+    borderRadius: 10,
+    height: 40,
+    marginHorizontal: 10,
+  },
+  filterButtonActive: {
+    backgroundColor: "#666",
+  },
+  filterButtonText: {
+    fontSize: 16,
+    color: "#fff",
+    fontWeight: "700",
+
+    marginHorizontal: "auto",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 10,
+  },
+  actionButton: {
+    backgroundColor: "#333",
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+  },
+  buttonText: {
+    fontSize: 16,
+    color: "#fff",
+    textAlign: "center",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
 });
 
