@@ -65,7 +65,7 @@ export const getFishDetail = async (fishId: string): Promise<KoiFish> => {
         }
 
         const response = await axios.get(
-            `${API_BASE_URL}/fishes/${fishId}`,
+            `${API_BASE_URL}/fishes/getFishById/${fishId}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,

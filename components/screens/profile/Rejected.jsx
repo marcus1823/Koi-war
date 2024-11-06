@@ -14,9 +14,9 @@ import { getAllRegistrations } from '../../../api/registrationAPI';
 import { AntDesign } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 
-export default function Approve() {
+export default function Rejected() {
   const router = useRouter();
-  const [approvedRegistrations, setApprovedRegistrations] = useState([]);
+  const [rejectedRegistrations, setRejectedRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -28,8 +28,8 @@ export default function Approve() {
     try {
       setLoading(true);
       const response = await getAllRegistrations();
-      const approvedOnly = response.filter(reg => reg.status === 'approved');
-      setApprovedRegistrations(approvedOnly);
+      const rejectedOnly = response.filter(reg => reg.status === 'rejected');
+      setRejectedRegistrations(rejectedOnly);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -61,7 +61,7 @@ export default function Approve() {
           </Text>
           <View style={styles.statusBadge}>
             <View style={styles.statusDot} />
-            <Text style={styles.statusText}>Đã duyệt</Text>
+            <Text style={styles.statusText}>Đã từ chối</Text>
           </View>
         </View>
       </View>
@@ -71,7 +71,7 @@ export default function Approve() {
   if (loading) {
     return (
       <View style={[styles.container, styles.centerContent]}>
-        <ActivityIndicator size="large" color="#4CAF50" />
+        <ActivityIndicator size="large" color="#F44336" />
       </View>
     );
   }
@@ -94,21 +94,21 @@ export default function Approve() {
         >
           <AntDesign name="arrowleft" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.title}>Đơn Đã Duyệt</Text>
+        <Text style={styles.title}>Đơn Bị Từ Chối</Text>
         <Text style={styles.totalCount}>
-          {approvedRegistrations.length} đơn
+          {rejectedRegistrations.length} đơn
         </Text>
       </View>
 
       <FlatList
-        data={approvedRegistrations}
+        data={rejectedRegistrations}
         renderItem={renderOrderItem}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.orderList}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <AntDesign name="inbox" size={50} color="#ccc" />
-            <Text style={styles.emptyText}>Không có đơn đăng ký nào đã được duyệt</Text>
+            <Text style={styles.emptyText}>Không có đơn đăng ký nào bị từ chối</Text>
           </View>
         }
       />
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F5E9',
+    backgroundColor: '#FFEBEE',
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 12,
@@ -201,11 +201,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#F44336',
     marginRight: 6,
   },
   statusText: {
-    color: '#4CAF50',
+    color: '#F44336',
     fontSize: 14,
     fontWeight: '500',
   },
