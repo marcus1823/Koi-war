@@ -1,86 +1,83 @@
-import { Variety } from "@/models/types";
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
-import {
-    FlatList,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
-import VarietyCard from "../varieCard";
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const VarietyList: React.FC<{ varieties: Variety[] }> = ({ varieties }) => {
-  const [selectedVarieties, setSelectedVarieties] = useState<Variety[]>([]);
-  const router = useRouter();
+interface FloatingCounterButtonProps {
+  count: number;
+  onPress: () => void;
+}
 
-  const handleSelect = (variety: Variety) => {
-    setSelectedVarieties((prevSelected) => {
-      if (prevSelected.find((item) => item._id === variety._id)) {
-        return prevSelected.filter((item) => item._id !== variety._id);
-      } else {
-        return [...prevSelected, variety];
-      }
-    });
-  };
-
-  const handlePress = () => {
-    const selectedData = selectedVarieties.map((variety) => ({
-      id: variety._id,
-      name: variety.name,
-      description: variety.description,
-    }));
-
-    router.push({
-      pathname: "/subCategories",
-      params: { selectedVarieties: JSON.stringify(selectedData) },
-    });
-  };
+const FloatingCounterButton: React.FC<FloatingCounterButtonProps> = ({
+  count,
+  onPress,
+}) => {
+  if (count === 0) return null;
 
   return (
-    <View style={{ flex: 1 }}>
-      <FlatList
-        data={varieties}
-        renderItem={({ item }) => (
-          <VarietyCard
-            variety={item}
-            isSelected={selectedVarieties.some((v) => v._id === item._id)}
-            onSelect={handleSelect}
-            onEdit={(variety) => console.log("Edit", variety)}
-            onDelete={(id) => console.log("Delete", id)}
-          />
-        )}
-        keyExtractor={(item) => item._id}
-        numColumns={2}
-      />
-
-      {selectedVarieties.length > 0 && (
-        <TouchableOpacity style={styles.button} onPress={handlePress}>
-          <Text style={styles.buttonText}>
-            Selected ({selectedVarieties.length})
+    <View style={styles.container}>
+      <TouchableOpacity 
+        style={styles.floatingButton} 
+        onPress={onPress}
+        activeOpacity={0.9}
+      >
+        <View style={styles.buttonContent}>
+          <Text style={styles.counterText}>
+            {count} {count === 1 ? 'Giống' : 'Giống'}
           </Text>
-        </TouchableOpacity>
-      )}
+          <Icon 
+            name="arrow-forward" 
+            size={24} 
+            color="#fff" 
+            style={styles.icon}
+          />
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  button: {
-    position: "absolute",
-    bottom: 20,
-    left: "50%",
-    transform: [{ translateX: -50 }],
-    backgroundColor: "#4CAF50",
-    borderRadius: 25,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    alignItems: "center",
+  container: {
+    position: 'absolute',
+    bottom: 200,
+    left: 0,
+    right: 0,
+    paddingBottom: 40,
+    alignItems: 'center',
+    zIndex: 1000,
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+  floatingButton: {
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 24,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    flexDirection: 'row',
+    minWidth: 140,
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  counterText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginRight: 8,
+  },
+  icon: {
+    marginLeft: 4,
   },
 });
 
-export default VarietyList;
+export default FloatingCounterButton;

@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   },
   checkboxButton: {
     backgroundColor: 'transparent',
-    marginRight: 52,
+    marginRight: 45,
   },
   editButton: {
     backgroundColor: '#e3f2fd',

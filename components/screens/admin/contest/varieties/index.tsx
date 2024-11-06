@@ -1,7 +1,12 @@
-import { createVariety } from "@/api/admin/varieties";
-import { deleteVariety, getAllVariety, updateVariety } from "@/api/varietyApi";
+import {
+    createVariety,
+    deleteVariety,
+    updateVariety,
+} from "@/api/admin/varieties";
+import { getAllVariety } from "@/api/varietyApi";
 import { CreateVarietyPayload, Variety } from "@/models/types";
 import { useRoute } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
     ActivityIndicator,
@@ -14,6 +19,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import VarietyCard from "./varieCard";
+import FloatingCounterButton from "./varieList";
 import { VarietyModal } from "./varieModal";
 
 interface RouteParams {
@@ -29,13 +35,14 @@ const EmptyListComponent: React.FC = () => (
 );
 
 const VarietiesScreen: React.FC = () => {
+  const router = useRouter();
   const [varieties, setVarieties] = useState<Variety[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
   const [selectedVariety, setSelectedVariety] = useState<Variety | null>(null);
-  const [selectedVarieties, setSelectedVarieties] = useState<string[]>([]);
+  const [selectedVarieties, setSelectedVarieties] = useState<Variety[]>([]);
 
   const route = useRoute();
   const { contestInstanceName, contestInstanceDes } =
@@ -80,6 +87,7 @@ const VarietiesScreen: React.FC = () => {
           try {
             await deleteVariety(id);
             await fetchVarieties();
+            Alert.alert("Thành công", "Giống đã được xóa thành công.");
           } catch (err) {
             setError("Lỗi khi xoá Giống.");
           }
@@ -90,10 +98,23 @@ const VarietiesScreen: React.FC = () => {
 
   const handleSelect = (variety: Variety) => {
     setSelectedVarieties((prev) => {
-      if (prev.includes(variety._id)) {
-        return prev.filter((id) => id !== variety._id);
+      if (prev.find((item) => item._id === variety._id)) {
+        return prev.filter((item) => item._id !== variety._id);
       }
-      return [...prev, variety._id];
+      return [...prev, variety];
+    });
+  };
+
+  const handleFloatingButtonPress = () => {
+    const selectedData = selectedVarieties.map((variety) => ({
+      id: variety._id,
+      name: variety.name,
+      description: variety.description,
+    }));
+
+    router.push({
+      pathname: "/subCategories",
+      params: { selectedVarieties: JSON.stringify(selectedData) },
     });
   };
 
@@ -160,16 +181,18 @@ const VarietiesScreen: React.FC = () => {
       <View style={styles.header}>
         <Text style={styles.title}>{contestInstanceName}</Text>
         <Text style={styles.des}>{contestInstanceDes}</Text>
-        <Text style={styles.varie}>Giống</Text>
       </View>
 
-      <TouchableOpacity
-        style={styles.createButton}
-        onPress={handleCreateVariety}
-      >
-        <Icon name="add" size={24} color="white" />
-        <Text style={styles.createButtonText}>Tạo giống mới</Text>
-      </TouchableOpacity>
+      <View style={styles.titleName}>
+        <Text style={styles.varie}>Giống đã có sẵn</Text>
+        <TouchableOpacity
+          style={styles.createButton}
+          onPress={handleCreateVariety}
+        >
+          <Icon name="add" size={24} color="white" />
+          <Text style={styles.createButtonText}>Tạo giống mới</Text>
+        </TouchableOpacity>
+      </View>
 
       <FlatList
         data={varieties}
@@ -179,13 +202,18 @@ const VarietiesScreen: React.FC = () => {
             variety={item}
             onEdit={handleEditVariety}
             onDelete={handleDeleteVariety}
-            isSelected={selectedVarieties.includes(item._id)}
+            isSelected={selectedVarieties.some((v) => v._id === item._id)}
             onSelect={handleSelect}
           />
         )}
         numColumns={2}
         columnWrapperStyle={styles.row}
         ListEmptyComponent={EmptyListComponent}
+      />
+
+      <FloatingCounterButton
+        count={selectedVarieties.length}
+        onPress={handleFloatingButtonPress}
       />
 
       <VarietyModal
@@ -213,6 +241,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#faf0e6",
     padding: 16,
   },
+  titleName: {
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
   header: {
     flexDirection: "column",
     gap: 10,
@@ -227,7 +260,8 @@ const styles = StyleSheet.create({
   },
   des: {},
   varie: {
-    fontSize: 20,
+    textDecorationLine: "underline",
+    fontSize: 15,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
     marginTop: 10,
@@ -237,8 +271,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   createButton: {
+    alignSelf: "center",
     flexDirection: "row",
-    alignItems: "center",
     backgroundColor: "#4CAF50",
     padding: 12,
     borderRadius: 8,
