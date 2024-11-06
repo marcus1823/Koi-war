@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  ActivityIndicator, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
   Image,
   TouchableOpacity,
   SafeAreaView,
-  StatusBar 
+  StatusBar
 } from 'react-native';
 import { getAllRegistrations } from '../../../api/registrationAPI';
 import { AntDesign } from '@expo/vector-icons';
@@ -42,30 +42,37 @@ export default function WaitingApproval() {
   };
 
   const renderOrderItem = ({ item }) => (
-    <View style={styles.orderItem}>
-      <View style={styles.fishInfo}>
-        <Image 
-          source={{ uri: item.fish.images[0] }} 
-          style={styles.fishImage}
-        />
-        <View style={styles.textContainer}>
-          <Text style={styles.orderTitle}>{item.fish.name}</Text>
-          <Text style={styles.orderInfo}>
-            {item.contestInstance.name}
-          </Text>
-          <Text style={styles.orderInfo}>
-            {item.contestSubCategory.name}
-          </Text>
-          <Text style={styles.fishDetails}>
-            {item.fish.length}cm | {item.fish.weight}kg
-          </Text>
-          <View style={styles.statusBadge}>
-            <View style={styles.statusDot} />
-            <Text style={styles.statusText}>Đang chờ duyệt</Text>
+    <TouchableOpacity 
+      onPress={() => router.push({ 
+        pathname: "/myKoi/detail/[id]", 
+        params: { id: item.fish._id } 
+      })}
+    >
+      <View style={styles.orderItem}>
+        <View style={styles.fishInfo}>
+          <Image
+            source={{ uri: item.fish.images[0] }}
+            style={styles.fishImage}
+          />
+          <View style={styles.textContainer}>
+            <Text style={styles.orderTitle}>{item.fish.name}</Text>
+            <Text style={styles.orderInfo}>
+              {item.contestInstance.name}
+            </Text>
+            <Text style={styles.orderInfo}>
+              {item.contestSubCategory.name}
+            </Text>
+            <Text style={styles.fishDetails}>
+              {item.fish.length}cm | {item.fish.weight}kg
+            </Text>
+            <View style={styles.statusBadge}>
+              <View style={styles.statusDot} />
+              <Text style={styles.statusText}>Đang chờ duyệt</Text>
+            </View>
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   if (loading) {
@@ -88,7 +95,7 @@ export default function WaitingApproval() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={handleBack}
         >

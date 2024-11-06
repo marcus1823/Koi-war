@@ -24,12 +24,6 @@ export default function Home() {
             <Menu />
             <NewContests />
             <Fishwin />
-
-            {/* <Text>Home</Text>
-            <Button
-              title="Go to Competitions"
-              onPress={() => router.push(`/competition`)}
-            /> */}
           </View>
         </>
       )}

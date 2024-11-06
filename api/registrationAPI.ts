@@ -53,8 +53,10 @@ export const getContestsByFishId = async (fishId: string) => {
       },
     });
 
-    if (response) {
-      return response.data;
+    console.log(response.data)
+
+    if (response.data) {
+      return Array.isArray(response.data) ? response.data : [response.data];
     } else {
       throw new Error('Failed to fetch contests for the fish');
     }

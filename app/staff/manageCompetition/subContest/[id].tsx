@@ -176,25 +176,27 @@ const SubContestDetailPage = () => {
                   <ActivityIndicator color="#f45124" />
                 ) : (
                   <>
-                    <TouchableOpacity
-                      style={[styles.actionButton, styles.approveButton]}
-                      onPress={() => handleStatusUpdate(reg._id, 'approved')}
-                      disabled={reg.status === 'approved'}
-                    >
-                      <Text style={styles.buttonText}>
-                        {reg.status === 'approved' ? 'Đã duyệt' : 'Duyệt'}
+                    {reg.status === 'pending' ? (
+                      <>
+                        <TouchableOpacity
+                          style={[styles.actionButton, styles.approveButton]}
+                          onPress={() => handleStatusUpdate(reg._id, 'approved')}
+                        >
+                          <Text style={styles.buttonText}>Duyệt</Text>
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity
+                          style={[styles.actionButton, styles.rejectButton]}
+                          onPress={() => handleStatusUpdate(reg._id, 'rejected')}
+                        >
+                          <Text style={styles.buttonText}>Từ chối</Text>
+                        </TouchableOpacity>
+                      </>
+                    ) : (
+                      <Text style={styles.handledText}>
+                        {reg.status === 'approved' ? 'Đã duyệt' : 'Đã từ chối'}
                       </Text>
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity
-                      style={[styles.actionButton, styles.rejectButton]}
-                      onPress={() => handleStatusUpdate(reg._id, 'rejected')}
-                      disabled={reg.status === 'rejected'}
-                    >
-                      <Text style={styles.buttonText}>
-                        {reg.status === 'rejected' ? 'Đã từ chối' : 'Từ chối'}
-                      </Text>
-                    </TouchableOpacity>
+                    )}
                   </>
                 )}
               </View>
@@ -338,6 +340,14 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: '600',
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  handledText: {
+    fontSize: 14,
+    color: '#666',
+    fontStyle: 'italic',
   },
 });
 
