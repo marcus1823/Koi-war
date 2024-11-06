@@ -62,3 +62,43 @@ export interface ContestSubCategoryResponse {
   success: boolean;
   data: ContestSubCategory[];
 }
+
+export interface Variety {
+  _id: string;
+  name: string;
+  description: string;
+  images: string[];
+}
+
+export interface VarietyCardProps {
+  variety: Variety;
+}
+
+export interface CreateVarietyPayload {
+  name: string;
+  description: string;
+  images: string[];
+}
+
+
+export interface SubCategory {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export interface SubCategoryCardProps {
+  subCategory: SubCategory;
+}
+
+export interface ClassificationRule {
+  id: string;
+  name: string;
+  description: string;
+  condition: string;
+  ranks: { name: string }[];
+}
+
+export interface ClassificationRuleCardProps {
+  classificationRule: ClassificationRule;
+}

@@ -1,12 +1,13 @@
 import { ContestInstance } from "@/models/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface ContestInstanceCardProps {
@@ -20,12 +21,20 @@ export const ContestInstanceCard = ({
   onUpdate,
   onDelete,
 }: ContestInstanceCardProps) => {
+  const router = useRouter();
+
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("vi-VN");
   };
+  const handlePress = () => {
+    router.push({
+      pathname: "/varieties",
+      params: { id: instance.id, contestInstanceName: instance.name, contestInstanceDes: instance.description },
+    });
+  };
 
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={handlePress}>
       <Image 
         source={{ uri: instance.images }}
         style={styles.image}
@@ -53,7 +62,7 @@ export const ContestInstanceCard = ({
           <Ionicons name="trash-outline" size={24} color="#FF3B30" />
         </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
