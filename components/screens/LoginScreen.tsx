@@ -31,7 +31,7 @@ function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [loginMessage, setLoginMessage] = useState("");
-  
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState("");
 
@@ -57,9 +57,12 @@ function LoginScreen() {
       const user = await loginUser(username, password);
       setIsLoggedIn(true);
       setUserRole(user.role);
-        switch (user.role) {
+      switch (user.role) {
         case "admin":
           router.push("/admin/dashboard");
+          break;
+        case "referee":
+          router.push("/referee/score");
           break;
         case "staff":
           router.push("/staff/manageCompetition");

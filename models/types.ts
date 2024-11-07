@@ -87,6 +87,7 @@ export interface SubCategory {
   description: string;
 }
 
+
 export interface SubCategoryCardProps {
   subCategory: SubCategory;
 }
@@ -101,4 +102,69 @@ export interface ClassificationRule {
 
 export interface ClassificationRuleCardProps {
   classificationRule: ClassificationRule;
+}
+
+export interface Fish {
+  id: number;
+  name: string;
+  owner: string;
+}
+
+export interface FishScore {
+  fishId: number;
+  scores: {
+    bodyScore: number;
+    patternScore: number;
+    colorScore: number;
+  };
+}
+
+export interface TabProps {
+  title: string;
+  active: boolean;
+  onPress: () => void;
+}
+
+export interface ContestCardProps {
+  contest: Contest;
+  onPress: (contest: Contest) => void;
+}
+
+export interface FishCardProps {
+  fish: Fish;
+  onScoreSubmit?: (scoreData: FishScore) => void;
+  scored: boolean;
+}
+
+export interface ContestModalProps {
+  visible: boolean;
+  contestInstances: ContestInstance[];
+  selectedInstance: string | null;
+  subCategories: SubCategory[];
+  selectedSubCategory: string | null;
+  onInstanceSelect: (instanceId: string) => void;
+  onSubCategorySelect: (categoryId: string) => void;
+  onClose: () => void;
+  onSubmit: () => void;
+}
+
+export interface FishCardProps {
+  fish: Fish;
+  onScoreSubmit?: (score: FishScore) => void;
+  scored: boolean;
+}
+
+export interface Fish {
+  id: number;
+  name: string;
+  owner: string;
+}
+
+export interface FishScore {
+  fishId: number;
+  scores: {
+    bodyScore: number;
+    patternScore: number;
+    colorScore: number;
+  };
 }

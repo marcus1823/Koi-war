@@ -112,7 +112,6 @@ const ContestInstancesScreen = () => {
         });
   
         if (updatedInstance) {
-          // Cập nhật state với instance đã được update
           setInstances((prev) =>
             prev.map((instance) =>
               instance.id === selectedInstance.id ? updatedInstance : instance
